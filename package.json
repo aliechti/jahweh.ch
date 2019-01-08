@@ -1,9 +1,13 @@
 {
   "name": "jahweh.ch.2019",
   "version": "1.0.0",
-  "main": "index.js",
+  "private": true,
   "author": "Adrian Liechti <info@jahweh.ch>",
   "license": "MIT",
+  "scripts": {
+    "dev": "webpack --mode=development",
+    "build": "webpack --mode=production"
+  },
   "devDependencies": {
     "ts-loader": "^5.3.3",
     "typescript": "^3.2.2",
