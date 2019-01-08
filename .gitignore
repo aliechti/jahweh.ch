@@ -1,4 +1,6 @@
 web/build
+### Node
+node_modules
 ### IntelliJ
 .idea
 ### Windows
