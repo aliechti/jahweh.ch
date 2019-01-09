@@ -26,7 +26,8 @@ export class Canvas {
     }
 
     public render = () => {
-        for (const object of this.objects) {
+        for (let i = this.objects.length - 1; i >= 0; i--) {
+            const object = this.objects[i];
             this.context.save();
             object.renderTo(this.context);
             this.context.restore();
