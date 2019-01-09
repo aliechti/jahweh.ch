@@ -18,6 +18,18 @@ export class Rectangle extends CanvasObject<RectangleProps> {
 
     public renderTo(context: CanvasRenderingContext2D) {
         const {props} = this;
+        context.rect(props.x, props.y, props.w, props.h);
+        if (props.fillStyle !== undefined) {
+            context.fillStyle = props.fillStyle;
+            context.fill();
+        }
+        if (props.lineWidth !== undefined && props.lineWidth > 0) {
+            context.lineWidth = props.lineWidth;
+            if (props.strokeStyle !== undefined) {
+                context.strokeStyle = props.strokeStyle;
+            }
+            context.stroke();
+        }
         Object.keys(props).map((i) => {
             const contextValue: any = (context as any)[i];
             const propsValue: any = (props as any)[i];
@@ -25,9 +37,5 @@ export class Rectangle extends CanvasObject<RectangleProps> {
                 (context as any)[i] = propsValue;
             }
         });
-        context.rect(props.x, props.y, props.w, props.h);
-        context.fill();
-        context.stroke();
-        context.restore();
     }
 }

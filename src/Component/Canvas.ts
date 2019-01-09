@@ -18,7 +18,7 @@ export class Canvas {
             this.fixSize();
             this.render();
         });
-        this.context.save();
+        this.context.globalCompositeOperation = 'destination-over';
     }
 
     public add(object: CanvasObject<any>) {
@@ -27,7 +27,9 @@ export class Canvas {
 
     public render = () => {
         for (const object of this.objects) {
+            this.context.save();
             object.renderTo(this.context);
+            this.context.restore();
         }
     };
 
