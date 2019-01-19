@@ -1,14 +1,19 @@
 import {Graphics, Polygon} from 'pixi.js';
 
+const sides = 6;
+
 export class Hexagon extends Graphics {
-    constructor(size: number, lineSize: number) {
+    constructor(radius: number, lineSize: number) {
         super();
-        const points = [1, 0, 2, 0, 3, 1, 3, 2, 2, 3, 1, 3, 0, 2, 0, 1, 1, 0].map((point) => {
-            return point * size;
-        });
+        const points: number[] = [];
+        for (let i = 0; i <= sides; i++) {
+            points.push(radius + radius * Math.cos(i * 2 * Math.PI / sides));
+            points.push(radius + radius * Math.sin(i * 2 * Math.PI / sides));
+        }
+        console.log(points);
         const polygon = new Polygon(points);
         this.beginFill(0xff00ff);
-        this.lineStyle(lineSize, 0x00ff00, 1, 0);
+        this.lineStyle(lineSize, 0x00ff00, 1, 0.5);
         this.drawPolygon(polygon);
         this.endFill();
     }
