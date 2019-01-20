@@ -5,6 +5,8 @@ export interface HexagonProps {
     lineWidth: number;
     fillColor?: number;
     lineColor?: number;
+    lineAlignment?: number;
+    alignment?: 'center' | 'tl';
 }
 
 const sides = 6;
@@ -21,21 +23,28 @@ export class Hexagon extends Graphics {
     }
 
     private toPolygon(): Polygon {
-        let {radius} = this.props;
+        const {radius, lineWidth, lineAlignment, alignment} = this.props;
         const points: number[] = [];
+        let x = 0;
+        let y = 0;
+        if (alignment !== 'center') {
+            const outerLineWidth = lineWidth * (lineAlignment || 0.5);
+            x = this.polygonWidth / 2 + outerLineWidth;
+            y = this.polygonHeight / 2 + outerLineWidth;
+        }
         for (let i = 0; i <= sides; i++) {
-            points.push(radius + radius * Math.cos(i * 2 * Math.PI / sides));
-            points.push(radius + radius * Math.sin(i * 2 * Math.PI / sides));
+            points.push(x + radius * Math.cos(i * 2 * Math.PI / sides));
+            points.push(y + radius * Math.sin(i * 2 * Math.PI / sides));
         }
         return new Polygon(points);
     }
 
     private draw(): void {
-        let {lineWidth, fillColor, lineColor} = this.props;
+        let {lineWidth, fillColor, lineColor, lineAlignment} = this.props;
         if (fillColor) {
             this.beginFill(fillColor);
         }
-        this.lineStyle(lineWidth, lineColor, 1, 0.5);
+        this.lineStyle(lineWidth, lineColor, 1, lineAlignment);
         this.drawPolygon(this.polygon);
         this.endFill();
     }
