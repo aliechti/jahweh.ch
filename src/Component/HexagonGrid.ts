@@ -40,6 +40,14 @@ export class HexagonGrid extends Container {
         return neighbors;
     }
 
+    public getChildOffset(child: Hexagon): { x: number, y: number } {
+        const index = this.getChildIndex(child);
+        return {
+            x: index % this.props.columns,
+            y: Math.floor(index / this.props.columns),
+        };
+    }
+
     private draw(): void {
         const {columns, rows} = this.props;
         const hexagonTemplate = new Hexagon(this.hexagonProps);
