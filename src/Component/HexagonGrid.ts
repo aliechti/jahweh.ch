@@ -7,8 +7,9 @@ interface HexagonGridProps {
 }
 
 export class HexagonGrid extends Container {
-    private props: HexagonGridProps;
-    private hexagonProps: HexagonProps;
+    public readonly props: HexagonGridProps;
+    public readonly hexagonProps: HexagonProps;
+    public children: Hexagon[];
 
     constructor(props: HexagonGridProps, hexagonProps: HexagonProps) {
         super();
@@ -22,13 +23,19 @@ export class HexagonGrid extends Container {
     }
 
     public getNeighborsByOffset(x: number, y: number): Hexagon[] {
-        const neighbors = [];
-        const matrix = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
+        const neighbors: Hexagon[] = [];
+        const matrixEven = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
+        const matrixOdd = [-1, -1, 0, -1, 1, -1, 1, 0, 0, 1, -1, 0];
+        const isEven = x % 2;
+        const matrix = (isEven ? matrixEven : matrixOdd);
         for (let i = 0; i < 6; i++) {
             const neighborX = x + matrix[i * 2];
             const neighborY = y + matrix[i * 2 + 1];
-            console.log('neighbor', i * 2, i * 2 + 1, matrix[i * 2], matrix[i * 2 + 1], neighborX, neighborY);
-            neighbors.push(this.getChildAt(neighborX + neighborY * this.props.columns));
+            try {
+                neighbors.push(this.getChildAt(neighborX + neighborY * this.props.columns));
+            } catch (e) {
+                // Ignore
+            }
         }
         return neighbors;
     }
