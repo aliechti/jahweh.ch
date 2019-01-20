@@ -1,15 +1,31 @@
 import {Graphics} from 'pixi.js';
-import {Hexagon} from './Hexagon';
+import {Hexagon, HexagonProps} from './Hexagon';
+
+interface HexagonGridProps {
+    columns: number;
+    rows: number;
+}
 
 export class HexagonGrid extends Graphics {
-    constructor(width: number, height: number, radius: number, lineSize: number) {
+    private props: HexagonGridProps;
+    private hexagonProps: HexagonProps;
+
+    constructor(props: HexagonGridProps, hexagonProps: HexagonProps) {
         super();
-        const hexWidth = 2 * radius;
-        const hexHeight = Math.sqrt(3) * radius;
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
+        this.props = props;
+        this.hexagonProps = hexagonProps;
+        this.draw();
+    }
+
+    private draw(): void {
+        const {columns, rows} = this.props;
+        const hexagonTemplate = new Hexagon(this.hexagonProps);
+        const hexWidth = hexagonTemplate.width;
+        const hexHeight = hexagonTemplate.height;
+        for (let y = 0; y < rows; y++) {
+            for (let x = 0; x < columns; x++) {
                 const isEven = x % 2;
-                const hexagon = new Hexagon(radius, 2);
+                const hexagon = hexagonTemplate.clone();
                 hexagon.x = hexWidth * x * 3 / 4;
                 hexagon.y = hexHeight * y;
                 if (isEven) {
