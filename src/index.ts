@@ -24,5 +24,9 @@ const grid = new HexagonGrid({
 
 const child = grid.getChildByOffset(1, 1);
 child.setProps({fillColor: 0xff0000});
+const neighbors = grid.getNeighborsByOffset(1, 1);
+for (const neighbor of neighbors) {
+    neighbor.setProps({fillColor: 0x0000ff});
+}
 
 app.stage.addChild(grid);

@@ -21,6 +21,18 @@ export class HexagonGrid extends Container {
         return this.getChildAt(x + y * this.props.columns);
     }
 
+    public getNeighborsByOffset(x: number, y: number): Hexagon[] {
+        const neighbors = [];
+        const matrix = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
+        for (let i = 0; i < 6; i++) {
+            const neighborX = x + matrix[i * 2];
+            const neighborY = y + matrix[i * 2 + 1];
+            console.log('neighbor', i * 2, i * 2 + 1, matrix[i * 2], matrix[i * 2 + 1], neighborX, neighborY);
+            neighbors.push(this.getChildAt(neighborX + neighborY * this.props.columns));
+        }
+        return neighbors;
+    }
+
     private draw(): void {
         const {columns, rows} = this.props;
         const hexagonTemplate = new Hexagon(this.hexagonProps);
