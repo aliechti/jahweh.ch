@@ -22,6 +22,17 @@ export class Hexagon extends Graphics {
         this.draw();
     }
 
+    public setProps(props: Partial<HexagonProps>) {
+        this.props = {...this.props, ...props};
+        const {radius, lineWidth, lineAlignment, alignment} = props;
+        const recalculate = [radius, lineWidth, lineAlignment, alignment]
+            .filter((item) => item !== undefined).length > 0;
+        if (recalculate) {
+            this.polygon = this.toPolygon();
+        }
+        this.draw();
+    }
+
     private toPolygon(): Polygon {
         const {radius, lineWidth, lineAlignment, alignment} = this.props;
         const points: number[] = [];
