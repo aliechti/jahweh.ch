@@ -20,8 +20,8 @@ export class HexagonGrid extends Graphics {
     private draw(): void {
         const {columns, rows} = this.props;
         const hexagonTemplate = new Hexagon(this.hexagonProps);
-        const hexWidth = hexagonTemplate.width;
-        const hexHeight = hexagonTemplate.height;
+        const hexWidth = hexagonTemplate.polygonWidth;
+        const hexHeight = hexagonTemplate.polygonHeight;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const isEven = x % 2;

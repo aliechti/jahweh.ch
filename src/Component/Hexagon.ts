@@ -40,11 +40,11 @@ export class Hexagon extends Graphics {
         this.endFill();
     }
 
-    get width(): number {
+    get polygonWidth(): number {
         return this.props.radius * 2;
     }
 
-    get height(): number {
+    get polygonHeight(): number {
         return this.props.radius * Math.sqrt(3);
     }
 }
