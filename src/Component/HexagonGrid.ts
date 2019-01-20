@@ -31,6 +31,11 @@ export class HexagonGrid extends Container {
         for (let i = 0; i < 6; i++) {
             const neighborX = x + matrix[i * 2];
             const neighborY = y + matrix[i * 2 + 1];
+            const isOverRightEdge = neighborX >= this.props.columns;
+            const isOverLeftEdge = neighborX < 0;
+            if (isOverRightEdge || isOverLeftEdge) {
+                continue;
+            }
             try {
                 neighbors.push(this.getChildAt(neighborX + neighborY * this.props.columns));
             } catch (e) {
