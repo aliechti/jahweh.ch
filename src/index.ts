@@ -21,4 +21,8 @@ const grid = new HexagonGrid({
     lineColor: 0x00ff00,
     lineWidth: 2,
 });
+
+const child = grid.getChildByOffset(1, 1);
+child.setProps({fillColor: 0xff0000});
+
 app.stage.addChild(grid);
