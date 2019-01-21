@@ -1,21 +1,28 @@
 import {Hexagon, HexagonProps} from './Hexagon';
 import Container = PIXI.Container;
+import SystemRenderer = PIXI.SystemRenderer;
+import Sprite = PIXI.Sprite;
 
 interface HexagonGridProps {
     columns: number;
     rows: number;
+    renderer: SystemRenderer;
+    players: Player[];
+    hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
+}
+
+interface Player {
+    hexagonProps: Pick<HexagonProps, 'fillColor'>;
 }
 
 export class HexagonGrid extends Container {
     public readonly props: HexagonGridProps;
-    public readonly hexagonProps: HexagonProps;
     public children: Hexagon[];
 
-    constructor(props: HexagonGridProps, hexagonProps: HexagonProps) {
+    constructor(props: HexagonGridProps) {
         super();
         this.props = props;
-        this.hexagonProps = hexagonProps;
-        this.draw();
+        this.generate();
     }
 
     public getChildByOffset(x: number, y: number): Hexagon {
@@ -53,15 +60,20 @@ export class HexagonGrid extends Container {
         };
     }
 
-    private draw(): void {
-        const {columns, rows} = this.props;
-        const hexagonTemplate = new Hexagon(this.hexagonProps);
-        const hexWidth = hexagonTemplate.polygonWidth;
-        const hexHeight = hexagonTemplate.polygonHeight;
+    private generate(): void {
+        const {columns, rows, renderer, players, hexagonProps} = this.props;
+        const hexagonCalculation = new Hexagon(hexagonProps);
+        const hexWidth = hexagonCalculation.polygonWidth;
+        const hexHeight = hexagonCalculation.polygonHeight;
+        const textures = [];
+        for (const player of players) {
+            const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
+            textures.push(renderer.generateTexture(hexagonTemplate));
+        }
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const isEven = x % 2;
-                const hexagon = new Hexagon(this.hexagonProps);
+                const hexagon = new Sprite(textures[Math.floor(Math.random() * Math.floor(players.length))]);
                 hexagon.x = hexWidth * x * 3 / 4;
                 hexagon.y = hexHeight * y;
                 if (isEven) {

@@ -17,30 +17,24 @@ const rows = Math.floor((window.innerHeight - hexHeight * 3 / 4) / hexHeight);
 const grid = new HexagonGrid({
     columns: columns,
     rows: rows,
-}, {
-    radius: radius,
-    fillColor: 0xff00ff,
-    lineColor: 0x00ff00,
-    lineWidth: 2,
+    hexagonProps: {
+        radius: radius,
+        lineWidth: 2,
+        lineColor: 0x000000,
+    },
+    players: [
+        {
+            hexagonProps: {
+                fillColor: 0xff00ff,
+            },
+        },
+        {
+            hexagonProps: {
+                fillColor: 0x880088,
+            },
+        }
+    ],
+    renderer: app.renderer,
 });
-
-for (const child of grid.children) {
-    const offset = grid.getChildOffset(child);
-    const neighbors = grid.getNeighborsByOffset(offset.x, offset.y);
-    child.interactive = true;
-    child.buttonMode = true;
-    child.on('mouseover', () => {
-        child.setProps({fillColor: 0xff0000});
-        for (const neighbor of neighbors) {
-            neighbor.setProps({fillColor: 0x0000ff});
-        }
-    });
-    child.on('mouseout', () => {
-        child.setProps({fillColor: grid.hexagonProps.fillColor});
-        for (const neighbor of neighbors) {
-            neighbor.setProps({fillColor: grid.hexagonProps.fillColor});
-        }
-    });
-}
 
 app.stage.addChild(grid);
