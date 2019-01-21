@@ -1,33 +1,48 @@
 import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
+import {HexagonField} from './HexagonField';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
-import Sprite = PIXI.Sprite;
 
 export interface HexagonGridProps {
     columns: number;
     rows: number;
     renderer: SystemRenderer;
-    players: Player[];
+    players: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[];
     hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
 }
 
+interface HexagonGridPropsPrivate extends HexagonGridProps {
+    players: Player[];
+}
+
 export class HexagonGrid extends Container {
-    public readonly props: HexagonGridProps;
+    public readonly props: HexagonGridPropsPrivate;
     public children: Hexagon[];
+    public hexagon: { width: number, height: number };
 
     constructor(props: HexagonGridProps) {
         super();
-        this.props = props;
+        this.props = props as any;
+        const {renderer, players, hexagonProps} = this.props;
+        const hexagonCalculation = new Hexagon(hexagonProps);
+        this.hexagon = {
+            width: hexagonCalculation.polygonWidth,
+            height: hexagonCalculation.polygonHeight,
+        };
+        for (const player of players) {
+            const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
+            player.hexagonTexture = renderer.generateTexture(hexagonTemplate);
+        }
         this.generate();
     }
 
-    public getChildByOffset(x: number, y: number): Hexagon {
+    public getChildByOffset(x: number, y: number): HexagonField {
         return this.getChildAt(x + y * this.props.columns);
     }
 
-    public getNeighborsByOffset(x: number, y: number): Hexagon[] {
-        const neighbors: Hexagon[] = [];
+    public getNeighborsByOffset(x: number, y: number): HexagonField[] {
+        const neighbors: HexagonField[] = [];
         const matrixEven = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
         const matrixOdd = [-1, -1, 0, -1, 1, -1, 1, 0, 0, 1, -1, 0];
         const isEven = x % 2;
@@ -49,7 +64,7 @@ export class HexagonGrid extends Container {
         return neighbors;
     }
 
-    public getChildOffset(child: Hexagon): { x: number, y: number } {
+    public getChildOffset(child: HexagonField): { x: number, y: number } {
         const index = this.getChildIndex(child);
         return {
             x: index % this.props.columns,
@@ -58,25 +73,25 @@ export class HexagonGrid extends Container {
     }
 
     private generate(): void {
-        const {columns, rows, renderer, players, hexagonProps} = this.props;
-        const hexagonCalculation = new Hexagon(hexagonProps);
-        const hexWidth = hexagonCalculation.polygonWidth;
-        const hexHeight = hexagonCalculation.polygonHeight;
-        const textures = [];
-        for (const player of players) {
-            const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
-            textures.push(renderer.generateTexture(hexagonTemplate));
-        }
+        const {columns, rows, players} = this.props;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const isEven = x % 2;
-                const hexagon = new Sprite(textures[Math.floor(Math.random() * Math.floor(players.length))]);
-                hexagon.x = hexWidth * x * 3 / 4;
-                hexagon.y = hexHeight * y;
+                const random = Math.floor(Math.random() * Math.floor(players.length));
+                const hexagon = new HexagonField({player: players[random]});
+                hexagon.x = this.hexagon.width * x * 3 / 4;
+                hexagon.y = this.hexagon.height * y;
                 if (isEven) {
-                    hexagon.y += hexHeight / 2;
+                    hexagon.y += this.hexagon.height / 2;
                 }
                 this.addChild(hexagon);
+                hexagon.interactive = true;
+                hexagon.on('mouseover', () => {
+                    hexagon.tint = 0x0000ff;
+                });
+                hexagon.on('mouseout', () => {
+                    hexagon.tint = 0xffffff;
+                });
             }
         }
     }
