@@ -1,18 +1,15 @@
 import {Hexagon, HexagonProps} from './Hexagon';
+import {Player} from './Game';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
 import Sprite = PIXI.Sprite;
 
-interface HexagonGridProps {
+export interface HexagonGridProps {
     columns: number;
     rows: number;
     renderer: SystemRenderer;
     players: Player[];
     hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
-}
-
-interface Player {
-    hexagonProps: Pick<HexagonProps, 'fillColor'>;
 }
 
 export class HexagonGrid extends Container {

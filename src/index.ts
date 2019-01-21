@@ -1,5 +1,5 @@
 import {Application} from 'pixi.js';
-import {HexagonGrid} from './Component/HexagonGrid';
+import {Game} from './Component/Game';
 
 const app = new Application(window.innerWidth, window.innerHeight, {
     antialias: true,
@@ -14,27 +14,28 @@ const hexWidth = 2 * radius;
 const hexHeight = Math.sqrt(3) * radius;
 const columns = Math.floor((window.innerWidth - hexWidth / 4) / (hexWidth * 3 / 4));
 const rows = Math.floor((window.innerHeight - hexHeight * 3 / 4) / hexHeight);
-const grid = new HexagonGrid({
-    columns: columns,
-    rows: rows,
-    hexagonProps: {
-        radius: radius,
-        lineWidth: 2,
-        lineColor: 0x000000,
-    },
-    players: [
-        {
-            hexagonProps: {
-                fillColor: 0xff00ff,
-            },
+const game = new Game({
+    app: app,
+    grid: {
+        columns: columns,
+        rows: rows,
+        hexagonProps: {
+            radius: radius,
+            lineWidth: 2,
+            lineColor: 0x000000,
         },
-        {
-            hexagonProps: {
-                fillColor: 0x880088,
+        players: [
+            {
+                hexagonProps: {
+                    fillColor: 0xff00ff,
+                },
             },
-        }
-    ],
-    renderer: app.renderer,
+            {
+                hexagonProps: {
+                    fillColor: 0x880088,
+                },
+            },
+        ],
+        renderer: app.renderer,
+    },
 });
-
-app.stage.addChild(grid);
