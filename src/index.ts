@@ -27,12 +27,22 @@ const game = new Game({
         players: [
             {
                 hexagonProps: {
-                    fillColor: 0xff00ff,
+                    fillColor: 0xff0088,
                 },
             },
             {
                 hexagonProps: {
-                    fillColor: 0x880088,
+                    fillColor: 0xff8800,
+                },
+            },
+            {
+                hexagonProps: {
+                    fillColor: 0xffff00,
+                },
+            },
+            {
+                hexagonProps: {
+                    fillColor: 0x00ffff,
                 },
             },
         ],
