@@ -38,7 +38,7 @@ export class Hexagon extends Graphics {
         const points: number[] = [];
         let x = 0;
         let y = 0;
-        if (alignment !== 'center') {
+        if (alignment === 'tl') {
             const outerLineWidth = lineWidth * (lineAlignment || 0.5);
             x = this.polygonWidth / 2 + outerLineWidth;
             y = this.polygonHeight / 2 + outerLineWidth;

@@ -2,6 +2,8 @@ import {Application} from 'pixi.js';
 import {HexagonGrid, HexagonGridProps, Territory} from './HexagonGrid';
 import {HexagonProps} from './Hexagon';
 import Texture = PIXI.Texture;
+import Graphics = PIXI.Graphics;
+import Point = PIXI.Point;
 
 export interface GameProps {
     app: Application;
@@ -12,6 +14,11 @@ export interface Player {
     hexagonProps: Pick<HexagonProps, 'fillColor'>;
     hexagonTexture: Texture;
     selectedTerritory?: Territory;
+}
+
+export interface Unit {
+    type: 'capital' | 'peasant';
+    texture: Texture;
 }
 
 export class Game {
@@ -33,6 +40,21 @@ export class Game {
                 this.player.selectedTerritory = field.territory;
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
             });
+        }
+        const capital = new Graphics();
+        capital.beginFill(0x6789AB);
+        capital.drawCircle(0, 0, 10);
+        capital.endFill();
+        const capitalTexture = props.app.renderer.generateTexture(capital);
+        capitalTexture.defaultAnchor = new Point(0.5, 0.5);
+        for (const territory of grid.territories) {
+            const size = territory.fields.length;
+            if (size > 1) {
+                territory.fields[0].unit = {
+                    type: 'capital',
+                    texture: capitalTexture,
+                };
+            }
         }
     }
 

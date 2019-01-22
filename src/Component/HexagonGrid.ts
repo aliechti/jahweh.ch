@@ -3,6 +3,7 @@ import {Player} from './Game';
 import {HexagonField} from './HexagonField';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
+import Point = PIXI.Point;
 
 export interface HexagonGridProps {
     columns: number;
@@ -44,6 +45,7 @@ export class HexagonGrid extends Container {
         for (const player of players) {
             const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
             player.hexagonTexture = renderer.generateTexture(hexagonTemplate);
+            player.hexagonTexture.defaultAnchor = new Point(0.5, 0.5);
         }
         this.generate();
         this.findTerritories();
@@ -119,14 +121,17 @@ export class HexagonGrid extends Container {
     }
 
     private generate(): void {
-        const {columns, rows, players} = this.props;
+        const {columns, rows, players, hexagonProps} = this.props;
+        const outerLineWidth = hexagonProps.lineWidth * 0.5;
+        const paddingX = this.hexagon.width / 2 + outerLineWidth;
+        const paddingY = this.hexagon.height / 2 + outerLineWidth;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const isEven = x % 2;
                 const random = Math.floor(Math.random() * Math.floor(players.length));
                 const hexagon = new HexagonField({player: players[random]});
-                hexagon.x = this.hexagon.width * x * 3 / 4;
-                hexagon.y = this.hexagon.height * y;
+                hexagon.x = paddingX + this.hexagon.width * x * 3 / 4;
+                hexagon.y = paddingY + this.hexagon.height * y;
                 if (isEven) {
                     hexagon.y += this.hexagon.height / 2;
                 }
