@@ -4,6 +4,7 @@ import {HexagonField} from './HexagonField';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
+import Polygon = PIXI.Polygon;
 
 export interface HexagonGridProps {
     columns: number;
@@ -30,7 +31,7 @@ interface OffsetCoordinates {
 export class HexagonGrid extends Container {
     public readonly props: HexagonGridPropsPrivate;
     public children: HexagonField[];
-    public hexagon: { width: number, height: number };
+    public hexagon: { width: number, height: number, polygon: Polygon };
     public territories: Territory[];
 
     constructor(props: HexagonGridProps) {
@@ -41,6 +42,7 @@ export class HexagonGrid extends Container {
         this.hexagon = {
             width: hexagonCalculation.polygonWidth,
             height: hexagonCalculation.polygonHeight,
+            polygon: hexagonCalculation.polygon,
         };
         for (const player of players) {
             const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
@@ -130,6 +132,7 @@ export class HexagonGrid extends Container {
                 const isEven = x % 2;
                 const random = Math.floor(Math.random() * Math.floor(players.length));
                 const hexagon = new HexagonField({player: players[random]});
+                hexagon.hitArea = this.hexagon.polygon;
                 hexagon.x = paddingX + this.hexagon.width * x * 3 / 4;
                 hexagon.y = paddingY + this.hexagon.height * y;
                 if (isEven) {

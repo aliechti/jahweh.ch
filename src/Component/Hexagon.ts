@@ -13,7 +13,7 @@ const sides = 6;
 
 export class Hexagon extends Graphics {
     private props: HexagonProps;
-    private polygon: Polygon;
+    public polygon: Polygon;
 
     constructor(props: HexagonProps) {
         super();
