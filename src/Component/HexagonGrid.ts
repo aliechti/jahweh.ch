@@ -30,6 +30,7 @@ export class HexagonGrid extends Container {
     public readonly props: HexagonGridPropsPrivate;
     public children: HexagonField[];
     public hexagon: { width: number, height: number };
+    public territories: Territory[];
 
     constructor(props: HexagonGridProps) {
         super();
@@ -49,31 +50,36 @@ export class HexagonGrid extends Container {
     }
 
     public findTerritories() {
-        const territories: Territory[] = [];
-        const remaining = this.children.slice();
-        for (const field of remaining) {
+        this.territories = [];
+        for (const field of this.children) {
+            // Only if no territory is defined
+            if (field.territory !== undefined) {
+                continue;
+            }
+            // Create new territory
             const territory: Territory = {
                 player: field.player,
-                fields: [field],
+                fields: [],
             };
-            field.territory = territory;
-            remaining.splice(remaining.indexOf(field), 1);
-            territories.push(territory);
+            this.territories.push(territory);
+            // Recursive function
             const addNeighbors = (hexagonField: HexagonField) => {
+                // Add field to territory and vice versa
+                hexagonField.territory = territory;
+                territory.fields.push(hexagonField);
+                // Find and loop trough neighbors
                 const offset = this.getChildOffset(hexagonField);
                 const neighbors = this.getNeighborsByOffset(offset.x, offset.y);
                 for (const neighbor of neighbors) {
-                    if (neighbor.player === hexagonField.player && remaining.includes(neighbor)) {
-                        territory.fields.push(neighbor);
-                        neighbor.territory = territory;
-                        remaining.splice(remaining.indexOf(neighbor), 1);
+                    // Add it if its the same player and no territory defined
+                    if (neighbor.player === hexagonField.player && neighbor.territory === undefined) {
+                        // Recursion
                         addNeighbors(neighbor);
                     }
                 }
             };
             addNeighbors(field);
         }
-        console.log(territories);
     }
 
     public getChildByOffset(x: number, y: number): HexagonField {
