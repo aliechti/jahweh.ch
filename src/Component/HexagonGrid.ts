@@ -16,7 +16,7 @@ interface HexagonGridPropsPrivate extends HexagonGridProps {
     players: Player[];
 }
 
-interface Territory {
+export interface Territory {
     player: Player;
     fields: HexagonField[];
 }
@@ -56,6 +56,7 @@ export class HexagonGrid extends Container {
                 player: field.player,
                 fields: [field],
             };
+            field.territory = territory;
             remaining.splice(remaining.indexOf(field), 1);
             territories.push(territory);
             const addNeighbors = (hexagonField: HexagonField) => {
@@ -64,6 +65,7 @@ export class HexagonGrid extends Container {
                 for (const neighbor of neighbors) {
                     if (neighbor.player === hexagonField.player && remaining.includes(neighbor)) {
                         territory.fields.push(neighbor);
+                        neighbor.territory = territory;
                         remaining.splice(remaining.indexOf(neighbor), 1);
                         addNeighbors(neighbor);
                     }
@@ -123,13 +125,6 @@ export class HexagonGrid extends Container {
                     hexagon.y += this.hexagon.height / 2;
                 }
                 this.addChild(hexagon);
-                hexagon.interactive = true;
-                hexagon.on('mouseover', () => {
-                    hexagon.tint = 0x0000ff;
-                });
-                hexagon.on('mouseout', () => {
-                    hexagon.tint = 0xffffff;
-                });
             }
         }
     }
