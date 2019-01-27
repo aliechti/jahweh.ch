@@ -1,5 +1,6 @@
-import {Player, Unit} from './Game';
+import {Player} from './Game';
 import {Territory} from './HexagonGrid';
+import {Unit} from './Unit';
 import Sprite = PIXI.Sprite;
 
 export interface HexagonFieldProps {
@@ -10,7 +11,6 @@ export interface HexagonFieldProps {
 
 export class HexagonField extends Sprite {
     private props: HexagonFieldProps;
-    private unitSprite: Sprite;
 
     constructor(props: HexagonFieldProps) {
         super(props.player.hexagonTexture);
@@ -39,12 +39,21 @@ export class HexagonField extends Sprite {
     }
 
     set unit(unit: Unit | undefined) {
-        this.props.unit = unit;
         if (unit) {
-            this.unitSprite = new Sprite(unit.texture);
-            this.addChild(this.unitSprite);
-        } else {
-            this.removeChild(this.unitSprite);
+            // Remove unit from previous field
+            if (unit.props.field) {
+                unit.props.field.unit = undefined;
+            }
+            // Add unit
+            this.props.unit = unit;
+            this.addChild(this.props.unit);
+            // Add field to unit
+            unit.props.field = this;
+        } else if (this.props.unit) {
+            // Remove unit
+            this.props.unit.props.field = undefined;
+            this.removeChild(this.props.unit);
+            this.props.unit = undefined;
         }
     }
 }

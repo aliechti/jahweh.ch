@@ -1,9 +1,11 @@
 import {Application} from 'pixi.js';
 import {HexagonGrid, HexagonGridProps, Territory} from './HexagonGrid';
 import {HexagonProps} from './Hexagon';
+import {Unit} from './Unit';
 import Texture = PIXI.Texture;
 import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
+import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 export interface GameProps {
     app: Application;
@@ -16,14 +18,10 @@ export interface Player {
     selectedTerritory?: Territory;
 }
 
-export interface Unit {
-    type: 'capital' | 'peasant';
-    texture: Texture;
-}
-
 export class Game {
     private props: GameProps;
     private player: Player;
+    private draggingUnit?: Unit;
 
     constructor(props: GameProps) {
         this.props = props;
@@ -34,11 +32,15 @@ export class Game {
 
         for (const field of grid.children) {
             field.interactive = true;
-            field.on('click', () => {
-                console.log('click', this.player.selectedTerritory, field.territory);
+            field.interactiveChildren = true;
+            field.on('click', (e) => {
                 this.tintTerritory(this.player.selectedTerritory, 0xffffff);
                 this.player.selectedTerritory = field.territory;
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
+                if (this.draggingUnit !== undefined && field.unit === undefined) {
+                    field.unit = this.draggingUnit;
+                    this.draggingUnit = undefined;
+                }
             });
         }
         const capital = new Graphics();
@@ -50,10 +52,19 @@ export class Game {
         for (const territory of grid.territories) {
             const size = territory.fields.length;
             if (size > 1) {
-                territory.fields[0].unit = {
+                const unit = new Unit({
                     type: 'capital',
                     texture: capitalTexture,
-                };
+                });
+                territory.fields[0].unit = unit;
+                unit.interactive = true;
+                unit.buttonMode = true;
+                unit.on('click', (e: InteractionEvent) => {
+                    if (this.draggingUnit === undefined) {
+                        this.draggingUnit = unit;
+                        e.stopPropagation();
+                    }
+                });
             }
         }
     }
