@@ -28,22 +28,28 @@ interface OffsetCoordinates {
     y: number;
 }
 
+interface HexagonCalculation {
+    width: number;
+    height: number;
+    polygon: Polygon;
+    outerLineWidth: number;
+    padding: {
+        x: number;
+        y: number;
+    }
+}
+
 export class HexagonGrid extends Container {
     public readonly props: HexagonGridPropsPrivate;
     public children: HexagonField[];
-    public hexagon: { width: number, height: number, polygon: Polygon };
+    public hexagon: HexagonCalculation;
     public territories: Territory[];
 
     constructor(props: HexagonGridProps) {
         super();
         this.props = props as any;
         const {renderer, players, hexagonProps} = this.props;
-        const hexagonCalculation = new Hexagon(hexagonProps);
-        this.hexagon = {
-            width: hexagonCalculation.polygonWidth,
-            height: hexagonCalculation.polygonHeight,
-            polygon: hexagonCalculation.polygon,
-        };
+        this.hexagon = this.toHexagonCalculation(hexagonProps);
         for (const player of players) {
             const hexagonTemplate = new Hexagon({...hexagonProps, ...player.hexagonProps});
             player.hexagonTexture = renderer.generateTexture(hexagonTemplate);
@@ -51,6 +57,18 @@ export class HexagonGrid extends Container {
         }
         this.generate();
         this.findTerritories();
+    }
+
+    private toHexagonCalculation(props: HexagonProps): HexagonCalculation {
+        const hexagon = new Hexagon(props);
+        const width = hexagon.polygonWidth;
+        const height = hexagon.polygonHeight;
+        const polygon = hexagon.polygon;
+        const outerLineWidth = props.lineWidth * 0.5;
+        const x = width / 2 + outerLineWidth;
+        const y = height / 2 + outerLineWidth;
+        const padding = {x, y};
+        return {width, height, polygon, outerLineWidth, padding};
     }
 
     public findTerritories() {
@@ -122,22 +140,24 @@ export class HexagonGrid extends Container {
         };
     }
 
+    public getPosition(coordinates: OffsetCoordinates): Point {
+        const isEven = coordinates.x % 2;
+        let x = this.hexagon.padding.x + this.hexagon.width * coordinates.x * 3 / 4;
+        let y = this.hexagon.padding.y + this.hexagon.height * coordinates.y;
+        if (isEven) {
+            y += this.hexagon.height / 2;
+        }
+        return new Point(x, y);
+    }
+
     private generate(): void {
-        const {columns, rows, players, hexagonProps} = this.props;
-        const outerLineWidth = hexagonProps.lineWidth * 0.5;
-        const paddingX = this.hexagon.width / 2 + outerLineWidth;
-        const paddingY = this.hexagon.height / 2 + outerLineWidth;
+        const {columns, rows, players} = this.props;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
-                const isEven = x % 2;
                 const random = Math.floor(Math.random() * Math.floor(players.length));
                 const hexagon = new HexagonField({player: players[random]});
                 hexagon.hitArea = this.hexagon.polygon;
-                hexagon.x = paddingX + this.hexagon.width * x * 3 / 4;
-                hexagon.y = paddingY + this.hexagon.height * y;
-                if (isEven) {
-                    hexagon.y += this.hexagon.height / 2;
-                }
+                hexagon.position = this.getPosition({x, y});
                 this.addChild(hexagon);
             }
         }
