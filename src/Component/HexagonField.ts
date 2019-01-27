@@ -46,13 +46,11 @@ export class HexagonField extends Sprite {
             }
             // Add unit
             this.props.unit = unit;
-            this.addChild(this.props.unit);
             // Add field to unit
             unit.props.field = this;
         } else if (this.props.unit) {
             // Remove unit
             this.props.unit.props.field = undefined;
-            this.removeChild(this.props.unit);
             this.props.unit = undefined;
         }
     }

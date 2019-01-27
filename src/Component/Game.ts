@@ -31,10 +31,10 @@ export class Game {
 
         this.props.app.stage.addChild(this.grid);
 
-        for (const field of this.grid.children) {
+        for (const field of this.grid.fieldContainer.children) {
             field.interactive = true;
-            field.interactiveChildren = true;
             field.on('click', (e) => {
+                console.log('click field');
                 this.tintTerritory(this.player.selectedTerritory, 0xffffff);
                 this.player.selectedTerritory = field.territory;
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
@@ -53,19 +53,23 @@ export class Game {
         for (const territory of this.grid.territories) {
             const size = territory.fields.length;
             if (size > 1) {
+                const field = territory.fields[0];
                 const unit = new Unit({
                     type: 'capital',
                     texture: capitalTexture,
                 });
-                territory.fields[0].unit = unit;
+                field.unit = unit;
                 unit.interactive = true;
                 unit.buttonMode = true;
+                unit.position = field.position;
                 unit.on('click', (e: InteractionEvent) => {
+                    console.log('click unit');
                     if (this.draggingUnit === undefined) {
                         this.draggingUnit = unit;
                         e.stopPropagation();
                     }
                 });
+                this.grid.unitContainer.addChild(unit);
             }
         }
     }
@@ -81,15 +85,8 @@ export class Game {
     private handleDragMove = (e: InteractionEvent) => {
         const unit = this.draggingUnit;
         if (unit) {
-            const field = unit.props.field;
-            let offsetX = 0;
-            let offsetY = 0;
-            if (field) {
-                offsetX = -(field.x);
-                offsetY = -(field.y);
-            }
-            unit.x = e.data.global.x + offsetX;
-            unit.y = e.data.global.y + offsetY;
+            unit.x = e.data.global.x;
+            unit.y = e.data.global.y;
         }
     };
 

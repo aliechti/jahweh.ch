@@ -1,10 +1,12 @@
 import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
 import {HexagonField} from './HexagonField';
+import {Unit} from './Unit';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
+import DisplayObject = PIXI.DisplayObject;
 
 export interface HexagonGridProps {
     columns: number;
@@ -39,11 +41,16 @@ interface HexagonCalculation {
     }
 }
 
+interface ExplicitContainer<T extends DisplayObject> extends Container {
+    children: T[];
+}
+
 export class HexagonGrid extends Container {
     public readonly props: HexagonGridPropsPrivate;
-    public children: HexagonField[];
     public hexagon: HexagonCalculation;
     public territories: Territory[];
+    public fieldContainer: ExplicitContainer<HexagonField>;
+    public unitContainer: ExplicitContainer<Unit>;
 
     constructor(props: HexagonGridProps) {
         super();
@@ -55,6 +62,10 @@ export class HexagonGrid extends Container {
             player.hexagonTexture = renderer.generateTexture(hexagonTemplate);
             player.hexagonTexture.defaultAnchor = new Point(0.5, 0.5);
         }
+        this.fieldContainer = new Container() as ExplicitContainer<HexagonField>;
+        this.unitContainer = new Container() as ExplicitContainer<Unit>;
+        this.addChild(this.fieldContainer);
+        this.addChild(this.unitContainer);
         this.generate();
         this.findTerritories();
     }
@@ -73,7 +84,7 @@ export class HexagonGrid extends Container {
 
     public findTerritories() {
         this.territories = [];
-        for (const field of this.children) {
+        for (const field of this.fieldContainer.children) {
             // Only if no territory is defined
             if (field.territory !== undefined) {
                 continue;
@@ -90,8 +101,8 @@ export class HexagonGrid extends Container {
                 hexagonField.territory = territory;
                 territory.fields.push(hexagonField);
                 // Find and loop trough neighbors
-                const offset = this.getChildOffset(hexagonField);
-                const neighbors = this.getNeighborsByOffset(offset.x, offset.y);
+                const offset = this.getFieldChildOffset(hexagonField);
+                const neighbors = this.getFieldNeighborsByOffset(offset.x, offset.y);
                 for (const neighbor of neighbors) {
                     // Add it if its the same player and no territory defined
                     if (neighbor.player === hexagonField.player && neighbor.territory === undefined) {
@@ -102,13 +113,14 @@ export class HexagonGrid extends Container {
             };
             addNeighbors(field);
         }
+        return this.territories;
     }
 
-    public getChildByOffset(x: number, y: number): HexagonField {
-        return this.getChildAt(x + y * this.props.columns);
+    public getFieldChildByOffset(x: number, y: number): HexagonField {
+        return this.fieldContainer.getChildAt(x + y * this.props.columns);
     }
 
-    public getNeighborsByOffset(x: number, y: number): HexagonField[] {
+    public getFieldNeighborsByOffset(x: number, y: number): HexagonField[] {
         const neighbors: HexagonField[] = [];
         const matrixEven = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
         const matrixOdd = [-1, -1, 0, -1, 1, -1, 1, 0, 0, 1, -1, 0];
@@ -123,7 +135,7 @@ export class HexagonGrid extends Container {
                 continue;
             }
             try {
-                neighbors.push(this.getChildByOffset(neighborX, neighborY));
+                neighbors.push(this.getFieldChildByOffset(neighborX, neighborY));
             } catch (e) {
                 // Ignore
             }
@@ -131,8 +143,8 @@ export class HexagonGrid extends Container {
         return neighbors;
     }
 
-    public getChildOffset(child: HexagonField): OffsetCoordinates {
-        const index = this.getChildIndex(child);
+    public getFieldChildOffset(child: HexagonField): OffsetCoordinates {
+        const index = this.fieldContainer.getChildIndex(child);
         const y = Math.floor(index / this.props.columns);
         return {
             x: index - y * this.props.columns,
@@ -150,7 +162,7 @@ export class HexagonGrid extends Container {
         return new Point(x, y);
     }
 
-    private generate(): void {
+    private generate() {
         const {columns, rows, players} = this.props;
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
@@ -158,7 +170,7 @@ export class HexagonGrid extends Container {
                 const hexagon = new HexagonField({player: players[random]});
                 hexagon.hitArea = this.hexagon.polygon;
                 hexagon.position = this.getPosition({x, y});
-                this.addChild(hexagon);
+                this.fieldContainer.addChild(hexagon);
             }
         }
     }
