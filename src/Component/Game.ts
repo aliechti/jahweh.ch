@@ -20,17 +20,18 @@ export interface Player {
 
 export class Game {
     private props: GameProps;
+    private grid: HexagonGrid;
     private player: Player;
-    private draggingUnit?: Unit;
+    private _draggingUnit?: Unit;
 
     constructor(props: GameProps) {
         this.props = props;
-        const grid = new HexagonGrid(this.props.grid);
-        this.player = grid.props.players[0];
+        this.grid = new HexagonGrid(this.props.grid);
+        this.player = this.grid.props.players[0];
 
-        this.props.app.stage.addChild(grid);
+        this.props.app.stage.addChild(this.grid);
 
-        for (const field of grid.children) {
+        for (const field of this.grid.children) {
             field.interactive = true;
             field.interactiveChildren = true;
             field.on('click', (e) => {
@@ -49,7 +50,7 @@ export class Game {
         capital.endFill();
         const capitalTexture = props.app.renderer.generateTexture(capital);
         capitalTexture.defaultAnchor = new Point(0.5, 0.5);
-        for (const territory of grid.territories) {
+        for (const territory of this.grid.territories) {
             const size = territory.fields.length;
             if (size > 1) {
                 const unit = new Unit({
@@ -74,6 +75,37 @@ export class Game {
             for (const field of territory.fields) {
                 field.tint = tint;
             }
+        }
+    }
+
+    private handleDragMove = (e: InteractionEvent) => {
+        const unit = this.draggingUnit;
+        if (unit) {
+            const field = unit.props.field;
+            let offsetX = 0;
+            let offsetY = 0;
+            if (field) {
+                offsetX = -(field.x);
+                offsetY = -(field.y);
+            }
+            unit.x = e.data.global.x + offsetX;
+            unit.y = e.data.global.y + offsetY;
+        }
+    };
+
+    get draggingUnit(): Unit | undefined {
+        return this._draggingUnit;
+    }
+
+    set draggingUnit(unit: Unit | undefined) {
+        if (this._draggingUnit !== undefined) {
+            this._draggingUnit.x = 0;
+            this._draggingUnit.y = 0;
+            this._draggingUnit.off('pointermove', this.handleDragMove);
+        }
+        this._draggingUnit = unit;
+        if (this._draggingUnit) {
+            this._draggingUnit.on('pointermove', this.handleDragMove);
         }
     }
 }
