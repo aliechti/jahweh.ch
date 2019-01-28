@@ -28,6 +28,7 @@ export class Game {
         this.props = props;
         this.grid = new HexagonGrid(this.props.grid);
         this.player = this.grid.props.players[0];
+        this.grid.interactive = true;
 
         this.props.app.stage.addChild(this.grid);
 
@@ -41,6 +42,7 @@ export class Game {
                 if (this.draggingUnit !== undefined && field.unit === undefined) {
                     field.unit = this.draggingUnit;
                     this.draggingUnit = undefined;
+                    field.unit.position = field.position;
                 }
             });
         }
@@ -96,13 +98,13 @@ export class Game {
 
     set draggingUnit(unit: Unit | undefined) {
         if (this._draggingUnit !== undefined) {
-            this._draggingUnit.x = 0;
-            this._draggingUnit.y = 0;
-            this._draggingUnit.off('pointermove', this.handleDragMove);
+            this._draggingUnit.interactive = true;
+            this.grid.off('pointermove', this.handleDragMove);
         }
         this._draggingUnit = unit;
         if (this._draggingUnit) {
-            this._draggingUnit.on('pointermove', this.handleDragMove);
+            this._draggingUnit.interactive = false;
+            this.grid.on('pointermove', this.handleDragMove);
         }
     }
 }
