@@ -39,8 +39,14 @@ export class Game {
                 this.tintTerritory(this.player.selectedTerritory, 0xffffff);
                 this.player.selectedTerritory = field.territory;
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
-                if (this.draggingUnit !== undefined && field.unit === undefined) {
-                    field.unit = this.draggingUnit;
+                if (this.draggingUnit !== undefined) {
+                    if (field.unit === undefined) {
+                        // Set unit to new field
+                        field.unit = this.draggingUnit;
+                    } else {
+                        console.warn('Unit can\'t move to this field');
+                    }
+                    // Reset unit dragging
                     this.draggingUnit = undefined;
                     field.unit.position = field.position;
                 }
