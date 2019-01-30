@@ -1,9 +1,11 @@
 import {Player} from './Game';
 import {Territory} from './Territory';
 import {Unit} from './Unit';
+import {OffsetCoordinates} from './HexagonGrid';
 import Sprite = PIXI.Sprite;
 
 export interface HexagonFieldProps {
+    coordinates: OffsetCoordinates;
     player: Player;
     territory?: Territory;
     unit?: Unit;
@@ -15,6 +17,10 @@ export class HexagonField extends Sprite {
     constructor(props: HexagonFieldProps) {
         super(props.player.hexagonTexture);
         this.props = props;
+    }
+
+    get coordinates(): OffsetCoordinates {
+        return this.props.coordinates;
     }
 
     get player(): Player {
