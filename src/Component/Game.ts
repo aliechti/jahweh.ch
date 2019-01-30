@@ -1,7 +1,8 @@
 import {Application} from 'pixi.js';
-import {HexagonGrid, HexagonGridProps, Territory} from './HexagonGrid';
+import {HexagonGrid, HexagonGridProps} from './HexagonGrid';
 import {HexagonProps} from './Hexagon';
 import {Unit} from './Unit';
+import {Territory} from './Territory';
 import Texture = PIXI.Texture;
 import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
@@ -59,9 +60,9 @@ export class Game {
         const capitalTexture = props.app.renderer.generateTexture(capital);
         capitalTexture.defaultAnchor = new Point(0.5, 0.5);
         for (const territory of this.grid.territories) {
-            const size = territory.fields.length;
+            const size = territory.props.fields.length;
             if (size > 1) {
-                const field = territory.fields[0];
+                const field = territory.props.fields[0];
                 const unit = new Unit({
                     type: 'capital',
                     texture: capitalTexture,
@@ -84,7 +85,7 @@ export class Game {
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
         if (territory) {
-            for (const field of territory.fields) {
+            for (const field of territory.props.fields) {
                 field.tint = tint;
             }
         }

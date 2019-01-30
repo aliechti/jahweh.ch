@@ -2,6 +2,7 @@ import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
 import {HexagonField} from './HexagonField';
 import {Unit} from './Unit';
+import {Territory} from './Territory';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
@@ -18,11 +19,6 @@ export interface HexagonGridProps {
 
 interface HexagonGridPropsPrivate extends HexagonGridProps {
     players: Player[];
-}
-
-export interface Territory {
-    player: Player;
-    fields: HexagonField[];
 }
 
 interface OffsetCoordinates {
@@ -90,16 +86,16 @@ export class HexagonGrid extends Container {
                 continue;
             }
             // Create new territory
-            const territory: Territory = {
+            const territory = new Territory({
                 player: field.player,
                 fields: [],
-            };
+            });
             this.territories.push(territory);
             // Recursive function
             const addNeighbors = (hexagonField: HexagonField) => {
                 // Add field to territory and vice versa
                 hexagonField.territory = territory;
-                territory.fields.push(hexagonField);
+                territory.props.fields.push(hexagonField);
                 // Find and loop trough neighbors
                 const offset = this.getFieldChildOffset(hexagonField);
                 const neighbors = this.getFieldNeighborsByOffset(offset.x, offset.y);

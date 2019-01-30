@@ -1,5 +1,5 @@
 import {Player} from './Game';
-import {Territory} from './HexagonGrid';
+import {Territory} from './Territory';
 import {Unit} from './Unit';
 import Sprite = PIXI.Sprite;
 
