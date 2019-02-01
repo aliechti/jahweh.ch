@@ -1,4 +1,3 @@
-import Sprite = PIXI.Sprite;
 import {HexagonField} from './HexagonField';
 import {Player} from './Game';
 import {UnitTypes} from './Unit';
@@ -18,15 +17,29 @@ const unitSalaries: { [key in UnitTypes]: number } = {
     instructor: 0,
 };
 
-export class Territory extends Sprite {
+export class Territory {
 
     public props: TerritoryProps;
-    public readonly money: number;
+    public money: number;
 
     constructor(props: TerritoryProps) {
-        super();
         this.props = props;
         this.money = 0;
+    }
+
+    public onTurn() {
+        if (this.isControllable()) {
+            this.money += this.income();
+            this.money -= this.salaries();
+        }
+    }
+
+    public isControllable(): boolean {
+        return this.props.fields.length > 1;
+    }
+
+    public isBankrupt(): boolean {
+        return this.money < 0;
     }
 
     public income(): number {

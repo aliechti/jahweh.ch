@@ -64,7 +64,7 @@ export class Game {
             if (size > 1) {
                 const field = territory.props.fields[0];
                 const unit = new Unit({
-                    type: 'capital',
+                    type: 'gym',
                     texture: capitalTexture,
                 });
                 field.unit = unit;
