@@ -9,10 +9,11 @@ window.addEventListener('resize', () => {
     app.renderer.resize(window.innerWidth, window.innerHeight);
 });
 
+const panelWidth = 250;
 const radius = 25;
 const hexWidth = 2 * radius;
 const hexHeight = Math.sqrt(3) * radius;
-const columns = Math.floor((window.innerWidth - hexWidth / 4) / (hexWidth * 3 / 4));
+const columns = Math.floor((window.innerWidth - hexWidth / 4 - panelWidth) / (hexWidth * 3 / 4));
 const rows = Math.floor((window.innerHeight - hexHeight * 3 / 4) / hexHeight);
 const game = new Game({
     app: app,
@@ -47,5 +48,10 @@ const game = new Game({
             },
         ],
         renderer: app.renderer,
+    },
+    panel: {
+        w: panelWidth,
+        h: window.innerHeight,
+        fillColor: 0x112233,
     },
 });

@@ -4,12 +4,14 @@ import {HexagonProps} from './Hexagon';
 import {Territory} from './Territory';
 import {UnitTypeManager} from './UnitTypeManager';
 import {Unit} from './Unit';
+import {Panel, PanelProps} from './Panel';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 export interface GameProps {
     app: Application;
     grid: HexagonGridProps;
+    panel: PanelProps;
 }
 
 export interface Player {
@@ -24,6 +26,7 @@ export class Game {
     private player: Player;
     private _draggingUnit?: Unit;
     private unitTypeManager: UnitTypeManager;
+    private panel: Panel;
 
     constructor(props: GameProps) {
         this.props = props;
@@ -32,7 +35,12 @@ export class Game {
         this.grid.interactive = true;
         this.unitTypeManager = new UnitTypeManager({renderer: this.props.app.renderer});
 
+        this.panel = new Panel(this.props.panel);
+        this.panel.x = window.innerWidth - this.props.panel.w;
+        this.panel.setPlayer(this.player);
+
         this.props.app.stage.addChild(this.grid);
+        this.props.app.stage.addChild(this.panel);
 
         for (const field of this.grid.fieldContainer.children) {
             field.interactive = true;
@@ -40,6 +48,7 @@ export class Game {
                 console.log('click field');
                 this.tintTerritory(this.player.selectedTerritory, 0xffffff);
                 this.player.selectedTerritory = field.territory;
+                this.panel.setTerritory(field.territory);
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
                 if (this.draggingUnit !== undefined) {
                     if (field.unit === undefined) {
