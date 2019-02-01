@@ -2,11 +2,12 @@ import Sprite = PIXI.Sprite;
 import Texture = PIXI.Texture;
 import {HexagonField} from './HexagonField';
 
-type Buildings = 'gym' | 'instructor';
-type Units = 'leek' | 'gym-bro' | 'bodybuilder' | 'strongman';
+export type Buildings = 'gym' | 'instructor';
+export type Units = 'leek' | 'gym-bro' | 'bodybuilder' | 'strongman';
+export type UnitTypes = Buildings | Units;
 
 export interface UnitProps {
-    type: Buildings | Units;
+    type: UnitTypes;
     texture: Texture;
     field?: HexagonField;
 }
