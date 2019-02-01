@@ -47,6 +47,10 @@ export class Game {
             field.interactive = true;
             field.on('click', (e) => {
                 console.log('click field');
+                if (field.territory) {
+                    // todo: remove, this is just for testing
+                    field.territory.money += 10;
+                }
                 this.tintTerritory(this.player.selectedTerritory, 0xffffff);
                 this.player.selectedTerritory = field.territory;
                 this.panel.setTerritory(field.territory);
@@ -87,9 +91,23 @@ export class Game {
         }
     }
 
-    private handlePanelUnitClick(type: UnitType) {
+    private handlePanelUnitClick = (type: UnitType) => {
         console.log('panel unit click', type);
-    }
+        const territory = this.player.selectedTerritory;
+        if (territory === undefined) {
+            console.warn('no territory selected');
+            return;
+        }
+        if (this.draggingUnit !== undefined) {
+            console.warn('you can\'t drag another unit');
+            return;
+        }
+        if (territory.money < type.cost) {
+            console.warn('not enough money to buy this unit');
+            return;
+        }
+        this.draggingUnit = new Unit({type});
+    };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
         if (territory) {
