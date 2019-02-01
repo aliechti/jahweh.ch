@@ -2,13 +2,18 @@ import Sprite = PIXI.Sprite;
 import Texture = PIXI.Texture;
 import {HexagonField} from './HexagonField';
 
-export type Buildings = 'gym' | 'instructor';
-export type Units = 'leek' | 'gym-bro' | 'bodybuilder' | 'strongman';
-export type UnitTypes = Buildings | Units;
+export interface UnitType {
+    name: string;
+    strength: number;
+    cost: number;
+    salary: number;
+    isBuildable: boolean;
+    isMovable: boolean;
+    texture: Texture;
+}
 
 export interface UnitProps {
-    type: UnitTypes;
-    texture: Texture;
+    type: UnitType;
     field?: HexagonField;
 }
 
@@ -17,7 +22,7 @@ export class Unit extends Sprite {
     public props: UnitProps;
 
     constructor(props: UnitProps) {
-        super(props.texture);
+        super(props.type.texture);
         this.props = props;
     }
 }

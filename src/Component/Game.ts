@@ -1,11 +1,10 @@
 import {Application} from 'pixi.js';
 import {HexagonGrid, HexagonGridProps} from './HexagonGrid';
 import {HexagonProps} from './Hexagon';
-import {Unit} from './Unit';
 import {Territory} from './Territory';
+import {UnitTypeManager} from './UnitTypeManager';
+import {Unit} from './Unit';
 import Texture = PIXI.Texture;
-import Graphics = PIXI.Graphics;
-import Point = PIXI.Point;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 export interface GameProps {
@@ -24,12 +23,14 @@ export class Game {
     private grid: HexagonGrid;
     private player: Player;
     private _draggingUnit?: Unit;
+    private unitTypeManager: UnitTypeManager;
 
     constructor(props: GameProps) {
         this.props = props;
         this.grid = new HexagonGrid(this.props.grid);
         this.player = this.grid.props.players[0];
         this.grid.interactive = true;
+        this.unitTypeManager = new UnitTypeManager({renderer: this.props.app.renderer});
 
         this.props.app.stage.addChild(this.grid);
 
@@ -53,19 +54,12 @@ export class Game {
                 }
             });
         }
-        const capital = new Graphics();
-        capital.beginFill(0x6789AB);
-        capital.drawCircle(0, 0, 10);
-        capital.endFill();
-        const capitalTexture = props.app.renderer.generateTexture(capital);
-        capitalTexture.defaultAnchor = new Point(0.5, 0.5);
         for (const territory of this.grid.territories) {
             const size = territory.props.fields.length;
             if (size > 1) {
                 const field = territory.props.fields[0];
                 const unit = new Unit({
-                    type: 'gym',
-                    texture: capitalTexture,
+                    type: this.unitTypeManager.mainBuilding,
                 });
                 field.unit = unit;
                 unit.interactive = true;

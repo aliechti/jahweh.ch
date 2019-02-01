@@ -1,6 +1,5 @@
 import {HexagonField} from './HexagonField';
 import {Player} from './Game';
-import {UnitTypes} from './Unit';
 
 export interface TerritoryProps {
     player: Player;
@@ -8,14 +7,6 @@ export interface TerritoryProps {
 }
 
 const fieldIncome = 2;
-const unitSalaries: { [key in UnitTypes]: number } = {
-    leek: 2,
-    'gym-bro': 6,
-    bodybuilder: 18,
-    strongman: 54,
-    gym: 0,
-    instructor: 0,
-};
 
 export class Territory {
 
@@ -51,7 +42,7 @@ export class Territory {
         for (const field of this.props.fields) {
             const unit = field.unit;
             if (unit) {
-                salaries += unitSalaries[unit.props.type];
+                salaries += unit.props.type.salary;
             }
         }
         return salaries;
