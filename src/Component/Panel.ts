@@ -1,7 +1,9 @@
 import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
+import Sprite = PIXI.Sprite;
 import {Player} from './Game';
 import {Territory} from './Territory';
+import {UnitType} from './Unit';
 
 export interface PanelProps {
     w: number;
@@ -12,6 +14,8 @@ export interface PanelProps {
     lineAlignment?: number;
 }
 
+const padding = 10;
+
 export class Panel extends Graphics {
     private props: PanelProps;
     private money: PIXI.Text;
@@ -21,7 +25,7 @@ export class Panel extends Graphics {
         this.props = props;
         this.draw();
         this.money = new PIXI.Text('0');
-        this.money.position = new Point(10, 10);
+        this.money.position = new Point(padding, padding);
         this.addChild(this.money);
     }
 
@@ -37,6 +41,27 @@ export class Panel extends Graphics {
             this.money.text = String(territory.money);
         } else {
             this.money.text = '0';
+        }
+    }
+
+    public setUnitTypes(unitTypes: UnitType[], onClick: (type: UnitType) => void) {
+        const margin = 10;
+        const y = 50 + padding;
+        let x = padding;
+        for (const type of unitTypes) {
+            if (type.isBuildable) {
+                const sprite = new Sprite(type.texture);
+                const width = sprite.width;
+                sprite.y = y;
+                sprite.x = x + width / 2;
+                x += width + margin;
+                sprite.interactive = true;
+                sprite.buttonMode = true;
+                sprite.on('click', () => {
+                    onClick(type);
+                });
+                this.addChild(sprite);
+            }
         }
     }
 

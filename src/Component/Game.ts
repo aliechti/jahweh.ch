@@ -3,7 +3,7 @@ import {HexagonGrid, HexagonGridProps} from './HexagonGrid';
 import {HexagonProps} from './Hexagon';
 import {Territory} from './Territory';
 import {UnitTypeManager} from './UnitTypeManager';
-import {Unit} from './Unit';
+import {Unit, UnitType} from './Unit';
 import {Panel, PanelProps} from './Panel';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
@@ -38,6 +38,7 @@ export class Game {
         this.panel = new Panel(this.props.panel);
         this.panel.x = window.innerWidth - this.props.panel.w;
         this.panel.setPlayer(this.player);
+        this.panel.setUnitTypes(this.unitTypeManager.units, this.handlePanelUnitClick);
 
         this.props.app.stage.addChild(this.grid);
         this.props.app.stage.addChild(this.panel);
@@ -84,6 +85,10 @@ export class Game {
                 this.grid.unitContainer.addChild(unit);
             }
         }
+    }
+
+    private handlePanelUnitClick(type: UnitType) {
+        console.log('panel unit click', type);
     }
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
