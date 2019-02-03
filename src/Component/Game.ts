@@ -5,8 +5,10 @@ import {Territory} from './Territory';
 import {UnitTypeManager} from './UnitTypeManager';
 import {Unit, UnitType} from './Unit';
 import {Panel, PanelProps} from './Panel';
+import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
+import Container = PIXI.Container;
 
 export interface GameProps {
     app: Application;
@@ -27,6 +29,8 @@ export class Game {
     private _draggingUnit?: Unit;
     private unitTypeManager: UnitTypeManager;
     private panel: Panel;
+    private dragContainer: ExplicitContainer<Unit>;
+    private unitContainer: ExplicitContainer<Unit>;
 
     constructor(props: GameProps) {
         this.props = props;
@@ -34,6 +38,8 @@ export class Game {
         this.player = this.grid.props.players[0];
         this.grid.interactive = true;
         this.unitTypeManager = new UnitTypeManager({renderer: this.props.app.renderer});
+        this.dragContainer = new Container() as ExplicitContainer<Unit>;
+        this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
         this.panel = new Panel(this.props.panel);
         this.panel.x = window.innerWidth - this.props.panel.w;
@@ -41,7 +47,9 @@ export class Game {
         this.panel.setUnitTypes(this.unitTypeManager.units, this.handlePanelUnitClick);
 
         this.props.app.stage.addChild(this.grid);
+        this.props.app.stage.addChild(this.unitContainer);
         this.props.app.stage.addChild(this.panel);
+        this.props.app.stage.addChild(this.dragContainer);
 
         for (const field of this.grid.fieldContainer.children) {
             field.interactive = true;
@@ -86,7 +94,7 @@ export class Game {
                         e.stopPropagation();
                     }
                 });
-                this.grid.unitContainer.addChild(unit);
+                this.unitContainer.addChild(unit);
             }
         }
     }
@@ -133,11 +141,13 @@ export class Game {
         if (this._draggingUnit !== undefined) {
             this._draggingUnit.interactive = true;
             this.grid.off('pointermove', this.handleDragMove);
+            this.unitContainer.addChild(this._draggingUnit);
         }
         this._draggingUnit = unit;
         if (this._draggingUnit) {
             this._draggingUnit.interactive = false;
             this.grid.on('pointermove', this.handleDragMove);
+            this.dragContainer.addChild(this._draggingUnit);
         }
     }
 }

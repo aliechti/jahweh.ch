@@ -1,13 +1,12 @@
 import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
 import {HexagonField} from './HexagonField';
-import {Unit} from './Unit';
 import {Territory} from './Territory';
+import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import Container = PIXI.Container;
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
-import DisplayObject = PIXI.DisplayObject;
 
 export interface HexagonGridProps {
     columns: number;
@@ -37,16 +36,11 @@ interface HexagonCalculation {
     }
 }
 
-interface ExplicitContainer<T extends DisplayObject> extends Container {
-    children: T[];
-}
-
 export class HexagonGrid extends Container {
     public readonly props: HexagonGridPropsPrivate;
     public hexagon: HexagonCalculation;
     public territories: Territory[];
     public fieldContainer: ExplicitContainer<HexagonField>;
-    public unitContainer: ExplicitContainer<Unit>;
 
     constructor(props: HexagonGridProps) {
         super();
@@ -59,9 +53,7 @@ export class HexagonGrid extends Container {
             player.hexagonTexture.defaultAnchor = new Point(0.5, 0.5);
         }
         this.fieldContainer = new Container() as ExplicitContainer<HexagonField>;
-        this.unitContainer = new Container() as ExplicitContainer<Unit>;
         this.addChild(this.fieldContainer);
-        this.addChild(this.unitContainer);
         this.generate();
         this.findTerritories();
     }
