@@ -6,6 +6,7 @@ import {UnitTypeManager} from './UnitTypeManager';
 import {Unit, UnitType} from './Unit';
 import {Panel, PanelProps} from './Panel';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
+import {HexagonField} from './HexagonField';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Container = PIXI.Container;
@@ -64,15 +65,22 @@ export class Game {
                 this.panel.setTerritory(field.territory);
                 this.tintTerritory(this.player.selectedTerritory, 0x555555);
                 if (this.draggingUnit !== undefined) {
-                    if (field.unit === undefined) {
-                        // Set unit to new field
-                        field.unit = this.draggingUnit;
-                    } else {
-                        console.warn('Unit can\'t move to this field');
-                    }
+                    const originalField = this.draggingUnit.props.field;
+                    const unit = this.draggingUnit;
+                    const success = this.handleUnitMovement(unit, field);
                     // Reset unit dragging
                     this.draggingUnit = undefined;
-                    field.unit.position = field.position;
+                    if (!success) {
+                        // Reset unit position
+                        if (originalField) {
+                            unit.position = originalField.position;
+                        } else {
+                            console.warn('Newly bought unit cant move there');
+                            // todo: refactor, it gets added to the unitContainer from the dragging setter
+                            // todo: revert payment
+                            this.unitContainer.removeChild(unit);
+                        }
+                    }
                 }
             });
         }
@@ -91,6 +99,18 @@ export class Game {
             }
         }
     }
+
+    private handleUnitMovement = (unit: Unit, field: HexagonField): boolean => {
+        if (field.unit !== undefined) {
+            console.warn('Unit can\'t move to this field');
+            return false;
+        }
+        // Set unit to new field
+        field.unit = unit;
+        // Reset unit position
+        field.unit.position = field.position;
+        return true;
+    };
 
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
