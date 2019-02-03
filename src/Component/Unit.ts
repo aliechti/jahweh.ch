@@ -1,5 +1,6 @@
 import Sprite = PIXI.Sprite;
 import Texture = PIXI.Texture;
+import InteractionEvent = PIXI.interaction.InteractionEvent;
 import {HexagonField} from './HexagonField';
 
 export interface UnitType {
@@ -15,6 +16,7 @@ export interface UnitType {
 export interface UnitProps {
     type: UnitType;
     field?: HexagonField;
+    onClick: (unit: Unit, e: InteractionEvent) => void;
 }
 
 export class Unit extends Sprite {
@@ -24,5 +26,8 @@ export class Unit extends Sprite {
     constructor(props: UnitProps) {
         super(props.type.texture);
         this.props = props;
+        this.interactive = true;
+        this.buttonMode = true;
+        this.on('click', (e: InteractionEvent) => props.onClick(this, e));
     }
 }

@@ -82,22 +82,23 @@ export class Game {
                 const field = territory.props.fields[0];
                 const unit = new Unit({
                     type: this.unitTypeManager.mainBuilding,
+                    field: field,
+                    onClick: this.handleUnitClick,
                 });
                 field.unit = unit;
-                unit.interactive = true;
-                unit.buttonMode = true;
                 unit.position = field.position;
-                unit.on('click', (e: InteractionEvent) => {
-                    console.log('click unit');
-                    if (this.draggingUnit === undefined) {
-                        this.draggingUnit = unit;
-                        e.stopPropagation();
-                    }
-                });
                 this.unitContainer.addChild(unit);
             }
         }
     }
+
+    private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
+        console.log('click unit');
+        if (this.draggingUnit === undefined) {
+            this.draggingUnit = unit;
+            e.stopPropagation();
+        }
+    };
 
     private handlePanelUnitClick = (type: UnitType) => {
         console.log('panel unit click', type);
@@ -114,7 +115,7 @@ export class Game {
             console.warn('not enough money to buy this unit');
             return;
         }
-        this.draggingUnit = new Unit({type});
+        this.draggingUnit = new Unit({type, onClick: this.handleUnitClick});
     };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
