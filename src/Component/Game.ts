@@ -115,6 +115,7 @@ export class Game {
             console.warn('not enough money to buy this unit');
             return;
         }
+        territory.money -= type.cost;
         this.draggingUnit = new Unit({type, onClick: this.handleUnitClick});
     };
 
