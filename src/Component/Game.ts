@@ -60,11 +60,13 @@ export class Game {
                     // todo: remove, this is just for testing
                     field.territory.money += 10;
                 }
-                this.tintTerritory(this.player.selectedTerritory, 0xffffff);
-                this.player.selectedTerritory = field.territory;
-                this.panel.setTerritory(field.territory);
-                this.tintTerritory(this.player.selectedTerritory, 0x555555);
-                if (this.draggingUnit !== undefined) {
+                // Only select other territory if no unit is dragging
+                if (this.draggingUnit === undefined) {
+                    this.tintTerritory(this.player.selectedTerritory, 0xffffff);
+                    this.player.selectedTerritory = field.territory;
+                    this.panel.setTerritory(field.territory);
+                    this.tintTerritory(this.player.selectedTerritory, 0x555555);
+                } else {
                     const originalField = this.draggingUnit.props.field;
                     const unit = this.draggingUnit;
                     const success = this.handleUnitMovement(unit, field);
@@ -103,6 +105,29 @@ export class Game {
     private handleUnitMovement = (unit: Unit, field: HexagonField): boolean => {
         if (field.unit !== undefined) {
             console.warn('Unit can\'t move to this field');
+            return false;
+        }
+        const territory = this.player.selectedTerritory;
+        if (territory === undefined) {
+            console.warn('No territory selected');
+            return false;
+        }
+        const fieldTerritory = field.territory;
+        if (fieldTerritory === undefined) {
+            console.warn('Field has no territory');
+            return false;
+        }
+        const neighbors = this.grid.getTerritoryNeighbors(territory);
+        const isMovingToNeighbors = neighbors.includes(field);
+        const isMovingInsideTerritory = territory.props.fields.includes(field);
+        if (isMovingToNeighbors) {
+            console.log('is moving to neighbors');
+        }
+        if (isMovingInsideTerritory) {
+            console.log('is moving inside territory');
+        }
+        if (!isMovingToNeighbors && !isMovingInsideTerritory) {
+            console.warn('Unit can only move to neighbors or inside same territory');
             return false;
         }
         // Set unit to new field
