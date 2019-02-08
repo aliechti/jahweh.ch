@@ -168,12 +168,19 @@ export class Game {
                 console.warn('Unit can only attack weaker units');
                 return false;
             }
+            // Defending is main building
+            if (defending === this.unitTypeManager.mainBuilding) {
+                fieldTerritory.money = 0;
+                // todo: check if is still controllable and rebuild main building
+            }
             // Remove defending unit
             this.unitContainer.removeChild(field.unit);
             field.unit.props.field = undefined;
             field.unit = undefined;
             console.log('Defending unit killed');
         }
+        // todo: capture field
+        // todo: recalculate territory if splitted up
         // Remove unit from previous field
         if (unit.props.field) {
             unit.props.field.unit = undefined;
@@ -186,6 +193,16 @@ export class Game {
         field.unit.position = field.position;
         return true;
     };
+
+    private getTerritoryMainBuilding(territory: Territory): Unit | undefined {
+        const field = territory.props.fields.find((item) => {
+            return item.unit !== undefined && item.unit.props.type === this.unitTypeManager.mainBuilding;
+        });
+        if (field === undefined) {
+            return undefined;
+        }
+        return field.unit;
+    }
 
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
