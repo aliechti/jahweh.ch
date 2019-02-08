@@ -129,7 +129,7 @@ export class Game {
     };
 
     private moveUnit = (unit: Unit, field: HexagonField): boolean => {
-        // Use unit field territory
+        // Use unit field territory and player
         let territory;
         if (unit.props.field && unit.props.field.territory) {
             territory = unit.props.field.territory;
@@ -179,8 +179,18 @@ export class Game {
             field.unit = undefined;
             console.log('Defending unit killed');
         }
-        // todo: capture field
-        // todo: recalculate territory if splitted up
+        // capture field
+        if (field.player !== this.player) {
+            field.player = this.player;
+            // Remove from old territory
+            fieldTerritory.props.fields.splice(fieldTerritory.props.fields.indexOf(field), 1);
+            // Add to new territory
+            territory.props.fields.push(field);
+            // Set new territory to field
+            field.territory = territory;
+            // todo: recalculate territory if splitted up or merge it if neighbor is from same player
+            // fix: recalculate selected territory for captured field tint
+        }
         // Remove unit from previous field
         if (unit.props.field) {
             unit.props.field.unit = undefined;
