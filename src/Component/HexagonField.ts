@@ -45,19 +45,6 @@ export class HexagonField extends Sprite {
     }
 
     set unit(unit: Unit | undefined) {
-        if (unit) {
-            // Remove unit from previous field
-            if (unit.props.field) {
-                unit.props.field.unit = undefined;
-            }
-            // Add unit
-            this.props.unit = unit;
-            // Add field to unit
-            unit.props.field = this;
-        } else if (this.props.unit) {
-            // Remove unit
-            this.props.unit.props.field = undefined;
-            this.props.unit = undefined;
-        }
+        this.props.unit = unit;
     }
 }

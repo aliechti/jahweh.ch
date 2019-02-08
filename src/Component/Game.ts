@@ -104,10 +104,18 @@ export class Game {
 
     private handleUnitMovement = (unit: Unit, field: HexagonField): boolean => {
         if (field.unit !== undefined) {
+            // todo: implement unit attacking
             console.warn('Unit can\'t move to this field');
             return false;
         }
-        const territory = this.player.selectedTerritory;
+        // Use unit field territory
+        let territory;
+        if (unit.props.field && unit.props.field.territory) {
+            territory = unit.props.field.territory;
+        } else {
+            // Use selected territory if new unit bought and doesn't have a field attached yet
+            territory = this.player.selectedTerritory;
+        }
         if (territory === undefined) {
             console.warn('No territory selected');
             return false;
@@ -130,6 +138,12 @@ export class Game {
             console.warn('Unit can only move to neighbors or inside same territory');
             return false;
         }
+        // Remove unit from previous field
+        if (unit.props.field) {
+            unit.props.field.unit = undefined;
+        }
+        // Add field to unit
+        unit.props.field = field;
         // Set unit to new field
         field.unit = unit;
         // Reset unit position
