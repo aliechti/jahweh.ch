@@ -60,13 +60,7 @@ export class Game {
                     // todo: remove, this is just for testing
                     field.territory.money += 10;
                 }
-                // Only select other territory if no unit is dragging
-                if (this.draggingUnit === undefined) {
-                    this.tintTerritory(this.player.selectedTerritory, 0xffffff);
-                    this.player.selectedTerritory = field.territory;
-                    this.panel.setTerritory(field.territory);
-                    this.tintTerritory(this.player.selectedTerritory, 0x555555);
-                } else {
+                if (this.draggingUnit !== undefined) {
                     const originalField = this.draggingUnit.props.field;
                     const unit = this.draggingUnit;
                     const success = this.handleUnitMovement(unit, field);
@@ -83,6 +77,14 @@ export class Game {
                             this.unitContainer.removeChild(unit);
                         }
                     }
+                } else if (field.player === this.player) {
+                    // Only select other territory if no unit is dragging and its the current player
+                    this.tintTerritory(this.player.selectedTerritory, 0xffffff);
+                    this.player.selectedTerritory = field.territory;
+                    this.panel.setTerritory(field.territory);
+                    this.tintTerritory(this.player.selectedTerritory, 0x555555);
+                } else {
+                    console.warn('Can\'t use another players territory');
                 }
             });
         }
