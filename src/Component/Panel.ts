@@ -1,6 +1,7 @@
 import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
 import Sprite = PIXI.Sprite;
+import Texture = PIXI.Texture;
 import {Player} from './Game';
 import {Territory} from './Territory';
 import {UnitType} from './Unit';
@@ -63,6 +64,16 @@ export class Panel extends Graphics {
                 this.addChild(sprite);
             }
         }
+    }
+
+    public setTurnButton(onClick: () => void, texture: Texture) {
+        const button = new Sprite(texture);
+        button.x = padding;
+        button.y = 100 + padding;
+        button.interactive = true;
+        button.buttonMode = true;
+        button.on('click', onClick);
+        this.addChild(button);
     }
 
     private draw(): void {

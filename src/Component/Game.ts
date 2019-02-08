@@ -10,6 +10,7 @@ import {HexagonField} from './HexagonField';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Container = PIXI.Container;
+import Graphics = PIXI.Graphics;
 
 export interface GameProps {
     app: Application;
@@ -32,11 +33,13 @@ export class Game {
     private panel: Panel;
     private dragContainer: ExplicitContainer<Unit>;
     private unitContainer: ExplicitContainer<Unit>;
+    private turn: number;
 
     constructor(props: GameProps) {
         this.props = props;
         this.grid = new HexagonGrid(this.props.grid);
         this.player = this.grid.props.players[0];
+        this.turn = 1;
         this.grid.interactive = true;
         this.unitTypeManager = new UnitTypeManager({renderer: this.props.app.renderer});
         this.dragContainer = new Container() as ExplicitContainer<Unit>;
@@ -46,6 +49,11 @@ export class Game {
         this.panel.x = window.innerWidth - this.props.panel.w;
         this.panel.setPlayer(this.player);
         this.panel.setUnitTypes(this.unitTypeManager.units, this.handlePanelUnitClick);
+        const turnButton = new Graphics();
+        turnButton.beginFill(0x552288);
+        turnButton.drawRect(0, 0, 100, 20);
+        turnButton.endFill();
+        this.panel.setTurnButton(this.nextTurn, this.props.app.renderer.generateTexture(turnButton));
 
         this.props.app.stage.addChild(this.grid);
         this.props.app.stage.addChild(this.unitContainer);
@@ -56,10 +64,6 @@ export class Game {
             field.interactive = true;
             field.on('click', (e) => {
                 console.log('click field');
-                if (field.territory) {
-                    // todo: remove, this is just for testing
-                    field.territory.money += 10;
-                }
                 if (this.draggingUnit !== undefined) {
                     const originalField = this.draggingUnit.props.field;
                     const unit = this.draggingUnit;
@@ -77,12 +81,11 @@ export class Game {
                             this.unitContainer.removeChild(unit);
                         }
                     }
-                } else if (field.player === this.player) {
+                } else if (field.territory && field.player === this.player) {
+                    // todo: remove, this is just for testing
+                    field.territory.money += 10;
                     // Only select other territory if no unit is dragging and its the current player
-                    this.tintTerritory(this.player.selectedTerritory, 0xffffff);
-                    this.player.selectedTerritory = field.territory;
-                    this.panel.setTerritory(field.territory);
-                    this.tintTerritory(this.player.selectedTerritory, 0x555555);
+                    this.selectTerritory(field.territory);
                 } else {
                     console.warn('Can\'t use another players territory');
                 }
@@ -103,6 +106,27 @@ export class Game {
             }
         }
     }
+
+    private selectTerritory(territory: Territory) {
+        this.unselectTerritory();
+        this.player.selectedTerritory = territory;
+        this.panel.setTerritory(territory);
+        this.tintTerritory(this.player.selectedTerritory, 0x555555);
+    }
+
+    private unselectTerritory() {
+        if (this.player.selectedTerritory) {
+            this.tintTerritory(this.player.selectedTerritory, 0xffffff);
+            this.player.selectedTerritory = undefined;
+        }
+    }
+
+    private nextTurn = () => {
+        const players = this.grid.props.players;
+        this.unselectTerritory();
+        this.player = players[this.turn % players.length];
+        this.turn++;
+    };
 
     private handleUnitMovement = (unit: Unit, field: HexagonField): boolean => {
         if (field.unit !== undefined) {
