@@ -67,7 +67,7 @@ export class Game {
                 if (this.draggingUnit !== undefined) {
                     const originalField = this.draggingUnit.props.field;
                     const unit = this.draggingUnit;
-                    const success = this.handleUnitMovement(unit, field);
+                    const success = this.moveUnit(unit, field);
                     // Reset unit dragging
                     this.draggingUnit = undefined;
                     if (!success) {
@@ -128,12 +128,7 @@ export class Game {
         this.turn++;
     };
 
-    private handleUnitMovement = (unit: Unit, field: HexagonField): boolean => {
-        if (field.unit !== undefined) {
-            // todo: implement unit attacking
-            console.warn('Unit can\'t move to this field');
-            return false;
-        }
+    private moveUnit = (unit: Unit, field: HexagonField): boolean => {
         // Use unit field territory
         let territory;
         if (unit.props.field && unit.props.field.territory) {
@@ -163,6 +158,21 @@ export class Game {
         if (!isMovingToNeighbors && !isMovingInsideTerritory) {
             console.warn('Unit can only move to neighbors or inside same territory');
             return false;
+        }
+        // Attack unit if there is one on this field
+        if (field.unit !== undefined) {
+            const defending = field.unit.props.type;
+            const attacking = unit.props.type;
+            // todo: implement unit attacking
+            if (attacking.strength <= defending.strength) {
+                console.warn('Unit can only attack weaker units');
+                return false;
+            }
+            // Remove defending unit
+            this.unitContainer.removeChild(field.unit);
+            field.unit.props.field = undefined;
+            field.unit = undefined;
+            console.log('Defending unit killed');
         }
         // Remove unit from previous field
         if (unit.props.field) {
