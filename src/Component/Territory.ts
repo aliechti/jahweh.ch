@@ -47,4 +47,12 @@ export class Territory {
         }
         return salaries;
     }
+
+    public addField(...fields: HexagonField[]): void {
+        for (const field of fields) {
+            field.territory = this;
+            field.player = this.props.player;
+        }
+        this.props.fields.push(...fields);
+    }
 }

@@ -130,14 +130,13 @@ export class Game {
 
     private moveUnit = (unit: Unit, field: HexagonField): boolean => {
         // Use unit field territory and player
-        let territory;
+        let territory: Territory;
         if (unit.props.field && unit.props.field.territory) {
             territory = unit.props.field.territory;
-        } else {
+        } else if (this.player.selectedTerritory !== undefined) {
             // Use selected territory if new unit bought and doesn't have a field attached yet
             territory = this.player.selectedTerritory;
-        }
-        if (territory === undefined) {
+        } else {
             console.warn('No territory selected');
             return false;
         }
@@ -146,8 +145,8 @@ export class Game {
             console.warn('Field has no territory');
             return false;
         }
-        const neighbors = this.grid.getTerritoryNeighbors(territory);
-        const isMovingToNeighbors = neighbors.includes(field);
+        const territoryNeighbors = this.grid.getTerritoryNeighbors(territory);
+        const isMovingToNeighbors = territoryNeighbors.includes(field);
         const isMovingInsideTerritory = territory.props.fields.includes(field);
         if (isMovingToNeighbors) {
             console.log('is moving to neighbors');
@@ -189,6 +188,19 @@ export class Game {
             // Set new territory to field
             field.territory = territory;
             // todo: recalculate territory if splitted up or merge it if neighbor is from same player
+            // Merge territories
+            const fieldNeighbors = this.grid.getFieldNeighbors(field);
+            const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
+                return neighbor.player === this.player && neighbor.territory !== territory;
+            }).map((neighbor) => {
+                return neighbor.territory as Territory;
+            }));
+            for (const neighbor of notConnectedTerritories) {
+                territory.money += neighbor.money;
+                territory.addField(...neighbor.props.fields);
+                neighbor.props.fields = [];
+                this.grid.territories.splice(this.grid.territories.indexOf(neighbor), 1);
+            }
             // fix: recalculate selected territory for captured field tint
         }
         // Remove unit from previous field
