@@ -83,24 +83,28 @@ export class HexagonGrid extends Container {
                 fields: [],
             });
             this.territories.push(territory);
-            // Recursive function
-            const addNeighbors = (hexagonField: HexagonField) => {
-                // Add field to territory and vice versa
-                hexagonField.territory = territory;
-                territory.props.fields.push(hexagonField);
-                // Find and loop trough neighbors
-                const neighbors = this.getFieldNeighbors(hexagonField);
-                for (const neighbor of neighbors) {
-                    // Add it if its the same player and no territory defined
-                    if (neighbor.player === hexagonField.player && neighbor.territory === undefined) {
-                        // Recursion
-                        addNeighbors(neighbor);
-                    }
-                }
-            };
-            addNeighbors(field);
+            territory.addField(...this.getConnectedFields(field));
         }
         return this.territories;
+    }
+
+    public getConnectedFields(field: HexagonField) {
+        const fields = new Set<HexagonField>();
+        // Recursive function
+        const addNeighbors = (hexagonField: HexagonField) => {
+            fields.add(hexagonField);
+            // Find and loop trough neighbors
+            const neighbors = this.getFieldNeighbors(hexagonField);
+            for (const neighbor of neighbors) {
+                // Add it if its the same player and not in the list yet
+                if (neighbor.player === hexagonField.player && !fields.has(neighbor)) {
+                    // Recursion
+                    addNeighbors(neighbor);
+                }
+            }
+        };
+        addNeighbors(field);
+        return fields;
     }
 
     public getTerritoryNeighbors(territory: Territory): HexagonField[] {
