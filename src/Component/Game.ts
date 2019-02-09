@@ -201,6 +201,47 @@ export class Game {
                 neighbor.props.fields = [];
                 this.grid.territories.splice(this.grid.territories.indexOf(neighbor), 1);
             }
+            // Split
+            const enemyFields = fieldNeighbors.filter((neighbor) => {
+                return neighbor.player !== this.player;
+            });
+            const fieldsChecked: HexagonField[] = [];
+            for (const enemyField of enemyFields) {
+                if (fieldsChecked.includes(enemyField)) {
+                    continue;
+                }
+                fieldsChecked.push(enemyField);
+                const onSameTerritory = enemyFields.filter((item) => {
+                    return item.territory === enemyField.territory && item !== enemyField;
+                });
+                if (onSameTerritory.length > 0) {
+                    for (const fieldOnSameTerritory of onSameTerritory) {
+                        if (fieldsChecked.includes(fieldOnSameTerritory)) {
+                            continue;
+                        }
+                        fieldsChecked.push(fieldOnSameTerritory);
+                        const connectedFields = this.grid.getConnectedFields(fieldOnSameTerritory);
+                        if (!connectedFields.has(enemyField)) {
+                            // make new territory
+                            const newTerritory = new Territory({
+                                player: fieldOnSameTerritory.player,
+                                fields: [],
+                            });
+                            // Remove fields from old territory
+                            for (const connectedField of connectedFields) {
+                                if (connectedField.territory) {
+                                    const index = connectedField.territory.props.fields.indexOf(connectedField);
+                                    connectedField.territory.props.fields.splice(index, 1);
+                                }
+                            }
+                            // Add to new territory
+                            newTerritory.addField(...connectedFields);
+                            this.grid.territories.push(newTerritory);
+                            // todo: add new main building
+                        }
+                    }
+                }
+            }
             // fix: recalculate selected territory for captured field tint
         }
         // Remove unit from previous field

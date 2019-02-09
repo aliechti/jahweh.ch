@@ -88,7 +88,7 @@ export class HexagonGrid extends Container {
         return this.territories;
     }
 
-    public getConnectedFields(field: HexagonField) {
+    public getConnectedFields(field: HexagonField): Set<HexagonField> {
         const fields = new Set<HexagonField>();
         // Recursive function
         const addNeighbors = (hexagonField: HexagonField) => {
