@@ -143,11 +143,9 @@ export class Game {
         for (const unit of this.unitContainer.children) {
             const field = unit.props.field;
             if (field && field.player === this.player) {
-                unit.interactive = true;
-                unit.buttonMode = true;
+                unit.onTurn();
             } else {
-                unit.interactive = false;
-                unit.buttonMode = false;
+                unit.offTurn();
             }
         }
     }
@@ -172,9 +170,6 @@ export class Game {
         const territoryNeighbors = this.grid.getTerritoryNeighbors(territory);
         const isMovingToNeighbors = territoryNeighbors.includes(field);
         const isMovingInsideTerritory = territory.props.fields.includes(field);
-        if (isMovingToNeighbors) {
-            console.log('is moving to neighbors');
-        }
         if (isMovingInsideTerritory) {
             console.log('is moving inside territory');
         }
@@ -278,6 +273,11 @@ export class Game {
         field.unit = unit;
         // Reset unit position
         field.unit.position = field.position;
+        // Disable moving on moved unit for this turn if it has moved to neighbors
+        if (isMovingToNeighbors) {
+            console.log('has moved to neighbors, disable moving this turn');
+            unit.canMove = false;
+        }
         return true;
     };
 
@@ -340,7 +340,10 @@ export class Game {
 
     set draggingUnit(unit: Unit | undefined) {
         if (this._draggingUnit !== undefined) {
-            this._draggingUnit.interactive = true;
+            // Reset unit interactivity only if it can move
+            if (this._draggingUnit.canMove) {
+                this._draggingUnit.interactive = true;
+            }
             this.grid.off('pointermove', this.handleDragMove);
             this.unitContainer.addChild(this._draggingUnit);
         }

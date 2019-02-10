@@ -22,16 +22,39 @@ export interface UnitProps {
 export class Unit extends Sprite {
 
     public props: UnitProps;
+    private _canMove: boolean;
 
     constructor(props: UnitProps) {
         super(props.type.texture);
         this.props = props;
-        this.interactive = true;
-        this.buttonMode = true;
+        this._canMove = false;
+        this.onTurn();
         this.on('click', this.handleClick);
     }
 
     private handleClick = (e: InteractionEvent) => {
         this.props.onClick(this, e);
     };
+
+    get canMove(): boolean {
+        return this._canMove;
+    }
+
+    set canMove(value: boolean) {
+        this._canMove = value;
+        this.interactive = value;
+        this.buttonMode = value;
+    }
+
+    public onTurn(): void {
+        if (this.props.type.isMovable) {
+            this.canMove = true;
+        }
+    }
+
+    public offTurn(): void {
+        if (this.props.type.isMovable) {
+            this.canMove = false;
+        }
+    }
 }
