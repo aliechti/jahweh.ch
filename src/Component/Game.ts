@@ -205,7 +205,6 @@ export class Game {
             // Defending is main building
             if (defending === this.unitTypeManager.mainBuilding) {
                 fieldTerritory.money = 0;
-                // todo: check if is still controllable and rebuild main building
             }
             // Remove defending unit
             this.unitContainer.removeChild(field.unit);
@@ -234,6 +233,8 @@ export class Game {
                 territory.addField(...neighbor.props.fields);
                 neighbor.props.fields = [];
                 this.grid.territories.splice(this.grid.territories.indexOf(neighbor), 1);
+                // Remove other main buildings
+                this.removeUnit(this.getTerritoryMainBuilding(neighbor));
             }
             // Split
             const enemyFields = fieldNeighbors.filter((neighbor) => {
@@ -249,11 +250,13 @@ export class Game {
                     return item.territory === enemyField.territory && item !== enemyField;
                 });
                 if (onSameTerritory.length > 0) {
+                    // Loop trough fields with the same territory
                     for (const fieldOnSameTerritory of onSameTerritory) {
                         if (fieldsChecked.includes(fieldOnSameTerritory)) {
                             continue;
                         }
                         fieldsChecked.push(fieldOnSameTerritory);
+                        // If the connected fields don't contain each other they are split up
                         const connectedFields = this.grid.getConnectedFields(fieldOnSameTerritory);
                         if (!connectedFields.has(enemyField)) {
                             // make new territory
@@ -271,30 +274,39 @@ export class Game {
                             // Add to new territory
                             newTerritory.addField(...connectedFields);
                             this.grid.territories.push(newTerritory);
-                            // add new main building if territory is controllable
-                            if (newTerritory.isControllable()) {
-                                const mainBuildingField = newTerritory.props.fields.find((item) => {
-                                    return item.unit !== undefined
-                                        && item.unit.props.type === this.unitTypeManager.mainBuilding;
-                                });
-                                if (mainBuildingField === undefined) {
-                                    // Add building to the field without a unit or replace it with the weakest one
-                                    function fieldScore(field: HexagonField) {
-                                        return field.unit === undefined ? 0 : field.unit.props.type.strength;
-                                    }
-
-                                    const fields = newTerritory.props.fields.sort((a, b) => {
-                                        return fieldScore(a) - fieldScore(b);
-                                    });
-                                    const newMainBuildingField = fields[0];
-                                    if (newMainBuildingField) {
-                                        this.addNewUnitToField(this.unitTypeManager.mainBuilding, newMainBuildingField);
-                                    }
-                                }
-                            }
-                            // todo: remove all main buildings from not anymore controllable territories
                         }
                     }
+                }
+            }
+            // Renew main buildings
+            const enemyTerritories = new Set(enemyFields.map((neighbor) => {
+                return neighbor.territory as Territory;
+            }));
+            for (const enemyTerritory of enemyTerritories) {
+                const mainBuilding = this.getTerritoryMainBuilding(enemyTerritory);
+                // add new main building if there is none and territory is controllable
+                if (mainBuilding === undefined && enemyTerritory.isControllable()) {
+                    const mainBuildingField = enemyTerritory.props.fields.find((item) => {
+                        return item.unit !== undefined
+                            && item.unit.props.type === this.unitTypeManager.mainBuilding;
+                    });
+                    if (mainBuildingField === undefined) {
+                        // Add building to the field without a unit or replace it with the weakest one
+                        function fieldScore(field: HexagonField) {
+                            return field.unit === undefined ? 0 : field.unit.props.type.strength;
+                        }
+
+                        const fields = enemyTerritory.props.fields.sort((a, b) => {
+                            return fieldScore(a) - fieldScore(b);
+                        });
+                        const newMainBuildingField = fields[0];
+                        if (newMainBuildingField) {
+                            this.addNewUnitToField(this.unitTypeManager.mainBuilding, newMainBuildingField);
+                        }
+                    }
+                } else if (mainBuilding !== undefined && !enemyTerritory.isControllable()) {
+                    // Remove main building if there is one and territory isn't controllable anymore
+                    this.removeUnit(this.getTerritoryMainBuilding(enemyTerritory));
                 }
             }
             // fix: recalculate selected territory for captured field tint
@@ -307,6 +319,14 @@ export class Game {
         }
         return true;
     };
+
+    private removeUnit(unit: Unit | undefined) {
+        if (unit && unit.props.field) {
+            unit.props.field.unit = undefined;
+            unit.props.field = undefined;
+            this.unitContainer.removeChild(unit);
+        }
+    }
 
     private getTerritoryMainBuilding(territory: Territory): Unit | undefined {
         const field = territory.props.fields.find((item) => {
