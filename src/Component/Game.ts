@@ -77,7 +77,10 @@ export class Game {
                         } else {
                             console.warn('Newly bought unit cant move there');
                             // todo: refactor, it gets added to the unitContainer from the dragging setter
-                            // todo: revert payment
+                            // Refund unit payment
+                            if (this.player.selectedTerritory) {
+                                this.player.selectedTerritory.money += unit.props.type.cost;
+                            }
                             this.unitContainer.removeChild(unit);
                         }
                     }
