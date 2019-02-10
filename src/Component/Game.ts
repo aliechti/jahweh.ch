@@ -105,6 +105,7 @@ export class Game {
                 this.unitContainer.addChild(unit);
             }
         }
+        this.setCurrentPlayerInteractivity();
     }
 
     private selectTerritory(territory: Territory) {
@@ -126,7 +127,30 @@ export class Game {
         this.unselectTerritory();
         this.player = players[this.turn % players.length];
         this.turn++;
+        // Attach unit click handlers for current player and remove others
+        this.setCurrentPlayerInteractivity();
+        // Territories on turn
+        for (const territory of this.grid.territories) {
+            if (territory.props.player === this.player) {
+                territory.onTurn();
+            }
+        }
+        // Set current player to panel
+        this.panel.setPlayer(this.player);
     };
+
+    private setCurrentPlayerInteractivity(): void {
+        for (const unit of this.unitContainer.children) {
+            const field = unit.props.field;
+            if (field && field.player === this.player) {
+                unit.interactive = true;
+                unit.buttonMode = true;
+            } else {
+                unit.interactive = false;
+                unit.buttonMode = false;
+            }
+        }
+    }
 
     private moveUnit = (unit: Unit, field: HexagonField): boolean => {
         // Use unit field territory and player

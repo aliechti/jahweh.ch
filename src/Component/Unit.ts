@@ -28,6 +28,10 @@ export class Unit extends Sprite {
         this.props = props;
         this.interactive = true;
         this.buttonMode = true;
-        this.on('click', (e: InteractionEvent) => props.onClick(this, e));
+        this.on('click', this.handleClick);
     }
+
+    private handleClick = (e: InteractionEvent) => {
+        this.props.onClick(this, e);
+    };
 }
