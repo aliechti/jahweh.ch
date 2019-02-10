@@ -309,7 +309,10 @@ export class Game {
                     this.removeUnit(this.getTerritoryMainBuilding(enemyTerritory));
                 }
             }
-            // fix: recalculate selected territory for captured field tint
+            // Recalculate selected territory
+            if (this.player.selectedTerritory) {
+                this.selectTerritory(this.player.selectedTerritory);
+            }
         }
         this.setUnitToField(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors
