@@ -96,17 +96,33 @@ export class Game {
             const size = territory.props.fields.length;
             if (size > 1) {
                 const field = territory.props.fields[0];
-                const unit = new Unit({
-                    type: this.unitTypeManager.mainBuilding,
-                    field: field,
-                    onClick: this.handleUnitClick,
-                });
-                field.unit = unit;
-                unit.position = field.position;
-                this.unitContainer.addChild(unit);
+                this.addNewUnitToField(this.unitTypeManager.mainBuilding, field);
             }
         }
         this.setCurrentPlayerInteractivity();
+    }
+
+    private addNewUnitToField(type: UnitType, field: HexagonField) {
+        const unit = new Unit({
+            type: type,
+            field: field,
+            onClick: this.handleUnitClick,
+        });
+        this.setUnitToField(unit, field);
+        this.unitContainer.addChild(unit);
+    }
+
+    private setUnitToField(unit: Unit, field: HexagonField) {
+        // Remove unit from previous field
+        if (unit.props.field) {
+            unit.props.field.unit = undefined;
+        }
+        // Add field to unit
+        unit.props.field = field;
+        // Set unit to new field
+        field.unit = unit;
+        // Reset unit position
+        unit.position = field.position;
     }
 
     private selectTerritory(territory: Territory) {
@@ -182,7 +198,6 @@ export class Game {
         if (field.unit !== undefined) {
             const defending = field.unit.props.type;
             const attacking = unit.props.type;
-            // todo: implement unit attacking
             if (attacking.strength <= defending.strength) {
                 console.warn('Unit can only attack weaker units');
                 return false;
@@ -207,7 +222,6 @@ export class Game {
             territory.props.fields.push(field);
             // Set new territory to field
             field.territory = territory;
-            // todo: recalculate territory if splitted up or merge it if neighbor is from same player
             // Merge territories
             const fieldNeighbors = this.grid.getFieldNeighbors(field);
             const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
@@ -257,23 +271,35 @@ export class Game {
                             // Add to new territory
                             newTerritory.addField(...connectedFields);
                             this.grid.territories.push(newTerritory);
-                            // todo: add new main building
+                            // add new main building if territory is controllable
+                            if (newTerritory.isControllable()) {
+                                const mainBuildingField = newTerritory.props.fields.find((item) => {
+                                    return item.unit !== undefined
+                                        && item.unit.props.type === this.unitTypeManager.mainBuilding;
+                                });
+                                if (mainBuildingField === undefined) {
+                                    // Add building to the field without a unit or replace it with the weakest one
+                                    function fieldScore(field: HexagonField) {
+                                        return field.unit === undefined ? 0 : field.unit.props.type.strength;
+                                    }
+
+                                    const fields = newTerritory.props.fields.sort((a, b) => {
+                                        return fieldScore(a) - fieldScore(b);
+                                    });
+                                    const newMainBuildingField = fields[0];
+                                    if (newMainBuildingField) {
+                                        this.addNewUnitToField(this.unitTypeManager.mainBuilding, newMainBuildingField);
+                                    }
+                                }
+                            }
+                            // todo: remove all main buildings from not anymore controllable territories
                         }
                     }
                 }
             }
             // fix: recalculate selected territory for captured field tint
         }
-        // Remove unit from previous field
-        if (unit.props.field) {
-            unit.props.field.unit = undefined;
-        }
-        // Add field to unit
-        unit.props.field = field;
-        // Set unit to new field
-        field.unit = unit;
-        // Reset unit position
-        field.unit.position = field.position;
+        this.setUnitToField(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors
         if (isMovingToNeighbors) {
             console.log('has moved to neighbors, disable moving this turn');
