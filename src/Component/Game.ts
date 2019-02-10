@@ -82,8 +82,6 @@ export class Game {
                         }
                     }
                 } else if (field.territory && field.player === this.player) {
-                    // todo: remove, this is just for testing
-                    field.territory.money += 10;
                     // Only select other territory if no unit is dragging and its the current player
                     this.selectTerritory(field.territory);
                 } else {
