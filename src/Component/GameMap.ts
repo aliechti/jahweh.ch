@@ -35,7 +35,7 @@ export class GameMap {
 
     private findTerritories(): void {
         this.territories = [];
-        for (const field of this.grid.children) {
+        for (const [, field] of this.grid.fields) {
             // Only if no territory is defined
             if (field.territory !== undefined) {
                 continue;

@@ -8,8 +8,6 @@ import Polygon = PIXI.Polygon;
 import Texture = PIXI.Texture;
 
 export interface HexagonGridProps {
-    columns: number;
-    rows: number;
     renderer: SystemRenderer;
     players: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[];
     hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
@@ -30,6 +28,8 @@ interface HexagonCalculation {
     }
 }
 
+export type PlayerChooser = (x: number, y: number, playerCount: number) => number | undefined;
+
 export class HexagonGridGenerator {
     public readonly props: HexagonGridPropsPrivate;
     public hexagon: HexagonCalculation;
@@ -40,16 +40,19 @@ export class HexagonGridGenerator {
         this.hexagon = HexagonGridGenerator.toHexagonCalculation(props.hexagonProps);
     }
 
-    public generate(): HexagonGrid {
-        const {columns, rows, players, hexagonProps} = this.props;
+    public generate(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
+        const {players} = this.props;
         const grid = new HexagonGrid({columns, rows});
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
-                const random = Math.floor(Math.random() * Math.floor(players.length));
-                const field = new HexagonField({player: players[random], coordinates: {x, y}});
-                field.hitArea = this.hexagon.polygon;
-                field.position = this.getPosition({x, y});
-                grid.addChild(field);
+                const index = getPlayer(x, y, players.length);
+                if (index !== undefined) {
+                    const player = players[index % players.length];
+                    const field = new HexagonField({player: player, coordinates: {x, y}});
+                    field.hitArea = this.hexagon.polygon;
+                    field.position = this.getPosition({x, y});
+                    grid.add(field, {x, y});
+                }
             }
         }
         return grid;

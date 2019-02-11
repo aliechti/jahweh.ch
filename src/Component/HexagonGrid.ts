@@ -1,5 +1,4 @@
 import {HexagonField} from './HexagonField';
-import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import Container = PIXI.Container;
 
 export interface HexagonGridProps {
@@ -12,13 +11,14 @@ export interface OffsetCoordinates {
     y: number;
 }
 
-export class HexagonGrid extends Container implements ExplicitContainer<HexagonField> {
-    public children: HexagonField[];
+export class HexagonGrid extends Container {
+    public fields: Map<number, HexagonField>;
     public readonly props: HexagonGridProps;
 
     constructor(props: HexagonGridProps) {
         super();
         this.props = props;
+        this.fields = new Map<number, HexagonField>();
     }
 
     public getConnectedFields(field: HexagonField): Set<HexagonField> {
@@ -40,10 +40,6 @@ export class HexagonGrid extends Container implements ExplicitContainer<HexagonF
         return fields;
     }
 
-    public getFieldChildByOffset(x: number, y: number): HexagonField {
-        return this.getChildAt(x + y * this.props.columns);
-    }
-
     public getFieldNeighbors(field: HexagonField): HexagonField[] {
         const {x, y} = field.coordinates;
         const neighbors: HexagonField[] = [];
@@ -59,12 +55,29 @@ export class HexagonGrid extends Container implements ExplicitContainer<HexagonF
             if (isOverRightEdge || isOverLeftEdge) {
                 continue;
             }
-            try {
-                neighbors.push(this.getFieldChildByOffset(neighborX, neighborY));
-            } catch (e) {
-                // Ignore
+            const field = this.get({x: neighborX, y: neighborY});
+            if (field !== undefined) {
+                neighbors.push(field);
             }
         }
         return neighbors;
+    }
+
+    public add(field: HexagonField, coordinates: OffsetCoordinates): void {
+        this.fields.set(this.getIndex(coordinates), field);
+        this.addChild(field);
+    }
+
+    public get(coordinates: OffsetCoordinates): HexagonField | undefined {
+        return this.fields.get(this.getIndex(coordinates));
+    }
+
+    public delete(coordinates: OffsetCoordinates): void {
+        this.fields.delete(this.getIndex(coordinates));
+    }
+
+    public getIndex(coordinates: OffsetCoordinates): number {
+        const {x, y} = coordinates;
+        return x + y * this.props.columns;
     }
 }
