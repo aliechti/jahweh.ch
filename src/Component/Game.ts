@@ -1,12 +1,12 @@
 import {Application} from 'pixi.js';
-import {HexagonGrid, HexagonGridProps} from './HexagonGrid';
-import {HexagonProps} from './Hexagon';
+import {HexagonGrid} from './HexagonGrid';
 import {Territory} from './Territory';
 import {UnitTypeManager} from './UnitTypeManager';
 import {Unit, UnitType} from './Unit';
 import {Panel, PanelProps} from './Panel';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {HexagonField} from './HexagonField';
+import {GameMap} from './GameMap';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Container = PIXI.Container;
@@ -14,19 +14,26 @@ import Graphics = PIXI.Graphics;
 
 export interface GameProps {
     app: Application;
-    grid: HexagonGridProps;
+    players: Player[];
+    grid: HexagonGrid;
     panel: PanelProps;
 }
 
-export interface Player {
-    hexagonProps: Pick<HexagonProps, 'fillColor'>;
+export interface PlayerProps {
+    color: number;
+}
+
+export interface Player extends PlayerProps {
     hexagonTexture: Texture;
     selectedTerritory?: Territory;
 }
 
 export class Game {
     private props: GameProps;
+    private app: Application;
     private grid: HexagonGrid;
+    private map: GameMap;
+    private players: Player[];
     private player: Player;
     private _draggingUnit?: Unit;
     private unitTypeManager: UnitTypeManager;
@@ -37,11 +44,13 @@ export class Game {
 
     constructor(props: GameProps) {
         this.props = props;
-        this.grid = new HexagonGrid(this.props.grid);
-        this.player = this.grid.props.players[0];
+        this.app = props.app;
+        this.grid = props.grid;
+        this.map = new GameMap({grid: this.grid});
+        this.players = props.players;
+        this.player = props.players[0];
         this.turn = 1;
-        this.grid.interactive = true;
-        this.unitTypeManager = new UnitTypeManager({renderer: this.props.app.renderer});
+        this.unitTypeManager = new UnitTypeManager({renderer: this.app.renderer});
         this.dragContainer = new Container() as ExplicitContainer<Unit>;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
@@ -53,14 +62,14 @@ export class Game {
         turnButton.beginFill(0x552288);
         turnButton.drawRect(0, 0, 100, 20);
         turnButton.endFill();
-        this.panel.setTurnButton(this.nextTurn, this.props.app.renderer.generateTexture(turnButton));
+        this.panel.setTurnButton(this.nextTurn, this.app.renderer.generateTexture(turnButton));
 
-        this.props.app.stage.addChild(this.grid);
-        this.props.app.stage.addChild(this.unitContainer);
-        this.props.app.stage.addChild(this.panel);
-        this.props.app.stage.addChild(this.dragContainer);
+        this.app.stage.addChild(this.grid);
+        this.app.stage.addChild(this.unitContainer);
+        this.app.stage.addChild(this.panel);
+        this.app.stage.addChild(this.dragContainer);
 
-        for (const field of this.grid.fieldContainer.children) {
+        for (const field of this.grid.children) {
             field.interactive = true;
             field.on('click', (e) => {
                 console.log('click field');
@@ -92,7 +101,7 @@ export class Game {
                 }
             });
         }
-        for (const territory of this.grid.territories) {
+        for (const territory of this.map.territories) {
             const size = territory.props.fields.length;
             if (size > 1) {
                 const field = territory.props.fields[0];
@@ -140,14 +149,14 @@ export class Game {
     }
 
     private nextTurn = () => {
-        const players = this.grid.props.players;
+        const players = this.players;
         this.unselectTerritory();
         this.player = players[this.turn % players.length];
         this.turn++;
         // Attach unit click handlers for current player and remove others
         this.setCurrentPlayerInteractivity();
         // Territories on turn
-        for (const territory of this.grid.territories) {
+        for (const territory of this.map.territories) {
             if (territory.props.player === this.player) {
                 territory.onTurn();
                 // Remove units if territory is bankrupt
@@ -194,7 +203,7 @@ export class Game {
             console.warn('Field has no territory');
             return false;
         }
-        const territoryNeighbors = this.grid.getTerritoryNeighbors(territory);
+        const territoryNeighbors = this.map.getTerritoryNeighbors(territory);
         const isMovingToNeighbors = territoryNeighbors.includes(field);
         const isMovingInsideTerritory = territory.props.fields.includes(field);
         if (isMovingInsideTerritory) {
@@ -252,7 +261,7 @@ export class Game {
                 // Add fields to territory and remove other territory
                 territory.addField(...neighbor.props.fields);
                 neighbor.props.fields = [];
-                this.grid.territories.splice(this.grid.territories.indexOf(neighbor), 1);
+                this.map.territories.splice(this.map.territories.indexOf(neighbor), 1);
             }
             // Split
             const enemyFields = fieldNeighbors.filter((neighbor) => {
@@ -291,7 +300,7 @@ export class Game {
                             }
                             // Add to new territory
                             newTerritory.addField(...connectedFields);
-                            this.grid.territories.push(newTerritory);
+                            this.map.territories.push(newTerritory);
                         }
                     }
                 }

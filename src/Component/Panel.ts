@@ -31,7 +31,7 @@ export class Panel extends Graphics {
     }
 
     public setPlayer(player: Player) {
-        const color = player.hexagonProps.fillColor;
+        const color = player.color;
         if (color) {
             this.money.style.fill = color;
         }
