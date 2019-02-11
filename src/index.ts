@@ -43,7 +43,12 @@ const chooserRandom: PlayerChooser = (x, y, count) => {
     return Math.floor(Math.random() * Math.floor(count));
 };
 const generateEvenlyChooser = (emptyPercentage: number): PlayerChooser => {
-    // todo: this isn't enough random, sometimes it produces strange maps
+    function shuffleArray(array: any[]) {
+        for (let i = 0; i < array.length; i++) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
     // todo: emptyPercentage should not create islands
     const fill: (number | undefined)[] = [];
     const emptyCount = columns * rows / 100 * emptyPercentage;
@@ -52,7 +57,7 @@ const generateEvenlyChooser = (emptyPercentage: number): PlayerChooser => {
     for (const i in players) {
         fill.push(...Array(Math.floor(fieldCount / players.length)).fill(i));
     }
-    fill.sort(() => Math.random() - 0.5);
+    shuffleArray(fill);
     return (x, y, count) => {
         return fill[x + y * columns] || undefined;
     };
