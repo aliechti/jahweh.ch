@@ -237,11 +237,12 @@ export class Game {
             }));
             for (const neighbor of notConnectedTerritories) {
                 territory.money += neighbor.money;
+                // Remove other main buildings
+                this.removeUnit(this.getTerritoryMainBuilding(neighbor));
+                // Add fields to territory and remove other territory
                 territory.addField(...neighbor.props.fields);
                 neighbor.props.fields = [];
                 this.grid.territories.splice(this.grid.territories.indexOf(neighbor), 1);
-                // Remove other main buildings
-                this.removeUnit(this.getTerritoryMainBuilding(neighbor));
             }
             // Split
             const enemyFields = fieldNeighbors.filter((neighbor) => {
