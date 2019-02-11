@@ -150,6 +150,16 @@ export class Game {
         for (const territory of this.grid.territories) {
             if (territory.props.player === this.player) {
                 territory.onTurn();
+                // Remove units if territory is bankrupt
+                if (territory.isBankrupt()) {
+                    console.log('Territory bankruptcy');
+                    for (const field of territory.props.fields) {
+                        if (field.unit !== undefined && field.unit.props.type !== this.unitTypeManager.mainBuilding) {
+                            this.removeUnit(field.unit);
+                        }
+                    }
+                    territory.money = 0;
+                }
             }
         }
         // Set current player to panel
