@@ -194,26 +194,34 @@ export class Game {
             console.warn('Unit can only move to neighbors or inside same territory');
             return false;
         }
-        // Attack unit if there is one on this field
-        if (field.unit !== undefined) {
-            const defending = field.unit.props.type;
-            const attacking = unit.props.type;
-            if (attacking.strength <= defending.strength) {
-                console.warn('Unit can only attack weaker units');
-                return false;
-            }
-            // Defending is main building
-            if (defending === this.unitTypeManager.mainBuilding) {
-                fieldTerritory.money = 0;
-            }
-            // Remove defending unit
-            this.unitContainer.removeChild(field.unit);
-            field.unit.props.field = undefined;
-            field.unit = undefined;
-            console.log('Defending unit killed');
-        }
         // capture field
         if (field.player !== this.player) {
+            const fieldNeighbors = this.grid.getFieldNeighbors(field);
+            const defendingPoints = Math.max(...fieldNeighbors.map((f) => {
+                return (f.player !== field.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
+            }));
+            const attacking = unit.props.type;
+            if (attacking.strength <= defendingPoints) {
+                console.warn('Field is defended by a stronger or same strength unit');
+                return false;
+            }
+            // Attack unit if there is one on this field
+            if (field.unit !== undefined) {
+                const defending = field.unit.props.type;
+                if (attacking.strength <= defending.strength) {
+                    console.warn('Unit can only attack weaker units');
+                    return false;
+                }
+                // Defending is main building
+                if (defending === this.unitTypeManager.mainBuilding) {
+                    fieldTerritory.money = 0;
+                }
+                // Remove defending unit
+                this.unitContainer.removeChild(field.unit);
+                field.unit.props.field = undefined;
+                field.unit = undefined;
+                console.log('Defending unit killed');
+            }
             field.player = this.player;
             // Remove from old territory
             fieldTerritory.props.fields.splice(fieldTerritory.props.fields.indexOf(field), 1);
@@ -222,7 +230,6 @@ export class Game {
             // Set new territory to field
             field.territory = territory;
             // Merge territories
-            const fieldNeighbors = this.grid.getFieldNeighbors(field);
             const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
                 return neighbor.player === this.player && neighbor.territory !== territory;
             }).map((neighbor) => {
