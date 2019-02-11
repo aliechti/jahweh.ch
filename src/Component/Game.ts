@@ -331,6 +331,28 @@ export class Game {
             if (this.player.selectedTerritory) {
                 this.selectTerritory(this.player.selectedTerritory);
             }
+        } else if (field.unit !== undefined) {
+            // Merge units from the same player if there is a unit with the same cost
+            const droppedType = field.unit.props.type;
+            const stayingType = unit.props.type;
+            const cost = stayingType.cost + droppedType.cost;
+            const mergedType = this.unitTypeManager.units.find((type) => {
+                return type.cost === cost;
+            });
+            if (mergedType) {
+                console.log('Units merged', {
+                    dropped: stayingType,
+                    staying: droppedType,
+                    merged: mergedType,
+                });
+                // If unit staying has already moved the merged one has too
+                unit.canMove = field.unit.canMove;
+                this.removeUnit(field.unit);
+                unit.setType(mergedType);
+            } else {
+                console.warn('No type with same cost found to merge');
+                return false;
+            }
         }
         this.setUnitToField(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors

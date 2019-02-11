@@ -36,6 +36,11 @@ export class Unit extends Sprite {
         this.props.onClick(this, e);
     };
 
+    public setType(type: UnitType): void {
+        this.props.type = type;
+        this.texture = type.texture;
+    }
+
     get canMove(): boolean {
         return this._canMove;
     }

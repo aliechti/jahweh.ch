@@ -51,7 +51,7 @@ const unitTypeDefinitions: UnitTypeDefinition[] = [
     }, {
         name: 'Bodybuilder',
         strength: 3,
-        cost: 40,
+        cost: 30,
         salary: 18,
         isBuildable: true,
         isMovable: true,
@@ -59,7 +59,7 @@ const unitTypeDefinitions: UnitTypeDefinition[] = [
     }, {
         name: 'Strongman',
         strength: 4,
-        cost: 80,
+        cost: 40,
         salary: 56,
         isBuildable: true,
         isMovable: true,
