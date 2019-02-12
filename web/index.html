@@ -9,9 +9,59 @@
             padding: 0;
             overflow: hidden;
         }
+
+        html, body, button {
+            font-size: 1.5rem;
+            font-family: sans-serif;
+            color: #fff;
+        }
+
+        button {
+            padding: 0.2rem 0.6rem;
+            cursor: pointer;
+            color: #000;
+            background-color: #fff;
+            border: 1px solid #000;
+        }
+
+        .full {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            padding: 1rem;
+            display: flex;
+        }
+
+        .start {
+            background-color: #00000088;
+        }
+
+        .center {
+            margin: auto;
+        }
+
+        .click-trough {
+            pointer-events: none;
+        }
+
+        .click-trough > * {
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
+<div class="start full">
+    <div class="center" style="text-align: center">
+        <button type="button" class="btn-start">Start</button>
+    </div>
+</div>
+<div class="in-game full click-trough" style="display: none">
+    <div style="margin: auto 0 0 auto">
+        <button type="button" class="btn-start">Restart</button>
+    </div>
+</div>
 <script src="build/script.js"></script>
 </body>
 </html>
