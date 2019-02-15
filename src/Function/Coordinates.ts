@@ -107,3 +107,16 @@ export function cubeMultiply(cube: CubeCoordinates, multiplier: number): CubeCoo
 export function cubeNeighbor(cube: CubeCoordinates, direction: number): CubeCoordinates {
     return cubeAdd(cube, cubeDirections[direction]);
 }
+
+export function* ring(radius: number, center?: AxialCoordinates): IterableIterator<AxialCoordinates> {
+    let current = axialMultiply(axialDirections[4], radius);
+    if (center !== undefined) {
+        current = axialAdd(current, center);
+    }
+    for (let i = 0; i < 6; i++) {
+        for (let j = 0; j < radius; j++) {
+            yield current;
+            current = axialNeighbor(current, i);
+        }
+    }
+}
