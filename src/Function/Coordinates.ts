@@ -72,3 +72,38 @@ export function offsetToPixel(offset: OffsetCoordinates, radius: number): PixelC
     const y = radius * Math.sqrt(3) * (offset.y + 0.5 * (offset.x & 1));
     return {x, y};
 }
+
+export function axialAdd(...axials: AxialCoordinates[]) {
+    const added: AxialCoordinates = {q: 0, r: 0};
+    for (const axial of axials) {
+        added.q += axial.q;
+        added.r += axial.r;
+    }
+    return added;
+}
+
+export function axialMultiply(axial: AxialCoordinates, multiplier: number): AxialCoordinates {
+    return {q: axial.q * multiplier, r: axial.r * multiplier};
+}
+
+export function axialNeighbor(axial: AxialCoordinates, direction: number): AxialCoordinates {
+    return axialAdd(axial, axialDirections[direction]);
+}
+
+export function cubeAdd(...cubes: CubeCoordinates[]) {
+    const added: CubeCoordinates = {x: 0, y: 0, z: 0};
+    for (const cube of cubes) {
+        added.x += cube.x;
+        added.y += cube.y;
+        added.z += cube.z;
+    }
+    return added;
+}
+
+export function cubeMultiply(cube: CubeCoordinates, multiplier: number): CubeCoordinates {
+    return {x: cube.x * multiplier, y: cube.y * multiplier, z: cube.z * multiplier};
+}
+
+export function cubeNeighbor(cube: CubeCoordinates, direction: number): CubeCoordinates {
+    return cubeAdd(cube, cubeDirections[direction]);
+}
