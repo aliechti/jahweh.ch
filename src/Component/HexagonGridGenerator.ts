@@ -2,7 +2,7 @@ import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {AxialCoordinates, axialToPixel, offsetToAxial} from '../Function/Coordinates';
+import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
@@ -58,6 +58,15 @@ export class HexagonGridGenerator {
             for (let q = 0; q < columns; q++) {
                 this.setFieldToGrid({q, r}, getPlayer, grid);
             }
+        }
+        return grid;
+    }
+
+    public ring(radius: number, getPlayer: PlayerChooser): HexagonGrid {
+        const grid = new HexagonGrid();
+        const center = offsetToAxial({x: radius, y: radius});
+        for (const axial of ring(radius, center)) {
+            this.setFieldToGrid(axial, getPlayer, grid);
         }
         return grid;
     }
