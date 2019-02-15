@@ -62,6 +62,21 @@ export class HexagonGridGenerator {
         return grid;
     }
 
+    public hexagon(radius: number, getPlayer: PlayerChooser): HexagonGrid {
+        const grid = new HexagonGrid();
+        const count = 1 + radius * 6;
+        const x = radius;
+        const y = Math.floor(radius * 2 / 3);
+        for (let q = -radius; q <= radius; q++) {
+            const r1 = Math.max(-radius, -q - radius);
+            const r2 = Math.min(radius, -q + radius);
+            for (let r = r1; r <= r2; r++) {
+                this.setFieldToGrid({q: q + x, r: r + y}, getPlayer, grid);
+            }
+        }
+        return grid;
+    }
+
     private setFieldToGrid(axial: AxialCoordinates, getPlayer: PlayerChooser, grid: HexagonGrid) {
         console.log('setfield', axial);
         const {players, hexagonProps} = this.props;
