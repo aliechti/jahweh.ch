@@ -51,7 +51,7 @@ function startGame() {
         },
         renderer: app.renderer,
     });
-    const chooserRandom: PlayerChooser = (x, y, count) => {
+    const chooserRandom: PlayerChooser = (axial, count) => {
         return Math.floor(Math.random() * Math.floor(count));
     };
     const generateEvenlyChooser = (emptyPercentage: number): PlayerChooser => {
@@ -71,14 +71,15 @@ function startGame() {
             fill.push(...Array(Math.floor(fieldCount / players.length)).fill(i));
         }
         shuffleArray(fill);
-        return (x, y, count) => {
-            return fill[x + y * columns] || undefined;
+        let i = 0;
+        return (axial, count) => {
+            return fill[i++] || undefined;
         };
     };
     const game = new Game({
         app: app,
         players: generator.props.players,
-        grid: generator.generate(columns, rows, generateEvenlyChooser(0)),
+        grid: generator.rectangle(columns, rows, generateEvenlyChooser(0)),
         panel: {
             w: panelWidth,
             h: window.innerHeight,

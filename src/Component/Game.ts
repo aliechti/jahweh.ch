@@ -69,7 +69,7 @@ export class Game {
         this.app.stage.addChild(this.panel);
         this.app.stage.addChild(this.dragContainer);
 
-        for (const [, field] of this.grid.fields) {
+        for (const field of this.grid.fields()) {
             field.interactive = true;
             field.on('click', (e) => {
                 console.log('click field');

@@ -1,7 +1,8 @@
 import {Hexagon, HexagonProps} from './Hexagon';
 import {Player} from './Game';
 import {HexagonField} from './HexagonField';
-import {HexagonGrid, OffsetCoordinates} from './HexagonGrid';
+import {HexagonGrid} from './HexagonGrid';
+import {AxialCoordinates, axialToPixel, offsetToAxial} from '../Function/Coordinates';
 import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
@@ -28,44 +29,52 @@ interface HexagonCalculation {
     }
 }
 
-export type PlayerChooser = (x: number, y: number, playerCount: number) => number | undefined;
+export type PlayerChooser = (axial: AxialCoordinates, playerCount: number) => number | undefined;
 
 export class HexagonGridGenerator {
     public readonly props: HexagonGridPropsPrivate;
-    public hexagon: HexagonCalculation;
+    public calculation: HexagonCalculation;
 
     constructor(props: HexagonGridProps) {
         this.props = {...props, players: []};
         this.props.players = this.generatePlayerTextures(props.players);
-        this.hexagon = HexagonGridGenerator.toHexagonCalculation(props.hexagonProps);
+        this.calculation = HexagonGridGenerator.toHexagonCalculation(props.hexagonProps);
     }
 
-    public generate(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
-        const {players} = this.props;
-        const grid = new HexagonGrid({columns, rows});
+    public rectangle(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
+        const grid = new HexagonGrid();
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
-                const index = getPlayer(x, y, players.length);
-                if (index !== undefined) {
-                    const player = players[index % players.length];
-                    const field = new HexagonField({player: player, coordinates: {x, y}});
-                    field.hitArea = this.hexagon.polygon;
-                    field.position = this.getPosition({x, y});
-                    grid.add(field, {x, y});
-                }
+                const axial = offsetToAxial({x, y});
+                this.setFieldToGrid(axial, getPlayer, grid);
             }
         }
         return grid;
     }
 
-    private getPosition(coordinates: OffsetCoordinates): Point {
-        const isEven = coordinates.x % 2;
-        let x = this.hexagon.padding.x + this.hexagon.width * coordinates.x * 3 / 4;
-        let y = this.hexagon.padding.y + this.hexagon.height * coordinates.y;
-        if (isEven) {
-            y += this.hexagon.height / 2;
+    public rhombus(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
+        const grid = new HexagonGrid();
+        for (let r = 0; r < rows; r++) {
+            for (let q = 0; q < columns; q++) {
+                this.setFieldToGrid({q, r}, getPlayer, grid);
+            }
         }
-        return new Point(x, y);
+        return grid;
+    }
+
+    private setFieldToGrid(axial: AxialCoordinates, getPlayer: PlayerChooser, grid: HexagonGrid) {
+        console.log('setfield', axial);
+        const {players, hexagonProps} = this.props;
+        const {padding, polygon} = this.calculation;
+        const index = getPlayer(axial, players.length);
+        if (index !== undefined) {
+            const player = players[index % players.length];
+            const field = new HexagonField({player, axial});
+            const pixel = axialToPixel(axial, hexagonProps.radius);
+            field.hitArea = polygon;
+            field.position = new Point(pixel.x + padding.x, pixel.y + padding.y);
+            grid.set(axial, field);
+        }
     }
 
     private generatePlayerTextures(playerProps: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[]): Player[] {

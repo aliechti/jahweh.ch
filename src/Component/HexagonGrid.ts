@@ -1,24 +1,13 @@
 import {HexagonField} from './HexagonField';
+import {AxialCoordinates, AxialMap} from '../Function/Coordinates';
 import Container = PIXI.Container;
 
-export interface HexagonGridProps {
-    columns: number;
-    rows: number;
-}
-
-export interface OffsetCoordinates {
-    x: number;
-    y: number;
-}
-
 export class HexagonGrid extends Container {
-    public fields: Map<number, HexagonField>;
-    public readonly props: HexagonGridProps;
+    private _fields: AxialMap<HexagonField>;
 
-    constructor(props: HexagonGridProps) {
+    constructor() {
         super();
-        this.props = props;
-        this.fields = new Map<number, HexagonField>();
+        this._fields = new Map();
     }
 
     public getConnectedFields(field: HexagonField): Set<HexagonField> {
@@ -41,21 +30,15 @@ export class HexagonGrid extends Container {
     }
 
     public getFieldNeighbors(field: HexagonField): HexagonField[] {
-        const {x, y} = field.coordinates;
+        const axial = field.axial;
         const neighbors: HexagonField[] = [];
-        const matrixEven = [-1, 0, 0, -1, 1, 0, 1, 1, 0, 1, -1, 1];
-        const matrixOdd = [-1, -1, 0, -1, 1, -1, 1, 0, 0, 1, -1, 0];
-        const isEven = x % 2;
-        const matrix = (isEven ? matrixEven : matrixOdd);
+        const matrix: AxialCoordinates[] = [
+            {q: 0, r: -1}, {q: 1, r: -1}, {q: 1, r: 0}, {q: 0, r: 1}, {q: -1, r: 1}, {q: -1, r: 0},
+        ];
         for (let i = 0; i < 6; i++) {
-            const neighborX = x + matrix[i * 2];
-            const neighborY = y + matrix[i * 2 + 1];
-            const isOverRightEdge = neighborX >= this.props.columns;
-            const isOverLeftEdge = neighborX < 0;
-            if (isOverRightEdge || isOverLeftEdge) {
-                continue;
-            }
-            const field = this.get({x: neighborX, y: neighborY});
+            const q = axial.q + matrix[i].q;
+            const r = axial.r + matrix[i].r;
+            const field = this.get({q, r});
             if (field !== undefined) {
                 neighbors.push(field);
             }
@@ -63,21 +46,39 @@ export class HexagonGrid extends Container {
         return neighbors;
     }
 
-    public add(field: HexagonField, coordinates: OffsetCoordinates): void {
-        this.fields.set(this.getIndex(coordinates), field);
+    public set(axial: AxialCoordinates, field: HexagonField): void {
+        let row = this._fields.get(axial.r);
+        if (row == undefined) {
+            row = new Map();
+            this._fields.set(axial.r, row);
+        }
+        if (row.has(axial.q)) {
+            this.removeChild(field);
+        }
         this.addChild(field);
+        row.set(axial.q, field);
     }
 
-    public get(coordinates: OffsetCoordinates): HexagonField | undefined {
-        return this.fields.get(this.getIndex(coordinates));
+    public get(axial: AxialCoordinates): HexagonField | undefined {
+        const row = this._fields.get(axial.r);
+        if (row) {
+            return row.get(axial.q);
+        }
+        return undefined;
     }
 
-    public delete(coordinates: OffsetCoordinates): void {
-        this.fields.delete(this.getIndex(coordinates));
+    public delete(axial: AxialCoordinates): void {
+        const row = this._fields.get(axial.r);
+        if (row) {
+            row.delete(axial.q);
+        }
     }
 
-    public getIndex(coordinates: OffsetCoordinates): number {
-        const {x, y} = coordinates;
-        return x + y * this.props.columns;
+    public* fields(): IterableIterator<HexagonField> {
+        for (const [, r] of this._fields) {
+            for (const [, q] of r) {
+                yield q;
+            }
+        }
     }
 }
