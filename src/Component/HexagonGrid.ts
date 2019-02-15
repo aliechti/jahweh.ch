@@ -1,5 +1,5 @@
 import {HexagonField} from './HexagonField';
-import {AxialCoordinates, AxialMap} from '../Function/Coordinates';
+import {AxialCoordinates, axialDirections, AxialMap} from '../Function/Coordinates';
 import Container = PIXI.Container;
 
 export class HexagonGrid extends Container {
@@ -32,12 +32,9 @@ export class HexagonGrid extends Container {
     public getFieldNeighbors(field: HexagonField): HexagonField[] {
         const axial = field.axial;
         const neighbors: HexagonField[] = [];
-        const matrix: AxialCoordinates[] = [
-            {q: 0, r: -1}, {q: 1, r: -1}, {q: 1, r: 0}, {q: 0, r: 1}, {q: -1, r: 1}, {q: -1, r: 0},
-        ];
-        for (let i = 0; i < 6; i++) {
-            const q = axial.q + matrix[i].q;
-            const r = axial.r + matrix[i].r;
+        for (const direction of axialDirections) {
+            const q = axial.q + direction.q;
+            const r = axial.r + direction.r;
             const field = this.get({q, r});
             if (field !== undefined) {
                 neighbors.push(field);
