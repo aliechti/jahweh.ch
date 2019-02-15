@@ -1,6 +1,6 @@
 import {Application} from 'pixi.js';
 import {Game} from './Component/Game';
-import {HexagonGridGenerator, PlayerChooser} from './Component/HexagonGridGenerator';
+import {ChooserProps, HexagonGridGenerator, PlayerChooser} from './Component/HexagonGridGenerator';
 
 const app = new Application(window.innerWidth, window.innerHeight, {
     antialias: true,
@@ -51,8 +51,8 @@ function startGame() {
         },
         renderer: app.renderer,
     });
-    const chooserRandom: PlayerChooser = (axial, count) => {
-        return Math.floor(Math.random() * Math.floor(count));
+    const chooserRandom: PlayerChooser = (props) => {
+        return Math.floor(Math.random() * Math.floor(props.playerCount));
     };
     const generateEvenlyChooser = (emptyPercentage: number): PlayerChooser => {
         function shuffleArray(array: any[]) {
@@ -64,22 +64,29 @@ function startGame() {
 
         // todo: emptyPercentage should not create islands
         const fill: (number | undefined)[] = [];
-        const emptyCount = columns * rows / 100 * emptyPercentage;
-        const fieldCount = columns * rows - emptyCount;
-        fill.push(...Array(Math.floor(emptyCount)).fill(null));
-        for (const i in players) {
-            fill.push(...Array(Math.floor(fieldCount / players.length)).fill(i));
+
+        function generateFill(props: ChooserProps) {
+            const emptyCount = props.fieldCount / 100 * emptyPercentage;
+            const fieldCount = props.fieldCount - emptyCount;
+            fill.push(...Array(Math.floor(emptyCount)).fill(null));
+            for (const i in players) {
+                fill.push(...Array(Math.floor(fieldCount / players.length)).fill(i));
+            }
+            shuffleArray(fill);
         }
-        shuffleArray(fill);
+
         let i = 0;
-        return (axial, count) => {
+        return (props) => {
+            if (i === 0) {
+                generateFill(props);
+            }
             return fill[i++] || undefined;
         };
     };
     const game = new Game({
         app: app,
         players: generator.props.players,
-        grid: generator.rectangle(columns, rows, generateEvenlyChooser(0)),
+        grid: generator.ring(4, generateEvenlyChooser(0)),
         panel: {
             w: panelWidth,
             h: window.innerHeight,

@@ -29,7 +29,13 @@ interface HexagonCalculation {
     }
 }
 
-export type PlayerChooser = (axial: AxialCoordinates, playerCount: number) => number | undefined;
+export interface ChooserProps {
+    axial: AxialCoordinates;
+    playerCount: number;
+    fieldCount: number;
+}
+
+export type PlayerChooser = (props: ChooserProps) => number | undefined;
 
 export class HexagonGridGenerator {
     public readonly props: HexagonGridPropsPrivate;
@@ -42,52 +48,58 @@ export class HexagonGridGenerator {
     }
 
     public rectangle(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
+        const fieldCount = columns * rows;
         const grid = new HexagonGrid();
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const axial = offsetToAxial({x, y});
-                this.setFieldToGrid(axial, getPlayer, grid);
+                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
             }
         }
         return grid;
     }
 
     public rhombus(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
+        const fieldCount = columns * rows;
         const grid = new HexagonGrid();
         for (let r = 0; r < rows; r++) {
             for (let q = 0; q < columns; q++) {
-                this.setFieldToGrid({q, r}, getPlayer, grid);
+                const axial = {q, r};
+                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
             }
         }
         return grid;
     }
 
     public ring(radius: number, getPlayer: PlayerChooser): HexagonGrid {
+        const fieldCount = radius * 6;
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
         for (const axial of ring(radius, center)) {
-            this.setFieldToGrid(axial, getPlayer, grid);
+            this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
         }
         return grid;
     }
 
     public spiral(radius: number, getPlayer: PlayerChooser): HexagonGrid {
+        // todo: calculate spiral field count
+        const fieldCount = 0;
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
-        this.setFieldToGrid(center, getPlayer, grid);
+        this.setFieldToGrid({axial: center, fieldCount}, grid, getPlayer);
         for (let i = 1; i <= radius; i++) {
             for (const axial of ring(i, center)) {
-                this.setFieldToGrid(axial, getPlayer, grid);
+                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
             }
         }
         return grid;
     }
 
-    private setFieldToGrid(axial: AxialCoordinates, getPlayer: PlayerChooser, grid: HexagonGrid) {
-        console.log('setfield', axial);
+    private setFieldToGrid(props: Pick<ChooserProps, 'axial' | 'fieldCount'>, grid: HexagonGrid, getPlayer: PlayerChooser) {
+        const {axial} = props;
         const {players, hexagonProps} = this.props;
         const {padding, polygon} = this.calculation;
-        const index = getPlayer(axial, players.length);
+        const index = getPlayer({...props, playerCount: players.length});
         if (index !== undefined) {
             const player = players[index % players.length];
             const field = new HexagonField({player, axial});
