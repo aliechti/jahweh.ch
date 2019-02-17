@@ -3,6 +3,7 @@
     "outDir": "./web/build/",
     "module": "es6",
     "target": "es6",
+    "jsx": "react",
     "removeComments": true,
     "preserveConstEnums": true,
     "sourceMap": true,
