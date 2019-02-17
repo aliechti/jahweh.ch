@@ -1,22 +1,23 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import {Application} from 'pixi.js';
 import {HexagonGrid} from './HexagonGrid';
 import {Territory} from './Territory';
 import {UnitTypeManager} from './UnitTypeManager';
 import {Unit, UnitType} from './Unit';
-import {Panel, PanelProps} from './Panel';
+import {Panel} from './Panel';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {HexagonField} from './HexagonField';
 import {GameMap} from './GameMap';
+import {HexagonGridGenerator} from './HexagonGridGenerator';
+import {generateEvenlyChooser} from '../Function/Generator';
 import Texture = PIXI.Texture;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Container = PIXI.Container;
-import Graphics = PIXI.Graphics;
 
 export interface GameProps {
-    app: Application;
-    players: Player[];
-    grid: HexagonGrid;
-    panel: PanelProps;
+    players: Pick<Player, 'color'>[];
+    container: HTMLElement;
 }
 
 export interface PlayerProps {
@@ -37,36 +38,47 @@ export class Game {
     private player: Player;
     private _draggingUnit?: Unit;
     private unitTypeManager: UnitTypeManager;
-    private panel: Panel;
+    private panelContainer: HTMLElement;
     private dragContainer: ExplicitContainer<Unit>;
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
 
     constructor(props: GameProps) {
         this.props = props;
-        this.app = props.app;
-        this.grid = props.grid;
+
+        this.app = new Application(window.innerWidth, window.innerHeight, {
+            antialias: true,
+        });
+        this.props.container.appendChild(this.app.view);
+        window.addEventListener('resize', () => {
+            this.app.renderer.resize(window.innerWidth, window.innerHeight);
+        });
+
+        const generator = new HexagonGridGenerator({
+            players: this.props.players,
+            hexagonProps: {
+                radius: 25,
+                lineWidth: 2,
+                lineColor: 0x000000,
+            },
+            renderer: this.app.renderer,
+        });
+        this.players = generator.props.players;
+        this.player = this.players[0];
+
+        this.grid = generator.ring(4, generateEvenlyChooser(0, this.players));
         this.map = new GameMap({grid: this.grid});
-        this.players = props.players;
-        this.player = props.players[0];
         this.turn = 1;
         this.unitTypeManager = new UnitTypeManager({renderer: this.app.renderer});
         this.dragContainer = new Container() as ExplicitContainer<Unit>;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
-        this.panel = new Panel(this.props.panel);
-        this.panel.x = window.innerWidth - this.props.panel.w;
-        this.panel.setPlayer(this.player);
-        this.panel.setUnitTypes(this.unitTypeManager.units, this.handlePanelUnitClick);
-        const turnButton = new Graphics();
-        turnButton.beginFill(0x552288);
-        turnButton.drawRect(0, 0, 100, 20);
-        turnButton.endFill();
-        this.panel.setTurnButton(this.nextTurn, this.app.renderer.generateTexture(turnButton));
+        this.panelContainer = document.createElement('div');
+        this.props.container.appendChild(this.panelContainer);
+        this.renderPanel();
 
         this.app.stage.addChild(this.grid);
         this.app.stage.addChild(this.unitContainer);
-        this.app.stage.addChild(this.panel);
         this.app.stage.addChild(this.dragContainer);
 
         for (const field of this.grid.fields()) {
@@ -111,6 +123,16 @@ export class Game {
         this.setCurrentPlayerInteractivity();
     }
 
+    private renderPanel() {
+        return ReactDOM.render(<Panel
+            player={this.player}
+            unitTypes={this.unitTypeManager.units}
+            territory={this.player.selectedTerritory}
+            onClickNextTurn={this.nextTurn}
+            onClickUnitType={this.handlePanelUnitClick}
+        />, this.panelContainer);
+    }
+
     private addNewUnitToField(type: UnitType, field: HexagonField) {
         const unit = new Unit({
             type: type,
@@ -137,7 +159,7 @@ export class Game {
     private selectTerritory(territory: Territory) {
         this.unselectTerritory();
         this.player.selectedTerritory = territory;
-        this.panel.setTerritory(territory);
+        this.renderPanel();
         this.tintTerritory(this.player.selectedTerritory, 0x555555);
     }
 
@@ -172,7 +194,7 @@ export class Game {
             }
         }
         // Set current player to panel
-        this.panel.setPlayer(this.player);
+        this.renderPanel();
     };
 
     private setCurrentPlayerInteractivity(): void {
