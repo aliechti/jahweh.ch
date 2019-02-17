@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@types/pixi.js": "^4.8.6",
-    "pixi.js": "^4.8.5"
+    "pixi.js": "^4.8.5",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2"
   }
 }
