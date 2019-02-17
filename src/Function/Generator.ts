@@ -1,5 +1,5 @@
-import {ChooserProps, PlayerChooser} from '../Component/HexagonGridGenerator';
 import {Player} from '../Component/Game';
+import {ChooserProps, PlayerChooser} from '../Component/HexagonGridGenerator';
 
 export const chooserRandom: PlayerChooser = (props) => {
     return Math.floor(Math.random() * Math.floor(props.playerCount));

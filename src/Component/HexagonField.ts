@@ -1,7 +1,7 @@
+import {AxialCoordinates} from '../Function/Coordinates';
 import {Player} from './Game';
 import {Territory} from './Territory';
 import {Unit} from './Unit';
-import {AxialCoordinates} from '../Function/Coordinates';
 import Sprite = PIXI.Sprite;
 
 export interface HexagonFieldProps {

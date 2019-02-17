@@ -1,11 +1,11 @@
-import {Hexagon, HexagonProps} from './Hexagon';
+import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
 import {Player} from './Game';
+import {Hexagon, HexagonProps} from './Hexagon';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
-import SystemRenderer = PIXI.SystemRenderer;
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
+import SystemRenderer = PIXI.SystemRenderer;
 import Texture = PIXI.Texture;
 
 export interface HexagonGridProps {

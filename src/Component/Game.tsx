@@ -1,19 +1,19 @@
+import {Application} from 'pixi.js';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import {Application} from 'pixi.js';
-import {HexagonGrid} from './HexagonGrid';
-import {Territory} from './Territory';
-import {UnitTypeManager} from './UnitTypeManager';
-import {Unit, UnitType} from './Unit';
-import {Panel} from './Panel';
-import {ExplicitContainer} from '../Interface/ExplicitContainer';
-import {HexagonField} from './HexagonField';
-import {GameMap} from './GameMap';
-import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {generateEvenlyChooser} from '../Function/Generator';
-import Texture = PIXI.Texture;
-import InteractionEvent = PIXI.interaction.InteractionEvent;
+import {ExplicitContainer} from '../Interface/ExplicitContainer';
+import {GameMap} from './GameMap';
+import {HexagonField} from './HexagonField';
+import {HexagonGrid} from './HexagonGrid';
+import {HexagonGridGenerator} from './HexagonGridGenerator';
+import {Panel} from './Panel';
+import {Territory} from './Territory';
+import {Unit, UnitType} from './Unit';
+import {UnitTypeManager} from './UnitTypeManager';
 import Container = PIXI.Container;
+import InteractionEvent = PIXI.interaction.InteractionEvent;
+import Texture = PIXI.Texture;
 
 export interface GameProps {
     players: Pick<Player, 'color'>[];

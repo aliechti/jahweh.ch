@@ -1,5 +1,5 @@
-import {HexagonField} from './HexagonField';
 import {AxialCoordinates, axialDirections, AxialMap} from '../Function/Coordinates';
+import {HexagonField} from './HexagonField';
 import Container = PIXI.Container;
 
 export class HexagonGrid extends Container {

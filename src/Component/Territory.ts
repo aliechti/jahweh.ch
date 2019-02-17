@@ -1,5 +1,5 @@
-import {HexagonField} from './HexagonField';
 import {Player} from './Game';
+import {HexagonField} from './HexagonField';
 
 export interface TerritoryProps {
     player: Player;

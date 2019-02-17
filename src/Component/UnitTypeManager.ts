@@ -1,7 +1,7 @@
-import SystemRenderer = PIXI.SystemRenderer;
 import Graphics = PIXI.Graphics;
-import Texture = PIXI.Texture;
 import Point = PIXI.Point;
+import SystemRenderer = PIXI.SystemRenderer;
+import Texture = PIXI.Texture;
 import {UnitType} from './Unit';
 
 interface Props {

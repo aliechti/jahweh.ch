@@ -1,6 +1,6 @@
+import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Sprite = PIXI.Sprite;
 import Texture = PIXI.Texture;
-import InteractionEvent = PIXI.interaction.InteractionEvent;
 import {HexagonField} from './HexagonField';
 
 export interface UnitType {

@@ -1,6 +1,6 @@
 import {HexagonField} from './HexagonField';
-import {Territory} from './Territory';
 import {HexagonGrid} from './HexagonGrid';
+import {Territory} from './Territory';
 
 interface Props {
     grid: HexagonGrid;
