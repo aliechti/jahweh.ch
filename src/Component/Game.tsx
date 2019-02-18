@@ -1,23 +1,23 @@
-import {Application} from 'pixi.js';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
-import {generateEvenlyChooser} from '../Function/Generator';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {HexagonGridGenerator} from './HexagonGridGenerator';
-import {Panel} from './Panel';
+import {PanelProps} from './Panel';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import {UnitTypeManager} from './UnitTypeManager';
 import Container = PIXI.Container;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
+import SystemRenderer = PIXI.SystemRenderer;
 import Texture = PIXI.Texture;
 
 export interface GameProps {
-    players: Pick<Player, 'color'>[];
-    container: HTMLElement;
+    players: Player[];
+    renderer: SystemRenderer;
+    grid: HexagonGrid;
+    updatePanel: (props: GamePanelProps) => void;
+    unitTypeManager: UnitTypeManager;
 }
 
 export interface PlayerProps {
@@ -29,59 +29,32 @@ export interface Player extends PlayerProps {
     selectedTerritory?: Territory;
 }
 
-export class Game {
+export type GamePanelProps = Pick<PanelProps, 'player' | 'territory'>;
+
+export class Game extends Container {
     private props: GameProps;
-    private app: Application;
-    private grid: HexagonGrid;
     private map: GameMap;
-    private players: Player[];
     private player: Player;
     private _draggingUnit?: Unit;
-    private unitTypeManager: UnitTypeManager;
-    private panelContainer: HTMLElement;
     private dragContainer: ExplicitContainer<Unit>;
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
 
     constructor(props: GameProps) {
+        super();
         this.props = props;
+        this.player = this.props.players[0];
 
-        this.app = new Application(window.innerWidth, window.innerHeight, {
-            antialias: true,
-        });
-        this.props.container.appendChild(this.app.view);
-        window.addEventListener('resize', () => {
-            this.app.renderer.resize(window.innerWidth, window.innerHeight);
-        });
-
-        const generator = new HexagonGridGenerator({
-            players: this.props.players,
-            hexagonProps: {
-                radius: 25,
-                lineWidth: 2,
-                lineColor: 0x000000,
-            },
-            renderer: this.app.renderer,
-        });
-        this.players = generator.props.players;
-        this.player = this.players[0];
-
-        this.grid = generator.ring(4, generateEvenlyChooser(0, this.players));
-        this.map = new GameMap({grid: this.grid});
-        this.turn = 1;
-        this.unitTypeManager = new UnitTypeManager({renderer: this.app.renderer});
+        this.map = new GameMap({grid: this.props.grid});
+        this.turn = 0;
         this.dragContainer = new Container() as ExplicitContainer<Unit>;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
-        this.panelContainer = document.createElement('div');
-        this.props.container.appendChild(this.panelContainer);
-        this.renderPanel();
+        this.addChild(this.props.grid);
+        this.addChild(this.unitContainer);
+        this.addChild(this.dragContainer);
 
-        this.app.stage.addChild(this.grid);
-        this.app.stage.addChild(this.unitContainer);
-        this.app.stage.addChild(this.dragContainer);
-
-        for (const field of this.grid.fields()) {
+        for (const field of this.props.grid.fields()) {
             field.interactive = true;
             field.on('click', (e) => {
                 console.log('click field');
@@ -117,20 +90,18 @@ export class Game {
             const size = territory.props.fields.length;
             if (size > 1) {
                 const field = territory.props.fields[0];
-                this.addNewUnitToField(this.unitTypeManager.mainBuilding, field);
+                this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, field);
             }
         }
         this.setCurrentPlayerInteractivity();
+        this.nextTurn();
     }
 
-    private renderPanel() {
-        return ReactDOM.render(<Panel
-            player={this.player}
-            unitTypes={this.unitTypeManager.units}
-            territory={this.player.selectedTerritory}
-            onClickNextTurn={this.nextTurn}
-            onClickUnitType={this.handlePanelUnitClick}
-        />, this.panelContainer);
+    private updatePanel() {
+        this.props.updatePanel({
+            player: this.player,
+            territory: this.player.selectedTerritory,
+        });
     }
 
     private addNewUnitToField(type: UnitType, field: HexagonField) {
@@ -159,7 +130,7 @@ export class Game {
     private selectTerritory(territory: Territory) {
         this.unselectTerritory();
         this.player.selectedTerritory = territory;
-        this.renderPanel();
+        this.updatePanel();
         this.tintTerritory(this.player.selectedTerritory, 0x555555);
     }
 
@@ -170,8 +141,8 @@ export class Game {
         }
     }
 
-    private nextTurn = () => {
-        const players = this.players;
+    public nextTurn = () => {
+        const players = this.props.players;
         this.unselectTerritory();
         this.player = players[this.turn % players.length];
         this.turn++;
@@ -185,7 +156,7 @@ export class Game {
                 if (territory.isBankrupt()) {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
-                        if (field.unit !== undefined && field.unit.props.type !== this.unitTypeManager.mainBuilding) {
+                        if (field.unit !== undefined && field.unit.props.type !== this.props.unitTypeManager.mainBuilding) {
                             this.removeUnit(field.unit);
                         }
                     }
@@ -194,7 +165,7 @@ export class Game {
             }
         }
         // Set current player to panel
-        this.renderPanel();
+        this.updatePanel();
     };
 
     private setCurrentPlayerInteractivity(): void {
@@ -237,7 +208,7 @@ export class Game {
         }
         // capture field
         if (field.player !== this.player) {
-            const fieldNeighbors = this.grid.getFieldNeighbors(field);
+            const fieldNeighbors = this.props.grid.getFieldNeighbors(field);
             const defendingPoints = Math.max(...fieldNeighbors.map((f) => {
                 return (f.player !== field.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
             }));
@@ -254,7 +225,7 @@ export class Game {
                     return false;
                 }
                 // Defending is main building
-                if (defending === this.unitTypeManager.mainBuilding) {
+                if (defending === this.props.unitTypeManager.mainBuilding) {
                     fieldTerritory.money = 0;
                 }
                 // Remove defending unit
@@ -306,7 +277,7 @@ export class Game {
                         }
                         fieldsChecked.push(fieldOnSameTerritory);
                         // If the connected fields don't contain each other they are split up
-                        const connectedFields = this.grid.getConnectedFields(fieldOnSameTerritory);
+                        const connectedFields = this.props.grid.getConnectedFields(fieldOnSameTerritory);
                         if (!connectedFields.has(enemyField)) {
                             // make new territory
                             const newTerritory = new Territory({
@@ -337,7 +308,7 @@ export class Game {
                 if (mainBuilding === undefined && enemyTerritory.isControllable()) {
                     const mainBuildingField = enemyTerritory.props.fields.find((item) => {
                         return item.unit !== undefined
-                            && item.unit.props.type === this.unitTypeManager.mainBuilding;
+                            && item.unit.props.type === this.props.unitTypeManager.mainBuilding;
                     });
                     if (mainBuildingField === undefined) {
                         // Add building to the field without a unit or replace it with the weakest one
@@ -350,7 +321,7 @@ export class Game {
                         });
                         const newMainBuildingField = fields[0];
                         if (newMainBuildingField) {
-                            this.addNewUnitToField(this.unitTypeManager.mainBuilding, newMainBuildingField);
+                            this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
                         }
                     }
                 } else if (mainBuilding !== undefined && !enemyTerritory.isControllable()) {
@@ -367,7 +338,7 @@ export class Game {
             const droppedType = field.unit.props.type;
             const stayingType = unit.props.type;
             const cost = stayingType.cost + droppedType.cost;
-            const mergedType = this.unitTypeManager.units.find((type) => {
+            const mergedType = this.props.unitTypeManager.units.find((type) => {
                 return type.cost === cost;
             });
             if (mergedType) {
@@ -404,7 +375,7 @@ export class Game {
 
     private getTerritoryMainBuilding(territory: Territory): Unit | undefined {
         const field = territory.props.fields.find((item) => {
-            return item.unit !== undefined && item.unit.props.type === this.unitTypeManager.mainBuilding;
+            return item.unit !== undefined && item.unit.props.type === this.props.unitTypeManager.mainBuilding;
         });
         if (field === undefined) {
             return undefined;
@@ -420,7 +391,7 @@ export class Game {
         }
     };
 
-    private handlePanelUnitClick = (type: UnitType) => {
+    public handlePanelUnitClick = (type: UnitType) => {
         console.log('panel unit click', type);
         const territory = this.player.selectedTerritory;
         if (territory === undefined) {
@@ -465,13 +436,13 @@ export class Game {
             if (this._draggingUnit.canMove) {
                 this._draggingUnit.interactive = true;
             }
-            this.grid.off('pointermove', this.handleDragMove);
+            this.props.grid.off('pointermove', this.handleDragMove);
             this.unitContainer.addChild(this._draggingUnit);
         }
         this._draggingUnit = unit;
         if (this._draggingUnit) {
             this._draggingUnit.interactive = false;
-            this.grid.on('pointermove', this.handleDragMove);
+            this.props.grid.on('pointermove', this.handleDragMove);
             this.dragContainer.addChild(this._draggingUnit);
         }
     }
