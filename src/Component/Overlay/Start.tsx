@@ -38,15 +38,20 @@ export class Start extends React.Component<Props> {
                                 return <option value={chooser}>{chooser}</option>;
                             })}
                         </select>
-                        <label>Radius</label>
-                        <input value={options.radius}
-                               onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
-                        <label>Columns</label>
-                        <input value={options.columns}
-                               onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
-                        <label>Rows</label>
-                        <input value={options.rows}
-                               onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
+                        {options.shape === 'spiral' || options.shape === 'ring'
+                            ? <>
+                                <label>Radius</label>
+                                <input value={options.radius}
+                                       onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
+                            </> : <>
+                                <label>Columns</label>
+                                <input value={options.columns}
+                                       onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
+                                <label>Rows</label>
+                                <input value={options.rows}
+                                       onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
+                            </>
+                        }
                     </div>
                     <div style={{textAlign: 'center', marginTop: '1rem'}}>
                         <button type="button" onClick={onClickStart}>Start</button>
