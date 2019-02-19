@@ -4,24 +4,35 @@
     <meta charset="UTF-8">
     <title>Adrian Liechti</title>
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         html, body {
             margin: 0;
             padding: 0;
             overflow: hidden;
         }
 
-        html, body, button {
+        html, body, input, select, button {
             font-size: 1.5rem;
             font-family: sans-serif;
             color: #fff;
         }
 
-        button {
+        input, select, button {
             padding: 0.2rem 0.6rem;
-            cursor: pointer;
             color: #000;
             background-color: #fff;
             border: 1px solid #000;
+        }
+
+        input, select {
+            width: 100%;
+        }
+
+        button {
+            cursor: pointer;
         }
 
         .full {
