@@ -28,14 +28,14 @@ export class Start extends React.Component<Props> {
                         <select value={options.shape}
                                 onChange={(e) => this.handleSetOption('shape', e.target.value)}>
                             {shapes.map((shape) => {
-                                return <option value={shape}>{shape}</option>;
+                                return <option key={shape} value={shape}>{shape}</option>;
                             })}
                         </select>
                         <label>Chooser</label>
                         <select value={options.chooser}
                                 onChange={(e) => this.handleSetOption('chooser', e.target.value)}>
                             {choosers.map((chooser) => {
-                                return <option value={chooser}>{chooser}</option>;
+                                return <option key={chooser} value={chooser}>{chooser}</option>;
                             })}
                         </select>
                         {options.shape === 'spiral' || options.shape === 'ring'
