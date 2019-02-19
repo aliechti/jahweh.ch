@@ -35,7 +35,10 @@ export class Panel extends React.Component<PanelProps> {
                 <div className="unit-shop">
                     {unitTypes.map((type) => {
                         if (type.isBuildable) {
-                            return <button key={type.name} type="button"
+                            const title = `cost: ${type.cost}\n`
+                                + `salary: ${type.salary}\n`
+                                + `movable: ${type.isMovable ? 'true' : 'false'}`;
+                            return <button key={type.name} type="button" title={title}
                                            onClick={() => onClickUnitType(type)}>{type.name}</button>;
                         }
                     })}
