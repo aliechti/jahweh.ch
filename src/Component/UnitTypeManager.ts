@@ -86,17 +86,29 @@ export class UnitTypeManager {
     }
 
     private definitionToTexture(definition: string): Texture {
+        const graphics = new Graphics();
+        graphics.lineStyle(1, 0x222222);
+        graphics.beginFill(0x6789AB);
         switch (definition) {
+            case 'square':
+                graphics.drawRect(0, 0, 15, 15);
+                break;
+            case 'line':
+                graphics.drawRect(0, 0, 4, 20);
+                break;
+            case 'line-2':
+                graphics.drawRect(0, 0, 6, 20);
+                break;
+            case 'line-3':
+                graphics.drawRect(0, 0, 8, 20);
+                break;
+            case 'line-4':
+                graphics.drawRect(0, 0, 10, 20);
+                break;
             case 'circle':
             default:
-                return this.textureCircle();
+                graphics.drawCircle(0, 0, 10);
         }
-    }
-
-    private textureCircle(): Texture {
-        const graphics = new Graphics();
-        graphics.beginFill(0x6789AB);
-        graphics.drawCircle(0, 0, 10);
         graphics.endFill();
         const texture = this.props.renderer.generateTexture(graphics);
         texture.defaultAnchor = new Point(0.5, 0.5);
