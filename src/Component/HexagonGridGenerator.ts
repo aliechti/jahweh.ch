@@ -82,8 +82,7 @@ export class HexagonGridGenerator {
     }
 
     public spiral(radius: number, getPlayer: PlayerChooser): HexagonGrid {
-        // todo: calculate spiral field count
-        const fieldCount = 0;
+        const fieldCount = 3 * radius * (radius + 1) + 1;
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
         this.setFieldToGrid({axial: center, fieldCount}, grid, getPlayer);

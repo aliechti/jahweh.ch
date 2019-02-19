@@ -55,7 +55,7 @@ export class GameContainer extends React.Component<Props, State> {
             renderer,
         });
         const players = generator.props.players;
-        const grid = generator.ring(4, generateEvenlyChooser(0, players));
+        const grid = generator.spiral(4, generateEvenlyChooser(0, players));
         const updatePanel = this.handlePanelUpdate;
         this.unitTypeManager = new UnitTypeManager({renderer});
         this.game = new Game({renderer, grid, players, updatePanel, unitTypeManager: this.unitTypeManager});
