@@ -3,7 +3,8 @@ import * as React from 'react';
 import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
 import {Game, GamePanelProps, Player} from './Game';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
-import {Panel} from './Panel';
+import {Panel} from './Overlay/Panel';
+import {Start} from './Overlay/Start';
 import {UnitTypeManager} from './UnitTypeManager';
 
 interface Props {
@@ -13,10 +14,10 @@ interface Props {
 interface State {
     isStarted: boolean;
     panelProps?: GamePanelProps;
-    options: Options;
+    options: GameOptions;
 }
 
-interface Options {
+export interface GameOptions {
     shape: Shape;
     chooser: Chooser;
     columns: number;
@@ -25,10 +26,8 @@ interface Options {
 }
 
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
-type Shape = FunctionPropertyNames<HexagonGridGenerator>;
-type Chooser = 'random' | 'evenly';
-const shapes: Shape[] = ['rectangle', 'rhombus', 'ring', 'spiral'];
-const choosers: Chooser[] = ['random', 'evenly'];
+export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
+export type Chooser = 'random' | 'evenly';
 
 export class GameContainer extends React.Component<Props, State> {
     private canvasContainer: React.RefObject<HTMLDivElement>;
@@ -109,12 +108,6 @@ export class GameContainer extends React.Component<Props, State> {
         this.setState({panelProps});
     };
 
-    private handleSetOption = (name: keyof Options, value: any) => {
-        const {options} = this.state;
-        options[name] = value;
-        this.setState({options});
-    };
-
     renderPanel() {
         const {panelProps} = this.state;
         if (panelProps === undefined || this.unitTypeManager === undefined || this.game === undefined) {
@@ -130,52 +123,15 @@ export class GameContainer extends React.Component<Props, State> {
         );
     }
 
-    renderStartScreen() {
-        const {options} = this.state;
-        return (
-            <div className="start full">
-                <div className="center">
-                    <div style={{width: '200px'}}>
-                        <label>Shape</label>
-                        <select value={options.shape}
-                                onChange={(e) => this.handleSetOption('shape', e.target.value)}>
-                            {shapes.map((shape) => {
-                                return <option value={shape}>{shape}</option>;
-                            })}
-                        </select>
-                        <label>Chooser</label>
-                        <select value={options.chooser}
-                                onChange={(e) => this.handleSetOption('chooser', e.target.value)}>
-                            {choosers.map((chooser) => {
-                                return <option value={chooser}>{chooser}</option>;
-                            })}
-                        </select>
-                        <label>Radius</label>
-                        <input value={options.radius}
-                               onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
-                        <label>Columns</label>
-                        <input value={options.columns}
-                               onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
-                        <label>Rows</label>
-                        <input value={options.rows}
-                               onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
-                    </div>
-                    <div style={{textAlign: 'center', marginTop: '1rem'}}>
-                        <button type="button" onClick={this.handleStartGame}>Start</button>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
     render() {
-        const {isStarted} = this.state;
+        const {isStarted, options} = this.state;
         return (
             <>
                 <div className="canvas-container" ref={this.canvasContainer}/>
                 {isStarted
                     ? this.renderPanel()
-                    : this.renderStartScreen()
+                    : <Start options={options} onClickStart={this.handleStartGame}
+                             onSetOptions={(options) => this.setState({options})}/>
                 }
             </>
         );

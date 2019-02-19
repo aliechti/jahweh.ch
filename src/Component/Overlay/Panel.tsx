@@ -1,7 +1,7 @@
 import * as React from 'react';
-import {Player} from './Game';
-import {Territory} from './Territory';
-import {UnitType} from './Unit';
+import {Player} from '../Game';
+import {Territory} from '../Territory';
+import {UnitType} from '../Unit';
 
 export interface PanelProps {
     player: Player;

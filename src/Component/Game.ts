@@ -1,9 +1,8 @@
-import * as React from 'react';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {PanelProps} from './Panel';
+import {PanelProps} from './Overlay/Panel';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import {UnitTypeManager} from './UnitTypeManager';
