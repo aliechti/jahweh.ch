@@ -91,6 +91,8 @@ export class Game extends Container {
             if (size > 1) {
                 const field = territory.props.fields[0];
                 this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, field);
+                // Start money
+                territory.money = 6;
             }
         }
         this.setCurrentPlayerInteractivity();
