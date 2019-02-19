@@ -9,6 +9,7 @@ export interface PanelProps {
     unitTypes: UnitType[];
     onClickUnitType: (type: UnitType) => void;
     onClickNextTurn: () => void;
+    onClickExit: () => void;
 }
 
 function colorToString(color: number): string {
@@ -24,7 +25,7 @@ export class Panel extends React.Component<PanelProps> {
     }
 
     render() {
-        const {player, territory, unitTypes, onClickUnitType, onClickNextTurn} = this.props;
+        const {player, territory, unitTypes, onClickUnitType, onClickNextTurn, onClickExit} = this.props;
         return (
             <div className="full click-trough" style={{left: 'auto', width: '250px'}}>
                 <div>
@@ -41,6 +42,9 @@ export class Panel extends React.Component<PanelProps> {
                 </div>
                 <div>
                     <button type="button" onClick={onClickNextTurn}>Next turn</button>
+                </div>
+                <div>
+                    <button type="button" onClick={onClickExit}>Exit game</button>
                 </div>
             </div>
         );

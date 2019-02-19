@@ -42,6 +42,10 @@ export class GameContainer extends React.Component<Props, State> {
         }
     }
 
+    componentWillUnmount() {
+        this.app.stop();
+    }
+
     private handleStartGame = () => {
         this.app.stage.removeChildren();
         const renderer = this.app.renderer;
@@ -63,13 +67,13 @@ export class GameContainer extends React.Component<Props, State> {
         this.setState({isStarted: true});
     };
 
+    private handleExit = () => {
+        this.setState({isStarted: false});
+    };
+
     private handlePanelUpdate = (panelProps: GamePanelProps) => {
         this.setState({panelProps});
     };
-
-    componentWillUnmount() {
-        this.app.stop();
-    }
 
     renderPanel() {
         const {panelProps} = this.state;
@@ -81,6 +85,7 @@ export class GameContainer extends React.Component<Props, State> {
                    unitTypes={this.unitTypeManager.units}
                    onClickUnitType={this.game.handlePanelUnitClick}
                    onClickNextTurn={this.game.nextTurn}
+                   onClickExit={this.handleExit}
             />
         );
     }
