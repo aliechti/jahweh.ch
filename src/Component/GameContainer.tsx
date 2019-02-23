@@ -37,7 +37,7 @@ export type Chooser = 'random' | 'evenly';
 
 const zoomOptions = {
     min: 0.5,
-    max: 4,
+    max: 2,
     steps: 0.1,
 };
 
