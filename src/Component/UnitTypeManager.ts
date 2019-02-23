@@ -1,11 +1,11 @@
 import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
-import SystemRenderer = PIXI.SystemRenderer;
+import RenderTexture = PIXI.RenderTexture;
 import Texture = PIXI.Texture;
 import {UnitType} from './Unit';
 
 interface Props {
-    renderer: SystemRenderer;
+    textureGenerator: (graphics: Graphics) => RenderTexture;
 }
 
 interface UnitTypeDefinition extends Pick<UnitType, Exclude<keyof UnitType, 'texture'>> {
@@ -110,7 +110,7 @@ export class UnitTypeManager {
                 graphics.drawCircle(0, 0, 10);
         }
         graphics.endFill();
-        const texture = this.props.renderer.generateTexture(graphics);
+        const texture = this.props.textureGenerator(graphics);
         texture.defaultAnchor = new Point(0.5, 0.5);
         return texture;
     }

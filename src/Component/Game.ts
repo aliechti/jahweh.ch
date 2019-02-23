@@ -8,12 +8,10 @@ import {Unit, UnitType} from './Unit';
 import {UnitTypeManager} from './UnitTypeManager';
 import Container = PIXI.Container;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
-import SystemRenderer = PIXI.SystemRenderer;
 import Texture = PIXI.Texture;
 
 export interface GameProps {
     players: Player[];
-    renderer: SystemRenderer;
     grid: HexagonGrid;
     updatePanel: (props: GamePanelProps) => void;
     unitTypeManager: UnitTypeManager;

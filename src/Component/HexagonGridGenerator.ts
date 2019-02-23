@@ -1,15 +1,15 @@
 import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
 import {Player} from './Game';
+import {TextureGenerator} from './GameContainer';
 import {Hexagon, HexagonProps} from './Hexagon';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
-import SystemRenderer = PIXI.SystemRenderer;
 import Texture = PIXI.Texture;
 
 export interface HexagonGridProps {
-    renderer: SystemRenderer;
+    textureGenerator: TextureGenerator;
     players: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[];
     hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
 }
@@ -118,9 +118,9 @@ export class HexagonGridGenerator {
     }
 
     private generateHexagonTexture(color: number): Texture {
-        const {renderer, hexagonProps} = this.props;
+        const {textureGenerator, hexagonProps} = this.props;
         const hexagonTemplate = new Hexagon({...hexagonProps, fillColor: color});
-        const texture = renderer.generateTexture(hexagonTemplate);
+        const texture = textureGenerator(hexagonTemplate);
         texture.defaultAnchor = new Point(0.5, 0.5);
         return texture;
     }
