@@ -89,10 +89,10 @@ export class GameContainer extends React.Component<Props, State> {
     private handleScroll = (e: WheelEvent) => {
         if (e.deltaY > 0) {
             // out
-            this.zoom = this.zoom - zoomOptions.steps;
+            this.zoom -= this.zoom * zoomOptions.steps;
         } else {
             // in
-            this.zoom = this.zoom + zoomOptions.steps;
+            this.zoom += this.zoom * zoomOptions.steps;
         }
     };
 
