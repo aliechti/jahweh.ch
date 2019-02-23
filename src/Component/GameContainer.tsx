@@ -35,12 +35,19 @@ type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : ne
 export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
 export type Chooser = 'random' | 'evenly';
 
+const zoomOptions = {
+    min: 0.5,
+    max: 4,
+    steps: 0.1,
+};
+
 export class GameContainer extends React.Component<Props, State> {
     private canvasContainer: React.RefObject<HTMLDivElement>;
     private app: Application;
     private game?: Game;
     private unitTypeManager?: UnitTypeManager;
     private textureGenerator: TextureGenerator;
+    private _zoom: number;
 
     constructor(props: any) {
         super(props);
@@ -62,7 +69,7 @@ export class GameContainer extends React.Component<Props, State> {
             antialias: true,
         });
         this.textureGenerator = (displayObject) => {
-            return this.app.renderer.generateTexture(displayObject, SCALE_MODES.LINEAR, 1);
+            return this.app.renderer.generateTexture(displayObject, SCALE_MODES.LINEAR, zoomOptions.max);
         };
         const container = this.canvasContainer.current;
         if (container) {
@@ -71,11 +78,23 @@ export class GameContainer extends React.Component<Props, State> {
                 this.app.renderer.resize(window.innerWidth, window.innerHeight);
             });
         }
+        window.addEventListener('wheel', this.handleScroll);
     }
 
     componentWillUnmount() {
         this.app.stop();
+        window.removeEventListener('wheel', this.handleScroll);
     }
+
+    private handleScroll = (e: WheelEvent) => {
+        if (e.deltaY > 0) {
+            // out
+            this.zoom = this.zoom - zoomOptions.steps;
+        } else {
+            // in
+            this.zoom = this.zoom + zoomOptions.steps;
+        }
+    };
 
     private handleStartGame = () => {
         const {options} = this.state;
@@ -105,7 +124,7 @@ export class GameContainer extends React.Component<Props, State> {
         const updatePanel = this.handlePanelUpdate;
         this.unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
         this.game = new Game({grid, players, updatePanel, unitTypeManager: this.unitTypeManager});
-        this.game.scale = new Point(1, 1);
+        this.zoom = 1;
         this.app.stage.addChild(this.game);
         this.setState({isStarted: true});
     };
@@ -117,6 +136,17 @@ export class GameContainer extends React.Component<Props, State> {
     private handlePanelUpdate = (panelProps: GamePanelProps) => {
         this.setState({panelProps});
     };
+
+    get zoom(): number {
+        return this._zoom;
+    }
+
+    set zoom(value: number) {
+        if (this.game && value >= zoomOptions.min && value <= zoomOptions.max) {
+            this.game.scale = new Point(value, value);
+            this._zoom = value;
+        }
+    }
 
     renderPanel() {
         const {panelProps} = this.state;
