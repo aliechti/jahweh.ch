@@ -142,9 +142,9 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     set zoom(value: number) {
-        if (this.game && value >= zoomOptions.min && value <= zoomOptions.max) {
-            this.game.scale = new Point(value, value);
-            this._zoom = value;
+        if (this.game) {
+            this._zoom = Math.min(Math.max(value, zoomOptions.min), zoomOptions.max);
+            this.game.scale = new Point(this._zoom, this._zoom);
         }
     }
 
