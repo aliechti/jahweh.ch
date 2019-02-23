@@ -43,6 +43,7 @@ const zoomOptions = {
 
 export class GameContainer extends React.Component<Props, State> {
     private canvasContainer: React.RefObject<HTMLDivElement>;
+    private draggingContainer: React.RefObject<HTMLDivElement>;
     private app: Application;
     private game?: Game;
     private unitTypeManager?: UnitTypeManager;
@@ -52,6 +53,7 @@ export class GameContainer extends React.Component<Props, State> {
     constructor(props: any) {
         super(props);
         this.canvasContainer = React.createRef();
+        this.draggingContainer = React.createRef();
         this.state = {
             isStarted: false,
             options: {
@@ -127,6 +129,22 @@ export class GameContainer extends React.Component<Props, State> {
         this.zoom = 1;
         this.app.stage.addChild(this.game);
         this.setState({isStarted: true});
+        const field = grid.get({q: 4, r: 4});
+        console.log(field);
+        if (field && this.draggingContainer.current) {
+            const image = this.app.renderer.plugins.extract.image(field.texture);
+            image.style.position = 'absolute';
+            image.style.left = (field.x * zoomOptions.max) + 'px';
+            image.style.top = (field.y * zoomOptions.max) + 'px';
+            image.style.transform = 'translate(-50%, -50%)';
+            this.draggingContainer.current.style.transform = `scale(${this.zoom / zoomOptions.max})`;
+            this.draggingContainer.current.style.width = `${this.zoom * 100}%`;
+            this.draggingContainer.current.style.height = `${this.zoom * 100}%`;
+            this.draggingContainer.current.style.transformOrigin = 'top left';
+            this.draggingContainer.current.style.padding = '0';
+            this.draggingContainer.current.appendChild(image);
+            field.visible = false;
+        }
     };
 
     private handleExit = () => {
@@ -145,6 +163,11 @@ export class GameContainer extends React.Component<Props, State> {
         if (this.game) {
             this._zoom = Math.min(Math.max(value, zoomOptions.min), zoomOptions.max);
             this.game.scale = new Point(this._zoom, this._zoom);
+            if (this.draggingContainer.current) {
+                this.draggingContainer.current.style.transform = `scale(${this.zoom / zoomOptions.max})`;
+                this.draggingContainer.current.style.width = `${this.zoom * 100}%`;
+                this.draggingContainer.current.style.height = `${this.zoom * 100}%`;
+            }
         }
     }
 
@@ -173,6 +196,7 @@ export class GameContainer extends React.Component<Props, State> {
                     : <Start options={options} onClickStart={this.handleStartGame}
                              onSetOptions={(options) => this.setState({options})}/>
                 }
+                <div className="dragging-container full click-trough" ref={this.draggingContainer}/>
             </>
         );
     }
