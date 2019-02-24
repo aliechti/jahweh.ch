@@ -19,10 +19,12 @@ export class DragManager {
         interactive: boolean,
     };
     private _zoom: number;
+    private lastPosition: { x: number, y: number };
 
     constructor(props: Props) {
         this.props = props;
         this.zoom = 1;
+        this.lastPosition = {x: 0, y: 0};
     }
 
     private handleMove = (e: PointerEvent) => {
@@ -36,6 +38,7 @@ export class DragManager {
         const {resolution} = this.props;
         image.style.left = (x * resolution) + 'px';
         image.style.top = (y * resolution) + 'px';
+        this.lastPosition = {x, y};
     }
 
     get dragging(): Unit | undefined {
@@ -89,5 +92,8 @@ export class DragManager {
         container.style.transform = `scale(${scale})`;
         container.style.width = `${1 / scale * 100}%`;
         container.style.height = `${1 / scale * 100}%`;
+        if (this._dragging) {
+            this.setImagePosition(this._dragging.image, this.lastPosition.x, this.lastPosition.y);
+        }
     }
 }
