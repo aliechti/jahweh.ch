@@ -36,8 +36,8 @@ export class DragManager {
 
     private setImagePosition(image: HTMLImageElement, x: number, y: number) {
         const {resolution} = this.props;
-        image.style.left = (x * resolution) + 'px';
-        image.style.top = (y * resolution) + 'px';
+        image.style.left = (x * resolution / this._zoom) + 'px';
+        image.style.top = (y * resolution / this._zoom) + 'px';
         this.lastPosition = {x, y};
     }
 
