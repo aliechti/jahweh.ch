@@ -72,7 +72,7 @@ export class DragManager {
             image.style.position = 'absolute';
             image.style.transform = 'translate(-50%, -50%)';
             if (position) {
-                this.setImagePosition(image, position.x, position.y);
+                this.setCalculatedImagePosition(image, position.x, position.y);
             }
             this._dragging = {
                 unit,

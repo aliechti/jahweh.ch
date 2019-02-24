@@ -151,10 +151,17 @@ export class GameContainer extends React.Component<Props, State> {
                         return;
                     }
                     if (unit.props.field) {
-                        // todo: fix initial position if position comes from canvas
-                        this.dragManager.setDragging(unit);
+                        // If the unit has a field, it's from the canvas with the same zoom ratio,
+                        // but without the resolution
+                        const resolution = zoomOptions.max;
+                        console.log(game.x, unit.x, resolution * unit.x);
+                        this.dragManager.setDragging(unit, {
+                            x: game.x * resolution + unit.x * resolution,
+                            y: game.y * resolution + unit.y * resolution,
+                        });
                     } else {
-                        this.dragManager.setDragging(unit, {x: unit.x, y: unit.y});
+                        const scale = zoomOptions.max / this._zoom;
+                        this.dragManager.setDragging(unit, {x: unit.x * scale, y: unit.y * scale});
                     }
                 },
             },
