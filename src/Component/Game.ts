@@ -1,5 +1,4 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
-import {DragManager} from '../Manager/DragManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
@@ -16,7 +15,7 @@ export interface GameProps {
     grid: HexagonGrid;
     updatePanel: (props: GamePanelProps) => void;
     unitTypeManager: UnitTypeManager;
-    dragManager: DragManager;
+    dragManager: GameDragManager;
     onWin: (player: Player) => void;
 }
 
@@ -27,6 +26,11 @@ export interface PlayerProps {
 export interface Player extends PlayerProps {
     hexagonTexture: Texture;
     selectedTerritory?: Territory;
+}
+
+export interface GameDragManager {
+    getDragging: () => Unit | undefined;
+    setDragging: (unit?: Unit) => void;
 }
 
 export type GamePanelProps = Pick<PanelProps, 'player' | 'territory'>;
@@ -56,13 +60,13 @@ export class Game extends Container {
             field.interactive = true;
             field.on('click', (e) => {
                 const {dragManager} = this.props;
-                const unit = dragManager.dragging;
+                const unit = dragManager.getDragging();
                 console.log('click field');
                 if (unit !== undefined) {
                     const originalField = unit.props.field;
                     const success = this.moveUnit(unit, field);
                     // Reset unit dragging
-                    dragManager.dragging = undefined;
+                    dragManager.setDragging(undefined);
                     if (!success) {
                         // Reset unit position
                         if (originalField) {
@@ -424,8 +428,8 @@ export class Game extends Container {
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
         const {dragManager} = this.props;
-        if (dragManager.dragging === undefined) {
-            dragManager.dragging = unit;
+        if (dragManager.getDragging() === undefined) {
+            dragManager.setDragging(unit);
             e.stopPropagation();
         }
     };
@@ -438,7 +442,7 @@ export class Game extends Container {
             return;
         }
         const {dragManager} = this.props;
-        if (dragManager.dragging !== undefined) {
+        if (dragManager.getDragging() !== undefined) {
             console.warn('you can\'t drag another unit');
             return;
         }
@@ -450,7 +454,7 @@ export class Game extends Container {
         const unit = new Unit({type, onClick: this.handleUnitClick});
         unit.x = position.x;
         unit.y = position.y;
-        dragManager.dragging = unit;
+        dragManager.setDragging(unit);
     };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {

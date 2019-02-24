@@ -143,7 +143,21 @@ export class GameContainer extends React.Component<Props, State> {
             players,
             updatePanel,
             unitTypeManager: this.unitTypeManager,
-            dragManager: this.dragManager,
+            dragManager: {
+                getDragging: () => this.dragManager.getDragging(),
+                setDragging: (unit) => {
+                    if (unit === undefined) {
+                        this.dragManager.setDragging(unit);
+                        return;
+                    }
+                    if (unit.props.field) {
+                        // todo: fix initial position if position comes from canvas
+                        this.dragManager.setDragging(unit);
+                    } else {
+                        this.dragManager.setDragging(unit, {x: unit.x, y: unit.y});
+                    }
+                },
+            },
             onWin: this.handleExit,
         });
         this.zoom = 1;

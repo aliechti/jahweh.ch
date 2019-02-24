@@ -45,11 +45,11 @@ export class DragManager {
         this.lastPosition = {x, y};
     }
 
-    get dragging(): Unit | undefined {
+    getDragging(): Unit | undefined {
         return (this._dragging ? this._dragging.unit : undefined);
     }
 
-    set dragging(unit: Unit | undefined) {
+    setDragging(unit: Unit | undefined, position?: { x: number, y: number }) {
         const {container, moveEventContainer, extractImage} = this.props;
         // Remove currently dragging
         if (this._dragging !== undefined) {
@@ -71,12 +71,8 @@ export class DragManager {
             image.classList.add('click-trough');
             image.style.position = 'absolute';
             image.style.transform = 'translate(-50%, -50%)';
-            if (unit.props.field) {
-                const {resolution} = this.props;
-                // If the unit has a field, it's from the canvas with the same zoom ratio, but without the resolution
-                this.setCalculatedImagePosition(image, unit.x * resolution, unit.y * resolution);
-            } else {
-                this.setImagePosition(image, unit.x, unit.y);
+            if (position) {
+                this.setImagePosition(image, position.x, position.y);
             }
             this._dragging = {
                 unit,
