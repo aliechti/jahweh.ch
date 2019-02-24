@@ -6,7 +6,8 @@ export interface TerritoryProps {
     fields: HexagonField[];
 }
 
-const fieldIncome = 2;
+const fieldIncome = 1;
+const fieldStartIncome = 3;
 
 export class Territory {
 
@@ -25,6 +26,12 @@ export class Territory {
         }
     }
 
+    public onStart() {
+        if (this.isControllable()) {
+            this.money += this.startIncome();
+        }
+    }
+
     public isControllable(): boolean {
         return this.props.fields.length > 1;
     }
@@ -35,6 +42,10 @@ export class Territory {
 
     public income(): number {
         return this.props.fields.length * fieldIncome;
+    }
+
+    public startIncome(): number {
+        return this.props.fields.length * fieldStartIncome;
     }
 
     public salaries(): number {

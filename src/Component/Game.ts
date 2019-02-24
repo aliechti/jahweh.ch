@@ -87,8 +87,6 @@ export class Game extends Container {
             if (size > 1) {
                 const field = territory.props.fields[0];
                 this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, field);
-                // Start money
-                territory.money = 6;
             }
         }
         this.setCurrentPlayerInteractivity();
@@ -147,12 +145,17 @@ export class Game extends Container {
         this.unselectTerritory();
         this.player = players[this.turn % players.length];
         this.turn++;
+        const isFirstTurn = this.turn / players.length <= 1;
         // Attach unit click handlers for current player and remove others
         this.setCurrentPlayerInteractivity();
         // Territories on turn
         for (const territory of this.map.territories) {
             if (territory.props.player === this.player) {
-                territory.onTurn();
+                if (isFirstTurn) {
+                    territory.onStart();
+                } else {
+                    territory.onTurn();
+                }
                 // Remove units if territory is bankrupt
                 if (territory.isBankrupt()) {
                     console.log('Territory bankruptcy');
