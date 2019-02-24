@@ -181,6 +181,10 @@ export class Game extends Container {
     }
 
     private moveUnit = (unit: Unit, field: HexagonField): boolean => {
+        if (unit === field.unit) {
+            console.warn('Unit is already on this field');
+            return false;
+        }
         // Use unit field territory and player
         let territory: Territory;
         if (unit.props.field && unit.props.field.territory) {
