@@ -49,7 +49,9 @@ export class DragManager {
             const {unit, image, interactive} = this._dragging;
             moveEventContainer.removeEventListener('mousemove', this.handleMove);
             // Reset unit interactivity and visibility
-            unit.interactive = interactive;
+            if (unit.canMove) {
+                unit.interactive = interactive;
+            }
             unit.visible = true;
             if (image) {
                 container.removeChild(image);
