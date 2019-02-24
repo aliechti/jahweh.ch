@@ -209,6 +209,9 @@ export class Game extends Container {
         const isMovingInsideTerritory = territory.props.fields.includes(field);
         if (isMovingInsideTerritory) {
             console.log('is moving inside territory');
+        } else if (!unit.canMove) {
+            console.warn('Only movable units can be placed outside the territory');
+            return false;
         }
         if (!isMovingToNeighbors && !isMovingInsideTerritory) {
             console.warn('Unit can only move to neighbors or inside same territory');
