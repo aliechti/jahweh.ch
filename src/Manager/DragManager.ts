@@ -5,6 +5,7 @@ import Texture = PIXI.Texture;
 
 interface Props {
     container: HTMLElement;
+    moveEventContainer: HTMLElement;
     resolution: number;
 
     extractImage(target?: DisplayObject | RenderTexture | Texture): HTMLImageElement;
@@ -25,18 +26,16 @@ export class DragManager {
     }
 
     private handleMove = (e: PointerEvent) => {
-        console.log('handleMove', e);
         if (this._dragging) {
-            const {image, unit} = this._dragging;
-            this.setImagePosition(image, unit);
+            const {image} = this._dragging;
+            this.setImagePosition(image, e.clientX, e.clientY);
         }
     };
 
-    private setImagePosition(image: HTMLImageElement, unit: Unit) {
+    private setImagePosition(image: HTMLImageElement, x: number, y: number) {
         const {resolution} = this.props;
-        image.style.left = (unit.x * resolution) + 'px';
-        image.style.top = (unit.y * resolution) + 'px';
-        console.log('setImagePosition', unit.x * resolution, unit.x, resolution);
+        image.style.left = (x * resolution) + 'px';
+        image.style.top = (y * resolution) + 'px';
     }
 
     get dragging(): Unit | undefined {
@@ -44,12 +43,11 @@ export class DragManager {
     }
 
     set dragging(unit: Unit | undefined) {
-        const {container, extractImage} = this.props;
+        const {container, moveEventContainer, extractImage} = this.props;
         // Remove currently dragging
         if (this._dragging !== undefined) {
             const {unit, image, interactive} = this._dragging;
-            console.log('remove mousemove');
-            container.removeEventListener('mousemove', this.handleMove);
+            moveEventContainer.removeEventListener('mousemove', this.handleMove);
             // Reset unit interactivity and visibility
             unit.interactive = interactive;
             unit.visible = true;
@@ -62,9 +60,9 @@ export class DragManager {
         if (unit) {
             console.log(unit.texture);
             const image = extractImage(unit.texture);
+            image.classList.add('click-trough');
             image.style.position = 'absolute';
             image.style.transform = 'translate(-50%, -50%)';
-            this.setImagePosition(image, unit);
             this._dragging = {
                 unit,
                 image,
@@ -73,8 +71,7 @@ export class DragManager {
             unit.interactive = false;
             unit.visible = false;
             container.appendChild(this._dragging.image);
-            console.log('add mousemove');
-            container.addEventListener('mousemove', this.handleMove);
+            moveEventContainer.addEventListener('mousemove', this.handleMove);
         }
     }
 

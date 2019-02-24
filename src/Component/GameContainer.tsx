@@ -86,6 +86,7 @@ export class GameContainer extends React.Component<Props, State> {
         if (dragContainer) {
             this.dragManager = new DragManager({
                 container: dragContainer,
+                moveEventContainer: document.body,
                 resolution: zoomOptions.max,
                 extractImage: (image) => this.app.renderer.plugins.extract.image(image),
             });
