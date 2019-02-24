@@ -1,11 +1,11 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
+import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
 import {PanelProps} from './Overlay/Panel';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
-import {UnitTypeManager} from './UnitTypeManager';
 import Container = PIXI.Container;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Texture = PIXI.Texture;

@@ -1,11 +1,11 @@
 import {Application} from 'pixi.js';
 import * as React from 'react';
 import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
+import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {Game, GamePanelProps, Player} from './Game';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {Panel} from './Overlay/Panel';
 import {Start} from './Overlay/Start';
-import {UnitTypeManager} from './UnitTypeManager';
 import DisplayObject = PIXI.DisplayObject;
 import Point = PIXI.Point;
 import RenderTexture = PIXI.RenderTexture;

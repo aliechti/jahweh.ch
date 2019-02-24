@@ -2,7 +2,7 @@ import Graphics = PIXI.Graphics;
 import Point = PIXI.Point;
 import RenderTexture = PIXI.RenderTexture;
 import Texture = PIXI.Texture;
-import {UnitType} from './Unit';
+import {UnitType} from '../Component/Unit';
 
 interface Props {
     textureGenerator: (graphics: Graphics) => RenderTexture;
