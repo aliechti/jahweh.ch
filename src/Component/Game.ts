@@ -1,4 +1,5 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
+import {DragManager} from '../Manager/DragManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
@@ -15,6 +16,7 @@ export interface GameProps {
     grid: HexagonGrid;
     updatePanel: (props: GamePanelProps) => void;
     unitTypeManager: UnitTypeManager;
+    dragManager: DragManager;
 }
 
 export interface PlayerProps {
@@ -32,8 +34,6 @@ export class Game extends Container {
     private props: GameProps;
     private map: GameMap;
     private player: Player;
-    private _draggingUnit?: Unit;
-    private dragContainer: ExplicitContainer<Unit>;
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
 
@@ -44,23 +44,22 @@ export class Game extends Container {
 
         this.map = new GameMap({grid: this.props.grid});
         this.turn = 0;
-        this.dragContainer = new Container() as ExplicitContainer<Unit>;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
         this.addChild(this.props.grid);
         this.addChild(this.unitContainer);
-        this.addChild(this.dragContainer);
 
         for (const field of this.props.grid.fields()) {
             field.interactive = true;
             field.on('click', (e) => {
+                const {dragManager} = this.props;
+                const unit = dragManager.dragging;
                 console.log('click field');
-                if (this.draggingUnit !== undefined) {
-                    const originalField = this.draggingUnit.props.field;
-                    const unit = this.draggingUnit;
+                if (unit !== undefined) {
+                    const originalField = unit.props.field;
                     const success = this.moveUnit(unit, field);
                     // Reset unit dragging
-                    this.draggingUnit = undefined;
+                    dragManager.dragging = undefined;
                     if (!success) {
                         // Reset unit position
                         if (originalField) {
@@ -384,8 +383,9 @@ export class Game extends Container {
 
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
-        if (this.draggingUnit === undefined) {
-            this.draggingUnit = unit;
+        const {dragManager} = this.props;
+        if (dragManager.dragging === undefined) {
+            dragManager.dragging = unit;
             e.stopPropagation();
         }
     };
@@ -397,7 +397,8 @@ export class Game extends Container {
             console.warn('no territory selected');
             return;
         }
-        if (this.draggingUnit !== undefined) {
+        const {dragManager} = this.props;
+        if (dragManager.dragging !== undefined) {
             console.warn('you can\'t drag another unit');
             return;
         }
@@ -406,7 +407,7 @@ export class Game extends Container {
             return;
         }
         territory.money -= type.cost;
-        this.draggingUnit = new Unit({type, onClick: this.handleUnitClick});
+        dragManager.dragging = new Unit({type, onClick: this.handleUnitClick});
     };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
@@ -414,35 +415,6 @@ export class Game extends Container {
             for (const field of territory.props.fields) {
                 field.tint = tint;
             }
-        }
-    }
-
-    private handleDragMove = (e: InteractionEvent) => {
-        const unit = this.draggingUnit;
-        if (unit) {
-            unit.x = e.data.global.x;
-            unit.y = e.data.global.y;
-        }
-    };
-
-    get draggingUnit(): Unit | undefined {
-        return this._draggingUnit;
-    }
-
-    set draggingUnit(unit: Unit | undefined) {
-        if (this._draggingUnit !== undefined) {
-            // Reset unit interactivity only if it can move
-            if (this._draggingUnit.canMove) {
-                this._draggingUnit.interactive = true;
-            }
-            this.props.grid.off('pointermove', this.handleDragMove);
-            this.unitContainer.addChild(this._draggingUnit);
-        }
-        this._draggingUnit = unit;
-        if (this._draggingUnit) {
-            this._draggingUnit.interactive = false;
-            this.props.grid.on('pointermove', this.handleDragMove);
-            this.dragContainer.addChild(this._draggingUnit);
         }
     }
 }
