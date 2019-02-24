@@ -36,8 +36,12 @@ export class DragManager {
 
     private setImagePosition(image: HTMLImageElement, x: number, y: number) {
         const {resolution} = this.props;
-        image.style.left = (x * resolution / this._zoom) + 'px';
-        image.style.top = (y * resolution / this._zoom) + 'px';
+        this.setCalculatedImagePosition(image, x * resolution / this._zoom, y * resolution / this._zoom);
+    }
+
+    private setCalculatedImagePosition(image: HTMLImageElement, x: number, y: number) {
+        image.style.left = x + 'px';
+        image.style.top = y + 'px';
         this.lastPosition = {x, y};
     }
 
@@ -63,12 +67,17 @@ export class DragManager {
         }
         // Set currently dragging
         if (unit) {
-            console.log(unit.texture);
             const image = extractImage(unit.texture);
             image.classList.add('click-trough');
             image.style.position = 'absolute';
             image.style.transform = 'translate(-50%, -50%)';
-            this.setImagePosition(image, unit.x, unit.y);
+            if (unit.props.field) {
+                const {resolution} = this.props;
+                // If the unit has a field, it's from the canvas with the same zoom ratio, but without the resolution
+                this.setCalculatedImagePosition(image, unit.x * resolution, unit.y * resolution);
+            } else {
+                this.setImagePosition(image, unit.x, unit.y);
+            }
             this._dragging = {
                 unit,
                 image,
