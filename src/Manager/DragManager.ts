@@ -65,6 +65,7 @@ export class DragManager {
             image.classList.add('click-trough');
             image.style.position = 'absolute';
             image.style.transform = 'translate(-50%, -50%)';
+            this.setImagePosition(image, unit.x, unit.y);
             this._dragging = {
                 unit,
                 image,

@@ -7,7 +7,7 @@ export interface PanelProps {
     player: Player;
     territory?: Territory;
     unitTypes: UnitType[];
-    onClickUnitType: (type: UnitType) => void;
+    onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
     onClickNextTurn: () => void;
     onClickExit: () => void;
 }
@@ -39,7 +39,10 @@ export class Panel extends React.Component<PanelProps> {
                                 + `salary: ${type.salary}\n`
                                 + `movable: ${type.isMovable ? 'true' : 'false'}`;
                             return <button key={type.name} type="button" title={title}
-                                           onClick={() => onClickUnitType(type)}>{type.name}</button>;
+                                           onClick={(e) => onClickUnitType(type, {
+                                               x: e.clientX,
+                                               y: e.clientY,
+                                           })}>{type.name}</button>;
                         }
                     })}
                 </div>

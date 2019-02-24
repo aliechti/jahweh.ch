@@ -430,7 +430,7 @@ export class Game extends Container {
         }
     };
 
-    public handlePanelUnitClick = (type: UnitType) => {
+    public handlePanelUnitClick = (type: UnitType, position: { x: number, y: number }) => {
         console.log('panel unit click', type);
         const territory = this.player.selectedTerritory;
         if (territory === undefined) {
@@ -447,7 +447,10 @@ export class Game extends Container {
             return;
         }
         territory.money -= type.cost;
-        dragManager.dragging = new Unit({type, onClick: this.handleUnitClick});
+        const unit = new Unit({type, onClick: this.handleUnitClick});
+        unit.x = position.x;
+        unit.y = position.y;
+        dragManager.dragging = unit;
     };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
