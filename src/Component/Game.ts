@@ -116,6 +116,9 @@ export class Game extends Container {
         // Remove unit from previous field
         if (unit.props.field) {
             unit.props.field.unit = undefined;
+        } else {
+            // Unit has no field, so it must be newly bought
+            this.unitContainer.addChild(unit);
         }
         // Add field to unit
         unit.props.field = field;
