@@ -142,6 +142,7 @@ export class GameContainer extends React.Component<Props, State> {
             updatePanel,
             unitTypeManager: this.unitTypeManager,
             dragManager: this.dragManager,
+            onWin: this.handleExit,
         });
         this.zoom = 1;
         this.app.stage.addChild(this.game);

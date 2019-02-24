@@ -17,6 +17,7 @@ export interface GameProps {
     updatePanel: (props: GamePanelProps) => void;
     unitTypeManager: UnitTypeManager;
     dragManager: DragManager;
+    onWin: (player: Player) => void;
 }
 
 export interface PlayerProps {
@@ -34,13 +35,15 @@ export class Game extends Container {
     private props: GameProps;
     private map: GameMap;
     private player: Player;
+    private players: Player[];
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
 
     constructor(props: GameProps) {
         super();
         this.props = props;
-        this.player = this.props.players[0];
+        this.players = [...this.props.players];
+        this.player = this.players[0];
 
         this.map = new GameMap({grid: this.props.grid});
         this.turn = 0;
@@ -141,11 +144,23 @@ export class Game extends Container {
     }
 
     public nextTurn = () => {
-        const players = this.props.players;
+        const {onWin, unitTypeManager} = this.props;
         this.unselectTerritory();
-        this.player = players[this.turn % players.length];
+        this.player = this.players[this.turn % this.players.length];
         this.turn++;
-        const isFirstTurn = this.turn / players.length <= 1;
+        const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
+        if (playerFieldCount === 0) {
+            // todo: lost based on controllable territories
+            // todo: remove player from players and don't increase turns
+            this.nextTurn();
+            return;
+        } else if (playerFieldCount * 100 / fieldCount > 60) {
+            // todo: check if player has won directly after turn
+            // todo: win condition based on player count
+            onWin(this.player);
+            return;
+        }
+        const isFirstTurn = this.turn / this.players.length <= 1;
         // Attach unit click handlers for current player and remove others
         this.setCurrentPlayerInteractivity();
         // Territories on turn
@@ -160,7 +175,7 @@ export class Game extends Container {
                 if (territory.isBankrupt()) {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
-                        if (field.unit !== undefined && field.unit.props.type !== this.props.unitTypeManager.mainBuilding) {
+                        if (field.unit !== undefined && field.unit.props.type !== unitTypeManager.mainBuilding) {
                             this.removeUnit(field.unit);
                         }
                     }
@@ -171,6 +186,18 @@ export class Game extends Container {
         // Set current player to panel
         this.updatePanel();
     };
+
+    private playerFieldCount(player: Player): { playerFieldCount: number, fieldCount: number } {
+        let fieldCount = 0;
+        let playerFieldCount = 0;
+        for (const field of this.props.grid.fields()) {
+            fieldCount++;
+            if (field.player === player) {
+                playerFieldCount++;
+            }
+        }
+        return {playerFieldCount, fieldCount};
+    }
 
     private setCurrentPlayerInteractivity(): void {
         for (const unit of this.unitContainer.children) {
