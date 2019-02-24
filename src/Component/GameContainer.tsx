@@ -45,6 +45,7 @@ const zoomOptions = {
 export class GameContainer extends React.Component<Props, State> {
     private canvasContainer: React.RefObject<HTMLDivElement>;
     private dragContainer: React.RefObject<HTMLDivElement>;
+    private panelContainer: React.RefObject<HTMLDivElement>;
     private app: Application;
     private game?: Game;
     private unitTypeManager?: UnitTypeManager;
@@ -56,6 +57,7 @@ export class GameContainer extends React.Component<Props, State> {
         super(props);
         this.canvasContainer = React.createRef();
         this.dragContainer = React.createRef();
+        this.panelContainer = React.createRef();
         this.state = {
             isStarted: false,
             options: {
@@ -136,7 +138,7 @@ export class GameContainer extends React.Component<Props, State> {
         }
         const updatePanel = this.handlePanelUpdate;
         this.unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
-        this.game = new Game({
+        const game = this.game = new Game({
             grid,
             players,
             updatePanel,
@@ -145,8 +147,20 @@ export class GameContainer extends React.Component<Props, State> {
             onWin: this.handleExit,
         });
         this.zoom = 1;
-        this.app.stage.addChild(this.game);
-        this.setState({isStarted: true});
+        // Set game anchor to center
+        const anchorX = game.width / game.scale.x * 0.5;
+        const anchorY = game.height / game.scale.y * 0.5;
+        game.pivot = new Point(anchorX, anchorY);
+        // Game must be started to get the panel width
+        this.setState({isStarted: true}, () => {
+            // Center game position
+            let panelWidth = 0;
+            if (this.panelContainer.current) {
+                panelWidth = this.panelContainer.current.offsetWidth;
+            }
+            game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
+            this.app.stage.addChild(game);
+        });
     };
 
     private handleExit = () => {
@@ -180,6 +194,7 @@ export class GameContainer extends React.Component<Props, State> {
                    onClickUnitType={this.game.handlePanelUnitClick}
                    onClickNextTurn={this.game.nextTurn}
                    onClickExit={this.handleExit}
+                   containerRef={this.panelContainer}
             />
         );
     }

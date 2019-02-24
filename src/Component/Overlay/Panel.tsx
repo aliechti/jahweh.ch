@@ -10,6 +10,7 @@ export interface PanelProps {
     onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
     onClickNextTurn: () => void;
     onClickExit: () => void;
+    containerRef?: React.RefObject<HTMLDivElement>;
 }
 
 function colorToString(color: number): string {
@@ -25,9 +26,9 @@ export class Panel extends React.Component<PanelProps> {
     }
 
     render() {
-        const {player, territory, unitTypes, onClickUnitType, onClickNextTurn, onClickExit} = this.props;
+        const {player, territory, unitTypes, onClickUnitType, onClickNextTurn, onClickExit, containerRef} = this.props;
         return (
-            <div className="full click-trough" style={{left: 'auto', width: '250px'}}>
+            <div ref={containerRef} className="full click-trough" style={{left: 'auto', width: '250px'}}>
                 <div>
                     <div style={{color: colorToString(player.color)}}>Player</div>
                     <div>Money {territory ? territory.money : 0}</div>
