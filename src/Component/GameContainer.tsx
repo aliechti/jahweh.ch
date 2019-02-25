@@ -8,6 +8,7 @@ import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {Panel} from './Overlay/Panel';
 import {Start} from './Overlay/Start';
 import DisplayObject = PIXI.DisplayObject;
+import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Point = PIXI.Point;
 import RenderTexture = PIXI.RenderTexture;
 import SCALE_MODES = PIXI.SCALE_MODES;
@@ -93,6 +94,7 @@ export class GameContainer extends React.Component<Props, State> {
                 extractImage: (image) => this.app.renderer.plugins.extract.image(image),
             });
         }
+        // Zoom scroll wheel handler
         window.addEventListener('wheel', this.handleScroll);
     }
 
@@ -163,6 +165,11 @@ export class GameContainer extends React.Component<Props, State> {
             onWin: this.handleExit,
         });
         this.zoom = 1;
+        // Drag/pan handlers
+        game.interactive = true;
+        game.on('mousedown', this.handleGamePanStart);
+        game.on('mouseup', this.handleGamePanEnd);
+        game.on('mouseupoutside', this.handleGamePanEnd);
         // Set game anchor to center
         const anchorX = game.width / game.scale.x * 0.5;
         const anchorY = game.height / game.scale.y * 0.5;
@@ -177,6 +184,25 @@ export class GameContainer extends React.Component<Props, State> {
             game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
             this.app.stage.addChild(game);
         });
+    };
+
+    private panStart: { x: number, y: number };
+
+    private handleGamePanStart = (e: InteractionEvent) => {
+        const game = e.currentTarget;
+        this.panStart = {x: e.data.global.x - game.x, y: e.data.global.y - game.y};
+        game.on('mousemove', this.handleGamePanMove);
+    };
+
+    private handleGamePanEnd = (e: InteractionEvent) => {
+        e.currentTarget.off('mousemove', this.handleGamePanMove);
+    };
+
+    private handleGamePanMove = (e: InteractionEvent) => {
+        const game = e.currentTarget;
+        const mouse = {x: e.data.global.x, y: e.data.global.y};
+        game.x = mouse.x - this.panStart.x;
+        game.y = mouse.y - this.panStart.y;
     };
 
     private handleExit = () => {
