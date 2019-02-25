@@ -34,12 +34,13 @@ export class DragManager {
         }
     };
 
-    private setImagePosition(image: HTMLImageElement, x: number, y: number) {
+    private setImageScale(image: HTMLImageElement) {
         const {resolution} = this.props;
-        this.setCalculatedImagePosition(image, x * resolution / this._zoom, y * resolution / this._zoom);
+        const scale = this._zoom / resolution;
+        image.style.transform = `translate(-50%, -50%) scale(${scale})`;
     }
 
-    private setCalculatedImagePosition(image: HTMLImageElement, x: number, y: number) {
+    private setImagePosition(image: HTMLImageElement, x: number, y: number) {
         image.style.left = x + 'px';
         image.style.top = y + 'px';
         this.lastPosition = {x, y};
@@ -50,7 +51,7 @@ export class DragManager {
     }
 
     setDragging(unit: Unit | undefined, position?: { x: number, y: number }) {
-        const {container, moveEventContainer, extractImage} = this.props;
+        const {container, moveEventContainer, extractImage, resolution} = this.props;
         // Remove currently dragging
         if (this._dragging !== undefined) {
             const {unit, image, interactive} = this._dragging;
@@ -70,9 +71,9 @@ export class DragManager {
             const image = extractImage(unit.texture);
             image.classList.add('click-trough');
             image.style.position = 'absolute';
-            image.style.transform = 'translate(-50%, -50%)';
+            this.setImageScale(image);
             if (position) {
-                this.setCalculatedImagePosition(image, position.x, position.y);
+                this.setImagePosition(image, position.x, position.y);
             }
             this._dragging = {
                 unit,
@@ -91,13 +92,9 @@ export class DragManager {
     }
 
     set zoom(value: number) {
-        const {container, resolution} = this.props;
         this._zoom = value;
-        const scale = this._zoom / resolution;
-        container.style.transform = `scale(${scale})`;
-        container.style.width = `${1 / scale * 100}%`;
-        container.style.height = `${1 / scale * 100}%`;
         if (this._dragging) {
+            this.setImageScale(this._dragging.image);
             this.setImagePosition(this._dragging.image, this.lastPosition.x, this.lastPosition.y);
         }
     }

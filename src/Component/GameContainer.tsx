@@ -148,20 +148,15 @@ export class GameContainer extends React.Component<Props, State> {
                 setDragging: (unit) => {
                     if (unit === undefined) {
                         this.dragManager.setDragging(unit);
-                        return;
-                    }
-                    if (unit.props.field) {
-                        // If the unit has a field, it's from the canvas with the same zoom ratio,
-                        // but without the resolution
-                        const resolution = zoomOptions.max;
-                        console.log(game.x, unit.x, resolution * unit.x);
+                    } else if (unit.props.field) {
+                        // If the unit has a field, it's from the canvas game container
+                        // Pivot and unit has to be calculated with the zoom ratio
                         this.dragManager.setDragging(unit, {
-                            x: game.x * resolution + unit.x * resolution,
-                            y: game.y * resolution + unit.y * resolution,
+                            x: game.x - game.pivot.x * this._zoom + unit.x * this._zoom,
+                            y: game.y - game.pivot.y * this._zoom + unit.y * this._zoom,
                         });
                     } else {
-                        const scale = zoomOptions.max / this._zoom;
-                        this.dragManager.setDragging(unit, {x: unit.x * scale, y: unit.y * scale});
+                        this.dragManager.setDragging(unit, {x: unit.x, y: unit.y});
                     }
                 },
             },
@@ -231,7 +226,14 @@ export class GameContainer extends React.Component<Props, State> {
                              onSetOptions={(options) => this.setState({options})}/>
                 }
                 <div className="drag-container click-trough"
-                     style={{position: 'absolute', transformOrigin: 'top left', top: '0', left: '0'}}
+                     style={{
+                         position: 'absolute',
+                         transformOrigin: 'top left',
+                         top: '0',
+                         left: '0',
+                         width: '100%',
+                         height: '100%',
+                     }}
                      ref={this.dragContainer}/>
             </>
         );
