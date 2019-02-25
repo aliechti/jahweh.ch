@@ -7,6 +7,7 @@ import {Game, GamePanelProps, Player} from './Game';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {Panel} from './Overlay/Panel';
 import {Start} from './Overlay/Start';
+import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Point = PIXI.Point;
@@ -189,6 +190,12 @@ export class GameContainer extends React.Component<Props, State> {
     private panStart: { x: number, y: number };
 
     private handleGamePanStart = (e: InteractionEvent) => {
+        // Don't allow pan start if something is dragging or a movable unit is clicked
+        const isDragging = this.dragManager.getDragging();
+        const isMovableUnit = e.target instanceof Unit && e.target.canMove;
+        if (isDragging || isMovableUnit) {
+            return;
+        }
         const game = e.currentTarget;
         this.panStart = {x: e.data.global.x - game.x, y: e.data.global.y - game.y};
         game.on('mousemove', this.handleGamePanMove);
