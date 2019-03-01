@@ -162,6 +162,7 @@ export class Game extends Container {
         // Set current player to panel
         this.updatePanel();
     };
+
     public handleTurnEnd = () => {
         const {onWin} = this.props;
         this.unselectTerritory();
@@ -303,7 +304,7 @@ export class Game extends Container {
                 // Add fields to territory and remove other territory
                 territory.addField(...neighbor.props.fields);
                 neighbor.props.fields = [];
-                this.map.territories.splice(this.map.territories.indexOf(neighbor), 1);
+                this.map.deleteTerritory(neighbor);
             }
             // Split
             const enemyFields = fieldNeighbors.filter((neighbor) => {

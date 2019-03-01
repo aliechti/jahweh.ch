@@ -49,4 +49,11 @@ export class GameMap {
             territory.addField(...this.grid.getConnectedFields(field));
         }
     }
+
+    public deleteTerritory(territory: Territory): void {
+        const index = this.territories.indexOf(territory);
+        if (index !== -1) {
+            this.territories.splice(index, 1);
+        }
+    }
 }
