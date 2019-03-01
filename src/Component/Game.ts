@@ -166,8 +166,10 @@ export class Game extends Container {
     public handleTurnEnd = () => {
         const {onWin} = this.props;
         this.unselectTerritory();
-        const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
-        if (playerFieldCount * 100 / fieldCount > 60) {
+        const playerFieldCount = this.player.territories
+            .map((territory) => territory.props.fields.length)
+            .reduce((value, current) => current + value);
+        if (playerFieldCount * 100 / this.map.grid.size() > 60) {
             // todo: win condition based on player count
             console.info('Player has won', this.player);
             onWin(this.player);
@@ -201,18 +203,6 @@ export class Game extends Container {
         this.turn++;
         this.handleTurnStart();
     };
-
-    private playerFieldCount(player: Player): { playerFieldCount: number, fieldCount: number } {
-        let fieldCount = 0;
-        let playerFieldCount = 0;
-        for (const field of this.props.grid.fields()) {
-            fieldCount++;
-            if (field.player === player) {
-                playerFieldCount++;
-            }
-        }
-        return {playerFieldCount, fieldCount};
-    }
 
     private setCurrentPlayerInteractivity(): void {
         for (const unit of this.unitContainer.children) {
