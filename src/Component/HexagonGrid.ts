@@ -1,9 +1,9 @@
-import {AxialCoordinates, axialDirections, AxialMap} from '../Function/Coordinates';
+import {AxialCoordinates, axialDirections} from '../Function/Coordinates';
 import {HexagonField} from './HexagonField';
 import Container = PIXI.Container;
 
 export class HexagonGrid extends Container {
-    private _fields: AxialMap<HexagonField>;
+    private _fields: Map<string, HexagonField>;
 
     constructor() {
         super();
@@ -44,38 +44,31 @@ export class HexagonGrid extends Container {
     }
 
     public set(axial: AxialCoordinates, field: HexagonField): void {
-        let row = this._fields.get(axial.r);
-        if (row == undefined) {
-            row = new Map();
-            this._fields.set(axial.r, row);
-        }
-        if (row.has(axial.q)) {
-            this.removeChild(field);
-        }
+        this._fields.set(HexagonGrid.key(axial), field);
         this.addChild(field);
-        row.set(axial.q, field);
     }
 
     public get(axial: AxialCoordinates): HexagonField | undefined {
-        const row = this._fields.get(axial.r);
-        if (row) {
-            return row.get(axial.q);
-        }
-        return undefined;
+        return this._fields.get(HexagonGrid.key(axial));
     }
 
     public delete(axial: AxialCoordinates): void {
-        const row = this._fields.get(axial.r);
-        if (row) {
-            row.delete(axial.q);
+        const field = this.get(axial);
+        if (field) {
+            this.removeChild(field);
+            this._fields.delete(HexagonGrid.key(axial));
         }
     }
 
-    public* fields(): IterableIterator<HexagonField> {
-        for (const [, r] of this._fields) {
-            for (const [, q] of r) {
-                yield q;
-            }
-        }
+    public fields(): IterableIterator<HexagonField> {
+        return this._fields.values();
+    }
+
+    public size(): number {
+        return this._fields.size;
+    }
+
+    private static key(axial: AxialCoordinates): string {
+        return [axial.r, axial.q].join(',');
     }
 }

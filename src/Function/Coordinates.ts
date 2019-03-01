@@ -19,8 +19,6 @@ export interface PixelCoordinates {
     y: number;
 }
 
-export type AxialMap<V> = Map<number, Map<number, V>>;
-
 export const axialDirections: AxialCoordinates[] = [
     {q: 0, r: -1}, {q: 1, r: -1}, {q: 1, r: 0}, {q: 0, r: 1}, {q: -1, r: 1}, {q: -1, r: 0},
 ];
