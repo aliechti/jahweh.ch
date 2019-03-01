@@ -46,14 +46,20 @@ export class GameMap {
                 fields: [],
             });
             this.territories.push(territory);
+            field.player.territories.push(territory);
             territory.addField(...this.grid.getConnectedFields(field));
         }
     }
 
     public deleteTerritory(territory: Territory): void {
-        const index = this.territories.indexOf(territory);
+        GameMap.deleteTerritoryFrom(territory, territory.props.player.territories);
+        GameMap.deleteTerritoryFrom(territory, this.territories);
+    }
+
+    private static deleteTerritoryFrom(territory: Territory, territories: Territory[]): void {
+        const index = territories.indexOf(territory);
         if (index !== -1) {
-            this.territories.splice(index, 1);
+            territories.splice(index, 1);
         }
     }
 }
