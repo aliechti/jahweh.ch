@@ -185,7 +185,7 @@ export class Game extends Container {
             const {playerFieldCount} = this.playerFieldCount(this.player);
             if (playerFieldCount === 0) {
                 // todo: lost based on controllable territories
-                playerManager.remove(nextPlayer);
+                playerManager.delete(nextPlayer);
                 nextPlayer = undefined;
             }
         } while (nextPlayer === undefined && i-- > 0);

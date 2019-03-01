@@ -37,7 +37,7 @@ export class PlayerManager {
         return this.players[index % this.players.length];
     }
 
-    public remove(player: Player): void {
+    public delete(player: Player): void {
         const index = this.players.indexOf(player);
         if (index !== -1) {
             this.players.splice(index, 1);
