@@ -1,4 +1,5 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
+import {Player, PlayerManager} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
@@ -8,24 +9,14 @@ import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import Container = PIXI.Container;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
-import Texture = PIXI.Texture;
 
 export interface GameProps {
-    players: Player[];
+    playerManager: PlayerManager;
     grid: HexagonGrid;
     updatePanel: (props: GamePanelProps) => void;
     unitTypeManager: UnitTypeManager;
     dragManager: GameDragManager;
     onWin: (player: Player) => void;
-}
-
-export interface PlayerProps {
-    color: number;
-}
-
-export interface Player extends PlayerProps {
-    hexagonTexture: Texture;
-    selectedTerritory?: Territory;
 }
 
 export interface GameDragManager {
@@ -39,18 +30,15 @@ export class Game extends Container {
     private props: GameProps;
     private map: GameMap;
     private player: Player;
-    private players: Player[];
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
 
     constructor(props: GameProps) {
         super();
         this.props = props;
-        this.players = [...this.props.players];
-        this.player = this.players[0];
-
+        this.player = this.props.playerManager.first();
         this.map = new GameMap({grid: this.props.grid});
-        this.turn = 0;
+        this.turn = 1;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
         this.addChild(this.props.grid);
@@ -96,8 +84,7 @@ export class Game extends Container {
                 this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, field);
             }
         }
-        this.setCurrentPlayerInteractivity();
-        this.nextTurn();
+        this.handleTurnStart();
     }
 
     private updatePanel() {
@@ -147,24 +134,9 @@ export class Game extends Container {
         }
     }
 
-    public nextTurn = () => {
-        const {onWin, unitTypeManager} = this.props;
-        this.unselectTerritory();
-        this.player = this.players[this.turn % this.players.length];
-        this.turn++;
-        const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
-        if (playerFieldCount === 0) {
-            // todo: lost based on controllable territories
-            // todo: remove player from players and don't increase turns
-            this.nextTurn();
-            return;
-        } else if (playerFieldCount * 100 / fieldCount > 60) {
-            // todo: check if player has won directly after turn
-            // todo: win condition based on player count
-            onWin(this.player);
-            return;
-        }
-        const isFirstTurn = this.turn / this.players.length <= 1;
+    public handleTurnStart = () => {
+        const {unitTypeManager, playerManager} = this.props;
+        const isFirstTurn = this.turn / playerManager.players.length <= 1;
         // Attach unit click handlers for current player and remove others
         this.setCurrentPlayerInteractivity();
         // Territories on turn
@@ -189,6 +161,42 @@ export class Game extends Container {
         }
         // Set current player to panel
         this.updatePanel();
+    };
+    public handleTurnEnd = () => {
+        const {onWin} = this.props;
+        this.unselectTerritory();
+        const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
+        if (playerFieldCount * 100 / fieldCount > 60) {
+            // todo: check if player has won directly after turn
+            // todo: win condition based on player count
+            onWin(this.player);
+            return;
+        }
+    };
+
+    public nextTurn = () => {
+        const {playerManager} = this.props;
+        this.handleTurnEnd();
+        // Check if next player has already lost and remove him if so
+        let nextPlayer;
+        let i = playerManager.players.length;
+        do {
+            nextPlayer = playerManager.next(this.player);
+            const {playerFieldCount} = this.playerFieldCount(this.player);
+            if (playerFieldCount === 0) {
+                // todo: lost based on controllable territories
+                playerManager.remove(nextPlayer);
+                nextPlayer = undefined;
+            }
+        } while (nextPlayer === undefined && i-- > 0);
+        if (nextPlayer === undefined) {
+            console.error('Next turn next player chooser is probably broken');
+            return;
+        }
+        this.player = nextPlayer;
+        // Start next turn
+        this.turn++;
+        this.handleTurnStart();
     };
 
     private playerFieldCount(player: Player): { playerFieldCount: number, fieldCount: number } {

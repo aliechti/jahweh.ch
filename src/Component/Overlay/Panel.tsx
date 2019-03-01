@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Player} from '../Game';
+import {Player} from '../../Manager/PlayerManager';
 import {Territory} from '../Territory';
 import {UnitType} from '../Unit';
 

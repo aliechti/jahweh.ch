@@ -2,8 +2,10 @@ import {Application} from 'pixi.js';
 import * as React from 'react';
 import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
 import {DragManager} from '../Manager/DragManager';
+import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
-import {Game, GamePanelProps, Player} from './Game';
+import {Game, GamePanelProps} from './Game';
+import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {Panel} from './Overlay/Panel';
 import {Start} from './Overlay/Start';
@@ -15,7 +17,7 @@ import RenderTexture = PIXI.RenderTexture;
 import SCALE_MODES = PIXI.SCALE_MODES;
 
 interface Props {
-    players: Pick<Player, 'color'>[];
+    players: PlayerProps[];
 }
 
 interface State {
@@ -117,19 +119,23 @@ export class GameContainer extends React.Component<Props, State> {
     private handleStartGame = () => {
         const {options} = this.state;
         this.app.stage.removeChildren();
-        const generator = new HexagonGridGenerator({
+        const hexagonProps: HexagonProps = {
+            radius: 25,
+            lineWidth: 2,
+            lineColor: 0x000000,
+        };
+        const playerManager = new PlayerManager({
             players: this.props.players,
-            hexagonProps: {
-                radius: 25,
-                lineWidth: 2,
-                lineColor: 0x000000,
-            },
+            hexagonProps: hexagonProps,
             textureGenerator: this.textureGenerator,
         });
-        const players = generator.props.players;
+        const generator = new HexagonGridGenerator({
+            players: playerManager.players,
+            hexagonProps: hexagonProps,
+        });
         let chooser;
         if (options.chooser === 'evenly') {
-            chooser = generateEvenlyChooser(0, players);
+            chooser = generateEvenlyChooser(0, playerManager.players);
         } else {
             chooser = chooserRandom;
         }
@@ -143,7 +149,7 @@ export class GameContainer extends React.Component<Props, State> {
         this.unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
         const game = this.game = new Game({
             grid,
-            players,
+            playerManager,
             updatePanel,
             unitTypeManager: this.unitTypeManager,
             dragManager: {

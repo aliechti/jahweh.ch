@@ -1,5 +1,5 @@
 import {AxialCoordinates} from '../Function/Coordinates';
-import {Player} from './Game';
+import {Player} from '../Manager/PlayerManager';
 import {Territory} from './Territory';
 import {Unit} from './Unit';
 import Sprite = PIXI.Sprite;

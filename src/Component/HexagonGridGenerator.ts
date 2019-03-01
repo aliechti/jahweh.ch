@@ -1,21 +1,14 @@
 import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
-import {Player} from './Game';
-import {TextureGenerator} from './GameContainer';
+import {Player} from '../Manager/PlayerManager';
 import {Hexagon, HexagonProps} from './Hexagon';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
 import Point = PIXI.Point;
 import Polygon = PIXI.Polygon;
-import Texture = PIXI.Texture;
 
 export interface HexagonGridProps {
-    textureGenerator: TextureGenerator;
-    players: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[];
-    hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
-}
-
-interface HexagonGridPropsPrivate extends HexagonGridProps {
     players: Player[];
+    hexagonProps: HexagonProps;
 }
 
 interface HexagonCalculation {
@@ -38,12 +31,11 @@ export interface ChooserProps {
 export type PlayerChooser = (props: ChooserProps) => number | undefined;
 
 export class HexagonGridGenerator {
-    public readonly props: HexagonGridPropsPrivate;
+    public readonly props: HexagonGridProps;
     public calculation: HexagonCalculation;
 
     constructor(props: HexagonGridProps) {
-        this.props = {...props, players: []};
-        this.props.players = this.generatePlayerTextures(props.players);
+        this.props = props;
         this.calculation = HexagonGridGenerator.toHexagonCalculation(props.hexagonProps);
     }
 
@@ -107,22 +99,6 @@ export class HexagonGridGenerator {
             field.position = new Point(pixel.x + padding.x, pixel.y + padding.y);
             grid.set(axial, field);
         }
-    }
-
-    private generatePlayerTextures(playerProps: Pick<Player, Exclude<keyof Player, 'hexagonTexture'>>[]): Player[] {
-        const players: Player[] = [];
-        for (const player of playerProps) {
-            players.push({...player, hexagonTexture: this.generateHexagonTexture(player.color)});
-        }
-        return players;
-    }
-
-    private generateHexagonTexture(color: number): Texture {
-        const {textureGenerator, hexagonProps} = this.props;
-        const hexagonTemplate = new Hexagon({...hexagonProps, fillColor: color});
-        const texture = textureGenerator(hexagonTemplate);
-        texture.defaultAnchor = new Point(0.5, 0.5);
-        return texture;
     }
 
     private static toHexagonCalculation(props: HexagonProps): HexagonCalculation {
