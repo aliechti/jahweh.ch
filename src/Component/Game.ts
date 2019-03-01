@@ -167,7 +167,6 @@ export class Game extends Container {
         this.unselectTerritory();
         const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
         if (playerFieldCount * 100 / fieldCount > 60) {
-            // todo: check if player has won directly after turn
             // todo: win condition based on player count
             onWin(this.player);
             return;
