@@ -169,6 +169,7 @@ export class Game extends Container {
         const {playerFieldCount, fieldCount} = this.playerFieldCount(this.player);
         if (playerFieldCount * 100 / fieldCount > 60) {
             // todo: win condition based on player count
+            console.info('Player has won', this.player);
             onWin(this.player);
             return;
         }
@@ -182,9 +183,11 @@ export class Game extends Container {
         let i = playerManager.players.length;
         do {
             nextPlayer = playerManager.next(this.player);
-            const {playerFieldCount} = this.playerFieldCount(this.player);
-            if (playerFieldCount === 0) {
-                // todo: lost based on controllable territories
+            const territories = nextPlayer.territories.filter((territory) => {
+                return territory.isControllable();
+            });
+            if (territories.length === 0) {
+                console.info('Player has lost', nextPlayer);
                 playerManager.delete(nextPlayer);
                 nextPlayer = undefined;
             }
