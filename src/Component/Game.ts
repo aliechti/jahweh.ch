@@ -122,7 +122,7 @@ export class Game extends Container {
                 if (territory.isBankrupt()) {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
-                        if (field.unit !== undefined && field.unit.props.type !== unitTypeManager.mainBuilding) {
+                        if (field.unit !== undefined && field.unit.props.type.salary > 0) {
                             this.removeUnit(field.unit);
                         }
                     }
