@@ -193,7 +193,8 @@ export class GameContainer extends React.Component<Props, State> {
         });
     };
 
-    private panStart: { x: number, y: number };
+    private panStart?: { x: number, y: number };
+    private panDelayTimer?: number;
 
     private handleGamePanStart = (e: InteractionEvent) => {
         // Don't allow pan start if something is dragging or a movable unit is clicked
@@ -203,17 +204,23 @@ export class GameContainer extends React.Component<Props, State> {
             return;
         }
         const game = e.currentTarget;
-        this.panStart = {x: e.data.global.x - game.x, y: e.data.global.y - game.y};
-        game.on('mousemove', this.handleGamePanMove);
+        this.panDelayTimer = setTimeout(() => {
+            game.on('mousemove', this.handleGamePanMove);
+        }, 100);
     };
 
     private handleGamePanEnd = (e: InteractionEvent) => {
+        this.panStart = undefined;
+        clearTimeout(this.panDelayTimer);
         e.currentTarget.off('mousemove', this.handleGamePanMove);
     };
 
     private handleGamePanMove = (e: InteractionEvent) => {
         const game = e.currentTarget;
         const mouse = {x: e.data.global.x, y: e.data.global.y};
+        if (this.panStart === undefined) {
+            this.panStart = {x: mouse.x - game.x, y: mouse.y - game.y};
+        }
         game.x = mouse.x - this.panStart.x;
         game.y = mouse.y - this.panStart.y;
     };
