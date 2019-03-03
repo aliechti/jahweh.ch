@@ -118,8 +118,8 @@ export class Game extends Container {
                 } else {
                     territory.onTurn();
                 }
-                // Remove units if territory is bankrupt or isn't controllable anymore
-                if (territory.isBankrupt() || !territory.isControllable()) {
+                // Remove units if territory is bankrupt
+                if (territory.isBankrupt()) {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
                         if (field.unit !== undefined && field.unit.props.type !== unitTypeManager.mainBuilding) {
@@ -338,9 +338,11 @@ export class Game extends Container {
                             this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
                         }
                     }
-                } else if (mainBuilding !== undefined && !enemyTerritory.isControllable()) {
-                    // Remove main building if there is one and territory isn't controllable anymore
-                    this.removeUnit(this.getTerritoryMainBuilding(enemyTerritory));
+                } else if (!enemyTerritory.isControllable()) {
+                    // Remove main building and every other unit if territory isn't controllable anymore
+                    for (const enemyField of enemyTerritory.props.fields) {
+                        this.removeUnit(enemyField.unit);
+                    }
                 }
             }
             // Recalculate selected territory
