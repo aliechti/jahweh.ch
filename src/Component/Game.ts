@@ -349,11 +349,15 @@ export class Game extends Container {
             }
         } else if (field.unit !== undefined) {
             // Merge units from the same player if there is a unit with the same cost
-            const droppedType = field.unit.props.type;
-            const stayingType = unit.props.type;
+            const stayingType = field.unit.props.type;
+            if (!stayingType.isBuildable || !stayingType.isMovable) {
+                console.warn('Only buildable and movable units can merge together');
+                return false;
+            }
+            const droppedType = unit.props.type;
             const cost = stayingType.cost + droppedType.cost;
             const mergedType = this.props.unitTypeManager.units.find((type) => {
-                return type.cost === cost;
+                return type.cost === cost && type.isMovable && type.isBuildable;
             });
             if (mergedType) {
                 console.log('Units merged', {
