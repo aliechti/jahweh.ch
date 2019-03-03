@@ -434,6 +434,8 @@ export class Game extends Container {
         if (dragManager.getDragging() === undefined) {
             dragManager.setDragging(unit);
             e.stopPropagation();
+        } else if (unit.props.field) {
+            this.handleFieldClick(unit.props.field);
         }
     };
 
