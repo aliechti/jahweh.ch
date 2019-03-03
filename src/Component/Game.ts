@@ -118,8 +118,8 @@ export class Game extends Container {
                 } else {
                     territory.onTurn();
                 }
-                // Remove units if territory is bankrupt
-                if (territory.isBankrupt()) {
+                // Remove units if territory is bankrupt or isn't controllable anymore
+                if (territory.isBankrupt() || !territory.isControllable()) {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
                         if (field.unit !== undefined && field.unit.props.type !== unitTypeManager.mainBuilding) {
