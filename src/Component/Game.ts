@@ -46,36 +46,7 @@ export class Game extends Container {
 
         for (const field of this.props.grid.fields()) {
             field.interactive = true;
-            field.on('click', (e) => {
-                const {dragManager} = this.props;
-                const unit = dragManager.getDragging();
-                console.log('click field');
-                if (unit !== undefined) {
-                    const originalField = unit.props.field;
-                    const success = this.moveUnit(unit, field);
-                    // Reset unit dragging
-                    dragManager.setDragging(undefined);
-                    if (!success) {
-                        // Reset unit position
-                        if (originalField) {
-                            unit.position = originalField.position;
-                        } else {
-                            console.warn('Newly bought unit cant move there');
-                            // todo: refactor, it gets added to the unitContainer from the dragging setter
-                            // Refund unit payment
-                            if (this.player.selectedTerritory) {
-                                this.player.selectedTerritory.money += unit.props.type.cost;
-                            }
-                            this.unitContainer.removeChild(unit);
-                        }
-                    }
-                } else if (field.territory && field.player === this.player) {
-                    // Only select other territory if no unit is dragging and its the current player
-                    this.selectTerritory(field.territory);
-                } else {
-                    console.warn('Can\'t use another players territory');
-                }
-            });
+            field.on('click', () => this.handleFieldClick(field));
         }
         for (const territory of this.map.territories) {
             const size = territory.props.fields.length;
@@ -425,6 +396,37 @@ export class Game extends Container {
         }
         return field.unit;
     }
+
+    private handleFieldClick = (field: HexagonField) => {
+        const {dragManager} = this.props;
+        const unit = dragManager.getDragging();
+        console.log('click field');
+        if (unit !== undefined) {
+            const originalField = unit.props.field;
+            const success = this.moveUnit(unit, field);
+            // Reset unit dragging
+            dragManager.setDragging(undefined);
+            if (!success) {
+                // Reset unit position
+                if (originalField) {
+                    unit.position = originalField.position;
+                } else {
+                    console.warn('Newly bought unit cant move there');
+                    // todo: refactor, it gets added to the unitContainer from the dragging setter
+                    // Refund unit payment
+                    if (this.player.selectedTerritory) {
+                        this.player.selectedTerritory.money += unit.props.type.cost;
+                    }
+                    this.unitContainer.removeChild(unit);
+                }
+            }
+        } else if (field.territory && field.player === this.player) {
+            // Only select other territory if no unit is dragging and its the current player
+            this.selectTerritory(field.territory);
+        } else {
+            console.warn('Can\'t use another players territory');
+        }
+    };
 
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
