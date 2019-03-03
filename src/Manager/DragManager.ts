@@ -36,8 +36,10 @@ export class DragManager {
 
     private setImageScale(image: HTMLImageElement) {
         const {resolution} = this.props;
-        const scale = this._zoom / resolution;
+        const upEffectScale = 1.2;
+        const scale = this._zoom / resolution * upEffectScale;
         image.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        image.style.opacity = '0.8';
     }
 
     private setImagePosition(image: HTMLImageElement, x: number, y: number) {
