@@ -56,6 +56,7 @@ export class Game extends Container {
             }
         }
         this.handleTurnStart();
+        this.autoPlay();
     }
 
     private updatePanel() {
@@ -105,11 +106,17 @@ export class Game extends Container {
         }
     }
 
-    public handleTurnStart = () => {
-        const {unitTypeManager, playerManager} = this.props;
+    private autoPlay() {
+        let doTurn = this.player.doTurn;
+        while (doTurn) {
+            doTurn();
+            doTurn = this.nextTurn();
+        }
+    }
+
+    private handleTurnStart = () => {
+        const {playerManager} = this.props;
         const isFirstTurn = this.turn / playerManager.players.length <= 1;
-        // Attach unit click handlers for current player and remove others
-        this.setCurrentPlayerInteractivity();
         // Territories on turn
         for (const territory of this.map.territories) {
             if (territory.props.player === this.player) {
@@ -132,34 +139,48 @@ export class Game extends Container {
         }
         // Set current player to panel
         this.updatePanel();
+        // Attach unit click handlers for current player and remove others
+        this.setCurrentPlayerInteractivity();
     };
 
-    public handleTurnEnd = () => {
-        const {onWin} = this.props;
+    private handleTurnEnd = () => {
         this.unselectTerritory();
-        const playerFieldCount = this.player.territories
+    };
+
+    private hasPlayerWon = (player: Player) => {
+        const playerFieldCount = player.territories
             .map((territory) => territory.props.fields.length)
             .reduce((value, current) => current + value);
-        if (playerFieldCount * 100 / this.map.grid.size() > 60) {
+        return playerFieldCount * 100 / this.map.grid.size() > 60;
+    };
+
+    private hasPlayerLost = (player: Player) => {
+        const territories = player.territories.filter((territory) => {
+            return territory.isControllable();
+        });
+        return territories.length === 0;
+    };
+
+    public nextTurns = () => {
+        this.nextTurn();
+        this.autoPlay();
+    };
+
+    private nextTurn = (): (() => void) | undefined => {
+        const {playerManager, onWin} = this.props;
+        this.handleTurnEnd();
+        if (this.hasPlayerWon(this.player)) {
             // todo: win condition based on player count
             console.info('Player has won', this.player);
             onWin(this.player);
             return;
         }
-    };
-
-    public nextTurn = () => {
-        const {playerManager} = this.props;
-        this.handleTurnEnd();
         // Check if next player has already lost and remove him if so
         let nextPlayer;
         let i = playerManager.players.length;
         do {
             nextPlayer = playerManager.next(this.player);
-            const territories = nextPlayer.territories.filter((territory) => {
-                return territory.isControllable();
-            });
-            if (territories.length === 0) {
+            if (this.hasPlayerLost(nextPlayer)) {
                 console.info('Player has lost', nextPlayer);
                 playerManager.delete(nextPlayer);
                 nextPlayer = undefined;
@@ -173,6 +194,7 @@ export class Game extends Container {
         // Start next turn
         this.turn++;
         this.handleTurnStart();
+        return this.player.doTurn;
     };
 
     private setCurrentPlayerInteractivity(): void {

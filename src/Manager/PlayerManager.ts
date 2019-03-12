@@ -12,6 +12,7 @@ interface Props {
 
 export interface PlayerProps {
     color: number;
+    doTurn?: () => void;
 }
 
 export interface Player extends PlayerProps {

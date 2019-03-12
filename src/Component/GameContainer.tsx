@@ -254,7 +254,7 @@ export class GameContainer extends React.Component<Props, State> {
             <Panel {...panelProps}
                    unitTypes={this.unitTypeManager.units}
                    onClickUnitType={this.game.handlePanelUnitClick}
-                   onClickNextTurn={this.game.nextTurn}
+                   onClickNextTurn={this.game.nextTurns}
                    onClickExit={this.handleExit}
                    containerRef={this.panelContainer}
             />
