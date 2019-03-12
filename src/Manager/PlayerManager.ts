@@ -1,6 +1,10 @@
 import {TextureGenerator} from '../Component/GameContainer';
+import {GameMap} from '../Component/GameMap';
 import {Hexagon, HexagonProps} from '../Component/Hexagon';
+import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
+import {Unit, UnitType} from '../Component/Unit';
+import {UnitTypeManager} from './UnitTypeManager';
 import Point = PIXI.Point;
 import Texture = PIXI.Texture;
 
@@ -12,13 +16,23 @@ interface Props {
 
 export interface PlayerProps {
     color: number;
-    doTurn?: () => void;
+    doTurn?: DoTurnFunction;
 }
 
 export interface Player extends PlayerProps {
     hexagonTexture: Texture;
     selectedTerritory?: Territory;
     territories: Territory[];
+}
+
+export type DoTurnFunction = (props: doTurnProps) => void;
+
+export interface doTurnProps {
+    player: Player;
+    map: GameMap;
+    unitTypeManager: UnitTypeManager;
+    moveUnit: (unit: Unit, field: HexagonField) => boolean;
+    buyUnit: (type: UnitType, field: HexagonField, territory: Territory) => Unit | undefined;
 }
 
 export class PlayerManager {

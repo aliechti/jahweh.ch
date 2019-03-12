@@ -1,5 +1,5 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
-import {Player, PlayerManager} from '../Manager/PlayerManager';
+import {DoTurnFunction, Player, PlayerManager} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
@@ -109,7 +109,13 @@ export class Game extends Container {
     private autoPlay() {
         let doTurn = this.player.doTurn;
         while (doTurn) {
-            doTurn();
+            doTurn({
+                player: this.player,
+                map: this.map,
+                unitTypeManager: this.props.unitTypeManager,
+                moveUnit: this.moveUnit,
+                buyUnit: this.buyUnit,
+            });
             doTurn = this.nextTurn();
         }
     }
@@ -150,7 +156,7 @@ export class Game extends Container {
     private hasPlayerWon = (player: Player) => {
         const playerFieldCount = player.territories
             .map((territory) => territory.props.fields.length)
-            .reduce((value, current) => current + value);
+            .reduce((value, current) => current + value, 0);
         return playerFieldCount * 100 / this.map.grid.size() > 60;
     };
 
@@ -166,7 +172,7 @@ export class Game extends Container {
         this.autoPlay();
     };
 
-    private nextTurn = (): (() => void) | undefined => {
+    private nextTurn = (): DoTurnFunction | undefined => {
         const {playerManager, onWin} = this.props;
         this.handleTurnEnd();
         if (this.hasPlayerWon(this.player)) {
@@ -430,24 +436,9 @@ export class Game extends Container {
         const unit = dragManager.getDragging();
         console.log('click field');
         if (unit !== undefined) {
-            const originalField = unit.props.field;
-            const success = this.moveUnit(unit, field);
+            this.moveUnit(unit, field);
             // Reset unit dragging
             dragManager.setDragging(undefined);
-            if (!success) {
-                // Reset unit position
-                if (originalField) {
-                    unit.position = originalField.position;
-                } else {
-                    console.warn('Newly bought unit cant move there');
-                    // todo: refactor, it gets added to the unitContainer from the dragging setter
-                    // Refund unit payment
-                    if (this.player.selectedTerritory) {
-                        this.player.selectedTerritory.money += unit.props.type.cost;
-                    }
-                    this.unitContainer.removeChild(unit);
-                }
-            }
         } else if (field.territory && field.player === this.player) {
             // Only select other territory if no unit is dragging and its the current player
             this.selectTerritory(field.territory);
@@ -488,6 +479,23 @@ export class Game extends Container {
         unit.x = position.x;
         unit.y = position.y;
         dragManager.setDragging(unit);
+    };
+
+    private buyUnit = (type: UnitType, field: HexagonField, territory: Territory): Unit | undefined => {
+        if (!type.isBuildable) {
+            console.warn('unit type is not buildable');
+            return;
+        }
+        if (territory.money < type.cost) {
+            console.warn('not enough money to buy this unit');
+            return;
+        }
+        this.selectTerritory(territory);
+        const unit = new Unit({type, onClick: this.handleUnitClick});
+        if (this.moveUnit(unit, field)) {
+            territory.money -= type.cost;
+            return unit;
+        }
     };
 
     private tintTerritory(territory: Territory | undefined, tint: number) {
