@@ -7,7 +7,7 @@ export interface TerritoryProps {
 }
 
 const fieldIncome = 1;
-const fieldStartIncome = 3;
+const fieldStartIncome = 4;
 
 export class Territory {
 
