@@ -436,7 +436,11 @@ export class Game extends Container {
         const unit = dragManager.getDragging();
         console.log('click field');
         if (unit !== undefined) {
-            this.moveUnit(unit, field);
+            if (unit.isBought()) {
+                this.moveUnit(unit, field);
+            } else if (this.player.selectedTerritory) {
+                this.buyUnit(unit.props.type, field, this.player.selectedTerritory);
+            }
             // Reset unit dragging
             dragManager.setDragging(undefined);
         } else if (field.territory && field.player === this.player) {
@@ -474,7 +478,6 @@ export class Game extends Container {
             console.warn('not enough money to buy this unit');
             return;
         }
-        territory.money -= type.cost;
         const unit = new Unit({type, onClick: this.handleUnitClick});
         unit.x = position.x;
         unit.y = position.y;

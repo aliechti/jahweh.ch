@@ -41,16 +41,6 @@ export class Unit extends Sprite {
         this.texture = type.texture;
     }
 
-    get canMove(): boolean {
-        return this._canMove;
-    }
-
-    set canMove(value: boolean) {
-        this._canMove = value;
-        this.interactive = value;
-        this.buttonMode = value;
-    }
-
     public onTurn(): void {
         if (this.props.type.isMovable) {
             this.canMove = true;
@@ -61,5 +51,19 @@ export class Unit extends Sprite {
         if (this.props.type.isMovable) {
             this.canMove = false;
         }
+    }
+
+    public isBought(): boolean {
+        return this.props.field !== undefined;
+    }
+
+    get canMove(): boolean {
+        return this._canMove;
+    }
+
+    set canMove(value: boolean) {
+        this._canMove = value;
+        this.interactive = value;
+        this.buttonMode = value;
     }
 }
