@@ -32,6 +32,7 @@ export class Game extends Container {
     private player: Player;
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
+    private isAutoplayRunning: boolean;
 
     constructor(props: GameProps) {
         super();
@@ -106,7 +107,11 @@ export class Game extends Container {
         }
     }
 
-    private autoPlay() {
+    private async autoPlay() {
+        function sleep(ms: number) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
         let doTurn = this.player.doTurn;
         while (doTurn) {
             doTurn({
@@ -117,6 +122,7 @@ export class Game extends Container {
                 buyUnit: this.buyUnit,
             });
             doTurn = this.nextTurn();
+            await sleep(500);
         }
     }
 
