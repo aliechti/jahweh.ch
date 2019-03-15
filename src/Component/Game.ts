@@ -173,9 +173,15 @@ export class Game extends Container {
         return territories.length === 0;
     };
 
-    public nextTurns = () => {
-        this.nextTurn();
-        this.autoPlay();
+    public nextTurns = (): Promise<void> => {
+        if (!this.isAutoplayRunning) {
+            this.nextTurn();
+            this.isAutoplayRunning = true;
+            return this.autoPlay().then(() => {
+                this.isAutoplayRunning = false;
+            });
+        }
+        return new Promise(() => undefined);
     };
 
     private nextTurn = (): DoTurnFunction | undefined => {
