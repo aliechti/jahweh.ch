@@ -23,6 +23,9 @@ export class Unit extends Sprite {
 
     public props: UnitProps;
     private _canMove: boolean;
+    private shakeStep: number = 0.03;
+    private shakeMax: number = 0.18;
+    private animationHandle?: number;
 
     constructor(props: UnitProps) {
         super(props.type.texture);
@@ -62,8 +65,35 @@ export class Unit extends Sprite {
     }
 
     set canMove(value: boolean) {
+        if (value) {
+            this.play();
+        } else {
+            this.stop();
+        }
         this._canMove = value;
         this.interactive = value;
         this.buttonMode = value;
     }
+
+    private play() {
+        if (this.animationHandle === undefined) {
+            this.animationHandle = requestAnimationFrame(this.animate);
+        }
+    }
+
+    private stop() {
+        if (this.animationHandle) {
+            cancelAnimationFrame(this.animationHandle);
+            this.animationHandle = undefined;
+            this.rotation = 0;
+        }
+    }
+
+    private animate = () => {
+        this.rotation += this.shakeStep;
+        if (this.rotation > this.shakeMax || this.rotation < -(this.shakeMax)) {
+            this.shakeStep *= -1;
+        }
+        this.animationHandle = requestAnimationFrame(this.animate);
+    };
 }
