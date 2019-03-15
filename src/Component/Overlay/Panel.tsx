@@ -8,9 +8,13 @@ export interface PanelProps {
     territory?: Territory;
     unitTypes: UnitType[];
     onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
-    onClickNextTurn: () => void;
+    onClickNextTurn: () => Promise<void>;
     onClickExit: () => void;
     containerRef?: React.RefObject<HTMLDivElement>;
+}
+
+interface State {
+    isAutoplayRunning: boolean;
 }
 
 function colorToString(color: number): string {
@@ -19,14 +23,17 @@ function colorToString(color: number): string {
     return '#' + padding + hex;
 }
 
-export class Panel extends React.Component<PanelProps> {
+export class Panel extends React.Component<PanelProps, State> {
     constructor(props: PanelProps) {
         super(props);
-        this.state = {};
+        this.state = {
+            isAutoplayRunning: false,
+        };
     }
 
     render() {
         const {player, territory, unitTypes, onClickUnitType, onClickNextTurn, onClickExit, containerRef} = this.props;
+        const {isAutoplayRunning} = this.state;
         return (
             <div ref={containerRef} className="full click-trough" style={{left: 'auto', width: '250px'}}>
                 <div>
@@ -48,7 +55,13 @@ export class Panel extends React.Component<PanelProps> {
                     })}
                 </div>
                 <div>
-                    <button type="button" onClick={onClickNextTurn}>Next turn</button>
+                    <button type="button" disabled={isAutoplayRunning} onClick={() => {
+                        this.setState({isAutoplayRunning: true});
+                        onClickNextTurn().then(() => {
+                            this.setState({isAutoplayRunning: false});
+                        });
+                    }}>Next turn
+                    </button>
                 </div>
                 <div>
                     <button type="button" onClick={onClickExit}>Exit game</button>
