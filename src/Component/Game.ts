@@ -40,6 +40,7 @@ export class Game extends Container {
         this.player = this.props.playerManager.first();
         this.map = new GameMap({grid: this.props.grid});
         this.turn = 1;
+        this.isAutoplayRunning = false;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
 
         this.addChild(this.props.grid);
@@ -112,17 +113,22 @@ export class Game extends Container {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
 
-        let doTurn = this.player.doTurn;
-        while (doTurn) {
-            doTurn({
-                player: this.player,
-                map: this.map,
-                unitTypeManager: this.props.unitTypeManager,
-                moveUnit: this.moveUnit,
-                buyUnit: this.buyUnit,
-            });
-            doTurn = this.nextTurn();
-            await sleep(500);
+        // This can be only run once at a time
+        if (!this.isAutoplayRunning) {
+            this.isAutoplayRunning = true;
+            let doTurn = this.player.doTurn;
+            while (doTurn) {
+                doTurn({
+                    player: this.player,
+                    map: this.map,
+                    unitTypeManager: this.props.unitTypeManager,
+                    moveUnit: this.moveUnit,
+                    buyUnit: this.buyUnit,
+                });
+                doTurn = this.nextTurn();
+                await sleep(500);
+            }
+            this.isAutoplayRunning = false;
         }
     }
 
@@ -173,15 +179,11 @@ export class Game extends Container {
         return territories.length === 0;
     };
 
-    public nextTurns = (): Promise<void> => {
+    public nextTurns = async (): Promise<void> => {
         if (!this.isAutoplayRunning) {
             this.nextTurn();
-            this.isAutoplayRunning = true;
-            return this.autoPlay().then(() => {
-                this.isAutoplayRunning = false;
-            });
+            await this.autoPlay();
         }
-        return new Promise(() => undefined);
     };
 
     private nextTurn = (): DoTurnFunction | undefined => {
