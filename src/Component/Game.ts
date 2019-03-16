@@ -118,15 +118,17 @@ export class Game extends Container {
             this.isAutoplayRunning = true;
             let doTurn = this.player.actor.doTurn;
             while (doTurn) {
-                doTurn({
-                    player: this.player,
-                    map: this.map,
-                    unitTypeManager: this.props.unitTypeManager,
-                    moveUnit: this.moveUnit,
-                    buyUnit: this.buyUnit,
-                });
+                await Promise.all([
+                    doTurn({
+                        player: this.player,
+                        map: this.map,
+                        unitTypeManager: this.props.unitTypeManager,
+                        moveUnit: this.moveUnit,
+                        buyUnit: this.buyUnit,
+                    }),
+                    sleep(500),
+                ]);
                 doTurn = this.nextTurn();
-                await sleep(500);
             }
             this.isAutoplayRunning = false;
         }

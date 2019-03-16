@@ -25,7 +25,7 @@ export interface Player extends PlayerProps {
     territories: Territory[];
 }
 
-export type DoTurnFunction = (props: DoTurnProps) => void;
+export type DoTurnFunction = (props: DoTurnProps) => Promise<void>;
 
 export interface DoTurnProps {
     player: Player;
