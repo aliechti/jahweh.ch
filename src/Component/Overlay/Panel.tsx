@@ -24,11 +24,21 @@ function colorToString(color: number): string {
 }
 
 export class Panel extends React.Component<PanelProps, State> {
+    private _isMounted: boolean;
+
     constructor(props: PanelProps) {
         super(props);
         this.state = {
             isAutoplayRunning: false,
         };
+    }
+
+    componentDidMount(): void {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount(): void {
+        this._isMounted = false;
     }
 
     render() {
@@ -58,7 +68,7 @@ export class Panel extends React.Component<PanelProps, State> {
                     <button type="button" disabled={isAutoplayRunning} onClick={() => {
                         this.setState({isAutoplayRunning: true});
                         onClickNextTurn().then(() => {
-                            this.setState({isAutoplayRunning: false});
+                            this._isMounted && this.setState({isAutoplayRunning: false});
                         });
                     }}>Next turn
                     </button>
