@@ -116,7 +116,7 @@ export class Game extends Container {
         // This can be only run once at a time
         if (!this.isAutoplayRunning) {
             this.isAutoplayRunning = true;
-            let doTurn = this.player.doTurn;
+            let doTurn = this.player.actor.doTurn;
             while (doTurn) {
                 doTurn({
                     player: this.player,
@@ -214,7 +214,7 @@ export class Game extends Container {
         // Start next turn
         this.turn++;
         this.handleTurnStart();
-        return this.player.doTurn;
+        return this.player.actor.doTurn;
     };
 
     private setCurrentPlayerInteractivity(): void {

@@ -16,7 +16,7 @@ interface Props {
 
 export interface PlayerProps {
     color: number;
-    doTurn?: DoTurnFunction;
+    actor: Actor;
 }
 
 export interface Player extends PlayerProps {
@@ -25,14 +25,18 @@ export interface Player extends PlayerProps {
     territories: Territory[];
 }
 
-export type DoTurnFunction = (props: doTurnProps) => void;
+export type DoTurnFunction = (props: DoTurnProps) => void;
 
-export interface doTurnProps {
+export interface DoTurnProps {
     player: Player;
     map: GameMap;
     unitTypeManager: UnitTypeManager;
     moveUnit: (unit: Unit, field: HexagonField) => boolean;
     buyUnit: (type: UnitType, field: HexagonField, territory: Territory) => Unit | undefined;
+}
+
+export interface Actor {
+    doTurn?: DoTurnFunction;
 }
 
 export class PlayerManager {
