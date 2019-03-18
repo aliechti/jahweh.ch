@@ -58,10 +58,14 @@ export class MovementManager {
         }
         // capture field
         if (field.player !== unitPlayer) {
-            this.captureField(unit, field, unitPlayer, unitTerritory);
+            if (!this.captureField(unit, field, unitPlayer, unitTerritory)) {
+                return false;
+            }
         } else if (field.unit !== undefined) {
             // Merge units from the same player if there is a unit with the same cost
-            this.mergeUnits(unit, field.unit);
+            if (!this.mergeUnits(unit, field.unit)) {
+                return false;
+            }
         }
         this.props.unitManager.set(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors
@@ -72,7 +76,7 @@ export class MovementManager {
         return true;
     };
 
-    public getFieldDefendingStrength(field: HexagonField) {
+    public getFieldDefendingStrength(field: HexagonField): number {
         const fieldNeighbors = this.map.grid.getFieldNeighbors(field);
         const ownStrength = field.unit ? field.unit.props.type.strength : 0;
         return Math.max(ownStrength, ...fieldNeighbors.map((f) => {
@@ -80,7 +84,7 @@ export class MovementManager {
         }));
     }
 
-    private captureField(unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory: Territory) {
+    private captureField(unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory: Territory): boolean {
         const fieldTerritory = field.territory as Territory;
         const attacking = unit.props.type;
         if (attacking.strength <= this.getFieldDefendingStrength(field)) {
@@ -131,9 +135,10 @@ export class MovementManager {
         if (unitPlayer.selectedTerritory) {
             this.props.selectTerritory(unitPlayer.selectedTerritory);
         }
+        return true;
     }
 
-    private mergeTerritories(main: Territory, territories: Iterable<Territory>) {
+    private mergeTerritories(main: Territory, territories: Iterable<Territory>): void {
         for (const neighbor of territories) {
             main.money += neighbor.money;
             // Remove other main buildings
@@ -145,7 +150,7 @@ export class MovementManager {
         }
     }
 
-    private splitTerritories(enemyFields: HexagonField[]) {
+    private splitTerritories(enemyFields: HexagonField[]): void {
         const fieldsChecked: HexagonField[] = [];
         for (const enemyField of enemyFields) {
             if (fieldsChecked.includes(enemyField)) {
@@ -186,7 +191,7 @@ export class MovementManager {
         }
     }
 
-    private renewMainBuildings(territories: Iterable<Territory>) {
+    private renewMainBuildings(territories: Iterable<Territory>): void {
         for (const enemyTerritory of territories) {
             const mainBuilding = this.props.unitManager.getTerritoryMainBuilding(enemyTerritory);
             // add new main building if there is none and territory is controllable
@@ -218,7 +223,7 @@ export class MovementManager {
         }
     }
 
-    private mergeUnits(unit: Unit, fieldUnit: Unit) {
+    private mergeUnits(unit: Unit, fieldUnit: Unit): boolean {
         const stayingType = fieldUnit.props.type;
         if (!stayingType.isBuildable || !stayingType.isMovable) {
             console.warn('Only buildable and movable units can merge together');
@@ -243,5 +248,6 @@ export class MovementManager {
             console.warn('No type with same cost found to merge');
             return false;
         }
+        return true;
     }
 }

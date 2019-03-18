@@ -83,12 +83,12 @@ export class Game extends Container {
         });
     }
 
-    private selectTerritory(territory: Territory) {
+    private selectTerritory = (territory: Territory) => {
         this.unselectTerritory();
         this.player.selectedTerritory = territory;
         this.updatePanel();
         this.tintTerritory(this.player.selectedTerritory, 0x555555);
-    }
+    };
 
     private unselectTerritory() {
         if (this.player.selectedTerritory) {
