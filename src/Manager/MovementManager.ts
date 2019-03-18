@@ -129,6 +129,19 @@ export class MovementManager {
         const enemyFields = fieldNeighbors.filter((neighbor) => {
             return neighbor.player !== unitPlayer;
         });
+        this.splitTerritories(enemyFields);
+        // Renew main buildings
+        const enemyTerritories = new Set(enemyFields.map((field) => {
+            return field.territory as Territory;
+        }));
+        this.renewMainBuildings(enemyTerritories);
+        // Recalculate selected territory
+        if (unitPlayer.selectedTerritory) {
+            this.props.selectTerritory(unitPlayer.selectedTerritory);
+        }
+    }
+
+    private splitTerritories(enemyFields: HexagonField[]) {
         const fieldsChecked: HexagonField[] = [];
         for (const enemyField of enemyFields) {
             if (fieldsChecked.includes(enemyField)) {
@@ -166,15 +179,6 @@ export class MovementManager {
                     }
                 }
             }
-        }
-        // Renew main buildings
-        const enemyTerritories = new Set(enemyFields.map((field) => {
-            return field.territory as Territory;
-        }));
-        this.renewMainBuildings(enemyTerritories);
-        // Recalculate selected territory
-        if (unitPlayer.selectedTerritory) {
-            this.props.selectTerritory(unitPlayer.selectedTerritory);
         }
     }
 
