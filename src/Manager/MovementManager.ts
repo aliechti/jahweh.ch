@@ -28,12 +28,12 @@ export class MovementManager {
             return false;
         }
         // Use unit field territory and player
-        let territory: Territory;
+        let unitTerritory: Territory;
         if (unit.props.field && unit.props.field.territory) {
-            territory = unit.props.field.territory;
+            unitTerritory = unit.props.field.territory;
         } else if (unitPlayer.selectedTerritory !== undefined) {
             // Use selected territory if new unit bought and doesn't have a field attached yet
-            territory = unitPlayer.selectedTerritory;
+            unitTerritory = unitPlayer.selectedTerritory;
         } else {
             console.warn('No territory selected');
             return false;
@@ -43,9 +43,9 @@ export class MovementManager {
             console.warn('Field has no territory');
             return false;
         }
-        const territoryNeighbors = this.map.getTerritoryNeighbors(territory);
+        const territoryNeighbors = this.map.getTerritoryNeighbors(unitTerritory);
         const isMovingToNeighbors = territoryNeighbors.includes(field);
-        const isMovingInsideTerritory = territory.props.fields.includes(field);
+        const isMovingInsideTerritory = unitTerritory.props.fields.includes(field);
         if (isMovingInsideTerritory) {
             console.log('is moving inside territory');
         } else if (!unit.canMove) {
@@ -58,131 +58,7 @@ export class MovementManager {
         }
         // capture field
         if (field.player !== unitPlayer) {
-            const fieldNeighbors = this.map.grid.getFieldNeighbors(field);
-            const defendingPoints = Math.max(...fieldNeighbors.map((f) => {
-                return (f.player !== field.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
-            }));
-            const attacking = unit.props.type;
-            if (attacking.strength <= defendingPoints) {
-                console.warn('Field is defended by a stronger or same strength unit');
-                return false;
-            }
-            // Attack unit if there is one on this field
-            if (field.unit !== undefined) {
-                const defending = field.unit.props.type;
-                if (attacking.strength <= defending.strength) {
-                    console.warn('Unit can only attack weaker units');
-                    return false;
-                }
-                // Defending is main building
-                if (defending === this.props.unitTypeManager.mainBuilding) {
-                    fieldTerritory.money = 0;
-                }
-                // Remove defending unit
-                this.props.unitManager.delete(field.unit);
-                console.log('Defending unit killed');
-            }
-            field.player = unitPlayer;
-            // Remove from old territory
-            fieldTerritory.props.fields.splice(fieldTerritory.props.fields.indexOf(field), 1);
-            // Add to new territory
-            territory.props.fields.push(field);
-            // Set new territory to field
-            field.territory = territory;
-            // Merge territories
-            const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
-                return neighbor.player === unitPlayer && neighbor.territory !== territory;
-            }).map((neighbor) => {
-                return neighbor.territory as Territory;
-            }));
-            for (const neighbor of notConnectedTerritories) {
-                territory.money += neighbor.money;
-                // Remove other main buildings
-                this.props.unitManager.delete(this.props.unitManager.getTerritoryMainBuilding(neighbor));
-                // Add fields to territory and remove other territory
-                territory.addField(...neighbor.props.fields);
-                neighbor.props.fields = [];
-                this.map.deleteTerritory(neighbor);
-            }
-            // Split
-            const enemyFields = fieldNeighbors.filter((neighbor) => {
-                return neighbor.player !== unitPlayer;
-            });
-            const fieldsChecked: HexagonField[] = [];
-            for (const enemyField of enemyFields) {
-                if (fieldsChecked.includes(enemyField)) {
-                    continue;
-                }
-                fieldsChecked.push(enemyField);
-                const onSameTerritory = enemyFields.filter((item) => {
-                    return item.territory === enemyField.territory && item !== enemyField;
-                });
-                if (onSameTerritory.length > 0) {
-                    // Loop trough fields with the same territory
-                    for (const fieldOnSameTerritory of onSameTerritory) {
-                        if (fieldsChecked.includes(fieldOnSameTerritory)) {
-                            continue;
-                        }
-                        fieldsChecked.push(fieldOnSameTerritory);
-                        // If the connected fields don't contain each other they are split up
-                        const connectedFields = this.map.grid.getConnectedFields(fieldOnSameTerritory);
-                        if (!connectedFields.has(enemyField)) {
-                            // make new territory
-                            const newTerritory = new Territory({
-                                player: fieldOnSameTerritory.player,
-                                fields: [],
-                            });
-                            // Remove fields from old territory
-                            for (const connectedField of connectedFields) {
-                                if (connectedField.territory) {
-                                    const index = connectedField.territory.props.fields.indexOf(connectedField);
-                                    connectedField.territory.props.fields.splice(index, 1);
-                                }
-                            }
-                            // Add to new territory
-                            newTerritory.addField(...connectedFields);
-                            this.map.territories.push(newTerritory);
-                        }
-                    }
-                }
-            }
-            // Renew main buildings
-            const enemyTerritories = new Set(enemyFields.map((neighbor) => {
-                return neighbor.territory as Territory;
-            }));
-            for (const enemyTerritory of enemyTerritories) {
-                const mainBuilding = this.props.unitManager.getTerritoryMainBuilding(enemyTerritory);
-                // add new main building if there is none and territory is controllable
-                if (mainBuilding === undefined && enemyTerritory.isControllable()) {
-                    const mainBuildingField = enemyTerritory.props.fields.find((item) => {
-                        return item.unit !== undefined
-                            && item.unit.props.type === this.props.unitTypeManager.mainBuilding;
-                    });
-                    if (mainBuildingField === undefined) {
-                        // Add building to the field without a unit or replace it with the weakest one
-                        function fieldScore(field: HexagonField) {
-                            return field.unit === undefined ? 0 : field.unit.props.type.strength;
-                        }
-
-                        const fields = enemyTerritory.props.fields.sort((a, b) => {
-                            return fieldScore(a) - fieldScore(b);
-                        });
-                        const newMainBuildingField = fields[0];
-                        if (newMainBuildingField) {
-                            this.props.unitManager.add(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
-                        }
-                    }
-                } else if (!enemyTerritory.isControllable()) {
-                    // Remove main building and every other unit if territory isn't controllable anymore
-                    for (const enemyField of enemyTerritory.props.fields) {
-                        this.props.unitManager.delete(enemyField.unit);
-                    }
-                }
-            }
-            // Recalculate selected territory
-            if (unitPlayer.selectedTerritory) {
-                this.props.selectTerritory(unitPlayer.selectedTerritory);
-            }
+            this.captureField(unit, field, unitPlayer, unitTerritory);
         } else if (field.unit !== undefined) {
             // Merge units from the same player if there is a unit with the same cost
             const stayingType = field.unit.props.type;
@@ -218,4 +94,133 @@ export class MovementManager {
         }
         return true;
     };
+
+    private captureField(unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory: Territory) {
+        const fieldTerritory = field.territory as Territory;
+        const fieldNeighbors = this.map.grid.getFieldNeighbors(field);
+        const defendingPoints = Math.max(...fieldNeighbors.map((f) => {
+            return (f.player !== field.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
+        }));
+        const attacking = unit.props.type;
+        if (attacking.strength <= defendingPoints) {
+            console.warn('Field is defended by a stronger or same strength unit');
+            return false;
+        }
+        // Attack unit if there is one on this field
+        if (field.unit !== undefined) {
+            const defending = field.unit.props.type;
+            if (attacking.strength <= defending.strength) {
+                console.warn('Unit can only attack weaker units');
+                return false;
+            }
+            // Defending is main building
+            if (defending === this.props.unitTypeManager.mainBuilding) {
+                fieldTerritory.money = 0;
+            }
+            // Remove defending unit
+            this.props.unitManager.delete(field.unit);
+            console.log('Defending unit killed');
+        }
+        field.player = unitPlayer;
+        // Remove from old territory
+        fieldTerritory.props.fields.splice(fieldTerritory.props.fields.indexOf(field), 1);
+        // Add to new territory
+        unitTerritory.props.fields.push(field);
+        // Set new territory to field
+        field.territory = unitTerritory;
+        // Merge territories
+        const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
+            return neighbor.player === unitPlayer && neighbor.territory !== unitTerritory;
+        }).map((neighbor) => {
+            return neighbor.territory as Territory;
+        }));
+        for (const neighbor of notConnectedTerritories) {
+            unitTerritory.money += neighbor.money;
+            // Remove other main buildings
+            this.props.unitManager.delete(this.props.unitManager.getTerritoryMainBuilding(neighbor));
+            // Add fields to territory and remove other territory
+            unitTerritory.addField(...neighbor.props.fields);
+            neighbor.props.fields = [];
+            this.map.deleteTerritory(neighbor);
+        }
+        // Split
+        const enemyFields = fieldNeighbors.filter((neighbor) => {
+            return neighbor.player !== unitPlayer;
+        });
+        const fieldsChecked: HexagonField[] = [];
+        for (const enemyField of enemyFields) {
+            if (fieldsChecked.includes(enemyField)) {
+                continue;
+            }
+            fieldsChecked.push(enemyField);
+            const onSameTerritory = enemyFields.filter((item) => {
+                return item.territory === enemyField.territory && item !== enemyField;
+            });
+            if (onSameTerritory.length > 0) {
+                // Loop trough fields with the same territory
+                for (const fieldOnSameTerritory of onSameTerritory) {
+                    if (fieldsChecked.includes(fieldOnSameTerritory)) {
+                        continue;
+                    }
+                    fieldsChecked.push(fieldOnSameTerritory);
+                    // If the connected fields don't contain each other they are split up
+                    const connectedFields = this.map.grid.getConnectedFields(fieldOnSameTerritory);
+                    if (!connectedFields.has(enemyField)) {
+                        // make new territory
+                        const newTerritory = new Territory({
+                            player: fieldOnSameTerritory.player,
+                            fields: [],
+                        });
+                        // Remove fields from old territory
+                        for (const connectedField of connectedFields) {
+                            if (connectedField.territory) {
+                                const index = connectedField.territory.props.fields.indexOf(connectedField);
+                                connectedField.territory.props.fields.splice(index, 1);
+                            }
+                        }
+                        // Add to new territory
+                        newTerritory.addField(...connectedFields);
+                        this.map.territories.push(newTerritory);
+                    }
+                }
+            }
+        }
+        // Renew main buildings
+        const enemyTerritories = new Set(enemyFields.map((neighbor) => {
+            return neighbor.territory as Territory;
+        }));
+        for (const enemyTerritory of enemyTerritories) {
+            const mainBuilding = this.props.unitManager.getTerritoryMainBuilding(enemyTerritory);
+            // add new main building if there is none and territory is controllable
+            if (mainBuilding === undefined && enemyTerritory.isControllable()) {
+                const mainBuildingField = enemyTerritory.props.fields.find((item) => {
+                    return item.unit !== undefined
+                        && item.unit.props.type === this.props.unitTypeManager.mainBuilding;
+                });
+                if (mainBuildingField === undefined) {
+                    // Add building to the field without a unit or replace it with the weakest one
+                    function fieldScore(field: HexagonField) {
+                        return field.unit === undefined ? 0 : field.unit.props.type.strength;
+                    }
+
+                    const fields = enemyTerritory.props.fields.sort((a, b) => {
+                        return fieldScore(a) - fieldScore(b);
+                    });
+                    const newMainBuildingField = fields[0];
+                    if (newMainBuildingField) {
+                        this.props.unitManager.add(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
+                    }
+                }
+            } else if (!enemyTerritory.isControllable()) {
+                // Remove main building and every other unit if territory isn't controllable anymore
+                for (const enemyField of enemyTerritory.props.fields) {
+                    this.props.unitManager.delete(enemyField.unit);
+                }
+            }
+        }
+        // Recalculate selected territory
+        if (unitPlayer.selectedTerritory) {
+            this.props.selectTerritory(unitPlayer.selectedTerritory);
+        }
+    }
 }
