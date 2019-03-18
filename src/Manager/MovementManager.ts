@@ -116,15 +116,7 @@ export class MovementManager {
         }).map((neighbor) => {
             return neighbor.territory as Territory;
         }));
-        for (const neighbor of notConnectedTerritories) {
-            unitTerritory.money += neighbor.money;
-            // Remove other main buildings
-            this.props.unitManager.delete(this.props.unitManager.getTerritoryMainBuilding(neighbor));
-            // Add fields to territory and remove other territory
-            unitTerritory.addField(...neighbor.props.fields);
-            neighbor.props.fields = [];
-            this.map.deleteTerritory(neighbor);
-        }
+        this.mergeTerritories(unitTerritory, notConnectedTerritories);
         // Split
         const enemyFields = fieldNeighbors.filter((neighbor) => {
             return neighbor.player !== unitPlayer;
@@ -138,6 +130,18 @@ export class MovementManager {
         // Recalculate selected territory
         if (unitPlayer.selectedTerritory) {
             this.props.selectTerritory(unitPlayer.selectedTerritory);
+        }
+    }
+
+    private mergeTerritories(main: Territory, territories: Iterable<Territory>) {
+        for (const neighbor of territories) {
+            main.money += neighbor.money;
+            // Remove other main buildings
+            this.props.unitManager.delete(this.props.unitManager.getTerritoryMainBuilding(neighbor));
+            // Add fields to territory and remove other territory
+            main.addField(...neighbor.props.fields);
+            neighbor.props.fields = [];
+            this.map.deleteTerritory(neighbor);
         }
     }
 
