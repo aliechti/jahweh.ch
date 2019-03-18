@@ -168,10 +168,18 @@ export class MovementManager {
             }
         }
         // Renew main buildings
-        const enemyTerritories = new Set(enemyFields.map((neighbor) => {
-            return neighbor.territory as Territory;
+        const enemyTerritories = new Set(enemyFields.map((field) => {
+            return field.territory as Territory;
         }));
-        for (const enemyTerritory of enemyTerritories) {
+        this.renewMainBuildings(enemyTerritories);
+        // Recalculate selected territory
+        if (unitPlayer.selectedTerritory) {
+            this.props.selectTerritory(unitPlayer.selectedTerritory);
+        }
+    }
+
+    private renewMainBuildings(territories: Iterable<Territory>) {
+        for (const enemyTerritory of territories) {
             const mainBuilding = this.props.unitManager.getTerritoryMainBuilding(enemyTerritory);
             // add new main building if there is none and territory is controllable
             if (mainBuilding === undefined && enemyTerritory.isControllable()) {
@@ -199,10 +207,6 @@ export class MovementManager {
                     this.props.unitManager.delete(enemyField.unit);
                 }
             }
-        }
-        // Recalculate selected territory
-        if (unitPlayer.selectedTerritory) {
-            this.props.selectTerritory(unitPlayer.selectedTerritory);
         }
     }
 
