@@ -72,14 +72,18 @@ export class MovementManager {
         return true;
     };
 
-    private captureField(unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory: Territory) {
-        const fieldTerritory = field.territory as Territory;
+    public getFieldDefendingStrength(field: HexagonField) {
         const fieldNeighbors = this.map.grid.getFieldNeighbors(field);
-        const defendingPoints = Math.max(...fieldNeighbors.map((f) => {
+        const ownStrength = field.unit ? field.unit.props.type.strength : 0;
+        return Math.max(ownStrength, ...fieldNeighbors.map((f) => {
             return (f.player !== field.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
         }));
+    }
+
+    private captureField(unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory: Territory) {
+        const fieldTerritory = field.territory as Territory;
         const attacking = unit.props.type;
-        if (attacking.strength <= defendingPoints) {
+        if (attacking.strength <= this.getFieldDefendingStrength(field)) {
             console.warn('Field is defended by a stronger or same strength unit');
             return false;
         }
@@ -106,6 +110,7 @@ export class MovementManager {
         // Set new territory to field
         field.territory = unitTerritory;
         // Merge territories
+        const fieldNeighbors = this.map.grid.getFieldNeighbors(field);
         const notConnectedTerritories = new Set<Territory>(fieldNeighbors.filter((neighbor) => {
             return neighbor.player === unitPlayer && neighbor.territory !== unitTerritory;
         }).map((neighbor) => {

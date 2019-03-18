@@ -29,13 +29,7 @@ export class SimpleAI implements Actor {
             // Buy movable unit
             const territoryNeighbors = map.getTerritoryNeighbors(territory);
             const requiredStrength = Math.min(...territoryNeighbors.map((neighbor) => {
-                const fieldNeighbors = map.grid.getFieldNeighbors(neighbor);
-                const ownStrength = neighbor.unit ? neighbor.unit.props.type.strength : 0;
-                const defendingPoints = Math.max(ownStrength, ...fieldNeighbors.map((f) => {
-                    return (f.player !== neighbor.player ? 0 : (f.unit ? f.unit.props.type.strength : 0));
-                }));
-                console.log('d', defendingPoints);
-                return defendingPoints;
+                return movementManager.getFieldDefendingStrength(neighbor);
             }));
             console.log('x', territoryNeighbors);
             const purchasableTypes = unitTypeManager.units.filter((type) => {
