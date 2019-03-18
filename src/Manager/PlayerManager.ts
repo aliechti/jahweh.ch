@@ -4,6 +4,7 @@ import {Hexagon, HexagonProps} from '../Component/Hexagon';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
 import {Unit, UnitType} from '../Component/Unit';
+import {MovementManager} from './MovementManager';
 import {UnitTypeManager} from './UnitTypeManager';
 import Point = PIXI.Point;
 import Texture = PIXI.Texture;
@@ -31,7 +32,7 @@ export interface DoTurnProps {
     player: Player;
     map: GameMap;
     unitTypeManager: UnitTypeManager;
-    moveUnit: (unit: Unit, field: HexagonField) => boolean;
+    movementManager: MovementManager;
     buyUnit: (type: UnitType, field: HexagonField, territory: Territory) => Unit | undefined;
 }
 

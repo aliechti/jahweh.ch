@@ -3,7 +3,7 @@ import {Actor, DoTurnProps} from '../Manager/PlayerManager';
 
 export class SimpleAI implements Actor {
     public doTurn = async (props: DoTurnProps) => {
-        const {player, map, moveUnit, unitTypeManager, buyUnit} = props;
+        const {player, map, movementManager, unitTypeManager, buyUnit} = props;
         for (const territory of player.territories) {
             if (!territory.isControllable()) {
                 continue;
@@ -19,7 +19,7 @@ export class SimpleAI implements Actor {
                         continue;
                     }
                     for (const neighbor of territoryNeighbors) {
-                        if (moveUnit(unit, neighbor)) {
+                        if (movementManager.move(unit, neighbor, player)) {
                             territoryNeighbors.delete(neighbor);
                             break;
                         }
