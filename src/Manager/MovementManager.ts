@@ -61,30 +61,7 @@ export class MovementManager {
             this.captureField(unit, field, unitPlayer, unitTerritory);
         } else if (field.unit !== undefined) {
             // Merge units from the same player if there is a unit with the same cost
-            const stayingType = field.unit.props.type;
-            if (!stayingType.isBuildable || !stayingType.isMovable) {
-                console.warn('Only buildable and movable units can merge together');
-                return false;
-            }
-            const droppedType = unit.props.type;
-            const cost = stayingType.cost + droppedType.cost;
-            const mergedType = this.props.unitTypeManager.units.find((type) => {
-                return type.cost === cost && type.isMovable && type.isBuildable;
-            });
-            if (mergedType) {
-                console.log('Units merged', {
-                    dropped: stayingType,
-                    staying: droppedType,
-                    merged: mergedType,
-                });
-                // If unit staying has already moved the merged one has too
-                unit.canMove = field.unit.canMove;
-                this.props.unitManager.delete(field.unit);
-                unit.setType(mergedType);
-            } else {
-                console.warn('No type with same cost found to merge');
-                return false;
-            }
+            this.mergeUnits(unit, field.unit);
         }
         this.props.unitManager.set(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors
@@ -221,6 +198,33 @@ export class MovementManager {
         // Recalculate selected territory
         if (unitPlayer.selectedTerritory) {
             this.props.selectTerritory(unitPlayer.selectedTerritory);
+        }
+    }
+
+    private mergeUnits(unit: Unit, fieldUnit: Unit) {
+        const stayingType = fieldUnit.props.type;
+        if (!stayingType.isBuildable || !stayingType.isMovable) {
+            console.warn('Only buildable and movable units can merge together');
+            return false;
+        }
+        const droppedType = unit.props.type;
+        const cost = stayingType.cost + droppedType.cost;
+        const mergedType = this.props.unitTypeManager.units.find((type) => {
+            return type.cost === cost && type.isMovable && type.isBuildable;
+        });
+        if (mergedType) {
+            console.log('Units merged', {
+                dropped: stayingType,
+                staying: droppedType,
+                merged: mergedType,
+            });
+            // If unit staying has already moved the merged one has too
+            unit.canMove = fieldUnit.canMove;
+            this.props.unitManager.delete(fieldUnit);
+            unit.setType(mergedType);
+        } else {
+            console.warn('No type with same cost found to merge');
+            return false;
         }
     }
 }
