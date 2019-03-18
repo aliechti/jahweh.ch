@@ -1,5 +1,6 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {DoTurnFunction, Player, PlayerManager} from '../Manager/PlayerManager';
+import {UnitManager} from '../Manager/UnitManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
@@ -33,6 +34,7 @@ export class Game extends Container {
     private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
     private isAutoplayRunning: boolean;
+    private unitManager: UnitManager;
 
     constructor(props: GameProps) {
         super();
@@ -42,6 +44,11 @@ export class Game extends Container {
         this.turn = 1;
         this.isAutoplayRunning = false;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
+        this.unitManager = new UnitManager({
+            unitTypeManager: this.props.unitTypeManager,
+            unitContainer: this.unitContainer,
+            handleUnitClick: this.handleUnitClick,
+        });
 
         this.addChild(this.props.grid);
         this.addChild(this.unitContainer);
@@ -54,7 +61,7 @@ export class Game extends Container {
             const size = territory.props.fields.length;
             if (size > 1) {
                 const field = territory.props.fields[0];
-                this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, field);
+                this.unitManager.add(this.props.unitTypeManager.mainBuilding, field);
             }
         }
         this.handleTurnStart();
@@ -66,32 +73,6 @@ export class Game extends Container {
             player: this.player,
             territory: this.player.selectedTerritory,
         });
-    }
-
-    private addNewUnitToField(type: UnitType, field: HexagonField) {
-        const unit = new Unit({
-            type: type,
-            field: field,
-            onClick: this.handleUnitClick,
-        });
-        this.setUnitToField(unit, field);
-        this.unitContainer.addChild(unit);
-    }
-
-    private setUnitToField(unit: Unit, field: HexagonField) {
-        // Remove unit from previous field
-        if (unit.props.field) {
-            unit.props.field.unit = undefined;
-        } else {
-            // Unit has no field, so it must be newly bought
-            this.unitContainer.addChild(unit);
-        }
-        // Add field to unit
-        unit.props.field = field;
-        // Set unit to new field
-        field.unit = unit;
-        // Reset unit position
-        unit.position = field.position;
     }
 
     private selectTerritory(territory: Territory) {
@@ -150,7 +131,7 @@ export class Game extends Container {
                     console.log('Territory bankruptcy');
                     for (const field of territory.props.fields) {
                         if (field.unit !== undefined && field.unit.props.type.salary > 0) {
-                            this.removeUnit(field.unit);
+                            this.unitManager.delete(field.unit);
                         }
                     }
                     territory.money = 0;
@@ -308,7 +289,7 @@ export class Game extends Container {
             for (const neighbor of notConnectedTerritories) {
                 territory.money += neighbor.money;
                 // Remove other main buildings
-                this.removeUnit(this.getTerritoryMainBuilding(neighbor));
+                this.unitManager.delete(this.getTerritoryMainBuilding(neighbor));
                 // Add fields to territory and remove other territory
                 territory.addField(...neighbor.props.fields);
                 neighbor.props.fields = [];
@@ -379,13 +360,13 @@ export class Game extends Container {
                         });
                         const newMainBuildingField = fields[0];
                         if (newMainBuildingField) {
-                            this.addNewUnitToField(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
+                            this.unitManager.add(this.props.unitTypeManager.mainBuilding, newMainBuildingField);
                         }
                     }
                 } else if (!enemyTerritory.isControllable()) {
                     // Remove main building and every other unit if territory isn't controllable anymore
                     for (const enemyField of enemyTerritory.props.fields) {
-                        this.removeUnit(enemyField.unit);
+                        this.unitManager.delete(enemyField.unit);
                     }
                 }
             }
@@ -413,14 +394,14 @@ export class Game extends Container {
                 });
                 // If unit staying has already moved the merged one has too
                 unit.canMove = field.unit.canMove;
-                this.removeUnit(field.unit);
+                this.unitManager.delete(field.unit);
                 unit.setType(mergedType);
             } else {
                 console.warn('No type with same cost found to merge');
                 return false;
             }
         }
-        this.setUnitToField(unit, field);
+        this.unitManager.set(unit, field);
         // Disable moving on moved unit for this turn if it has moved to neighbors
         if (isMovingToNeighbors) {
             console.log('has moved to neighbors, disable moving this turn');
@@ -428,14 +409,6 @@ export class Game extends Container {
         }
         return true;
     };
-
-    private removeUnit(unit: Unit | undefined) {
-        if (unit && unit.props.field) {
-            unit.props.field.unit = undefined;
-            unit.props.field = undefined;
-            this.unitContainer.removeChild(unit);
-        }
-    }
 
     private getTerritoryMainBuilding(territory: Territory): Unit | undefined {
         const field = territory.props.fields.find((item) => {
