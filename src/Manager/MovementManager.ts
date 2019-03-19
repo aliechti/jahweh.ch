@@ -185,6 +185,7 @@ export class MovementManager {
                         // Add to new territory
                         newTerritory.addField(...connectedFields);
                         this.map.territories.push(newTerritory);
+                        newTerritory.props.player.territories.push(newTerritory);
                     }
                 }
             }
