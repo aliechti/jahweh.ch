@@ -146,6 +146,11 @@ export class MovementManager {
             // Add fields to territory and remove other territory
             main.addField(...neighbor.props.fields);
             neighbor.props.fields = [];
+            // todo: put this into the player class
+            const playerTerritoryIndex = neighbor.props.player.territories.indexOf(neighbor);
+            if (playerTerritoryIndex !== -1) {
+                neighbor.props.player.territories.splice(playerTerritoryIndex, 1);
+            }
             this.map.deleteTerritory(neighbor);
         }
     }
@@ -185,6 +190,7 @@ export class MovementManager {
                         // Add to new territory
                         newTerritory.addField(...connectedFields);
                         this.map.territories.push(newTerritory);
+                        // todo: put this into the player class
                         newTerritory.props.player.territories.push(newTerritory);
                     }
                 }
