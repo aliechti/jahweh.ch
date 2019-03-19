@@ -22,6 +22,12 @@ interface HexagonCalculation {
     }
 }
 
+export type SavedGrid = SavedField[];
+
+export interface SavedField extends AxialCoordinates {
+    p: number;
+}
+
 export interface ChooserProps {
     axial: AxialCoordinates;
     playerCount: number;
@@ -86,19 +92,39 @@ export class HexagonGridGenerator {
         return grid;
     }
 
-    private setFieldToGrid(props: Pick<ChooserProps, 'axial' | 'fieldCount'>, grid: HexagonGrid, getPlayer: PlayerChooser) {
-        const {axial} = props;
-        const {players, hexagonProps} = this.props;
-        const {padding, polygon} = this.calculation;
-        const index = getPlayer({...props, playerCount: players.length});
-        if (index !== undefined) {
-            const player = players[index % players.length];
-            const field = new HexagonField({player, axial});
-            const pixel = axialToPixel(axial, hexagonProps.radius);
-            field.hitArea = polygon;
-            field.position = new Point(pixel.x + padding.x, pixel.y + padding.y);
+    public load(savedGrid: SavedGrid): HexagonGrid {
+        const grid = new HexagonGrid();
+        for (const savedField of savedGrid) {
+            const axial = savedField;
+            const field = this.generateField(axial, savedField.p);
             grid.set(axial, field);
         }
+        return grid;
+    }
+
+    private setFieldToGrid(
+        props: Pick<ChooserProps, 'axial' | 'fieldCount'>,
+        grid: HexagonGrid,
+        getPlayer: PlayerChooser,
+    ) {
+        const {axial} = props;
+        const {players} = this.props;
+        const index = getPlayer({...props, playerCount: players.length});
+        if (index !== undefined) {
+            const field = this.generateField(axial, index);
+            grid.set(axial, field);
+        }
+    }
+
+    private generateField(axial: AxialCoordinates, playerIndex: number): HexagonField {
+        const {players, hexagonProps} = this.props;
+        const {padding, polygon} = this.calculation;
+        const player = players[playerIndex % players.length];
+        const field = new HexagonField({player, axial});
+        const pixel = axialToPixel(axial, hexagonProps.radius);
+        field.hitArea = polygon;
+        field.position = new Point(pixel.x + padding.x, pixel.y + padding.y);
+        return field;
     }
 
     private static toHexagonCalculation(props: HexagonProps): HexagonCalculation {
