@@ -142,6 +142,13 @@ export class GameContainer extends React.Component<Props, State> {
         let grid;
         if (options.shape === 'spiral' || options.shape === 'ring') {
             grid = generator[options.shape](options.radius, chooser);
+        } else if (options.shape === 'load') {
+            const savedGrid = JSON.parse(localStorage.getItem('savedGrid') || '');
+            if (!Array.isArray(savedGrid)) {
+                console.error('could not load saved grid');
+                return;
+            }
+            grid = generator[options.shape](savedGrid);
         } else {
             grid = generator[options.shape](options.columns, options.rows, chooser);
         }
