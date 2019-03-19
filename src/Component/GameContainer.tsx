@@ -145,6 +145,7 @@ export class GameContainer extends React.Component<Props, State> {
         } else {
             grid = generator[options.shape](options.columns, options.rows, chooser);
         }
+        console.info('grid', JSON.stringify(HexagonGridGenerator.save(grid, playerManager.players)));
         const updatePanel = this.handlePanelUpdate;
         this.unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
         const game = this.game = new Game({
