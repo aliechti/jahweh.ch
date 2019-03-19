@@ -102,6 +102,17 @@ export class HexagonGridGenerator {
         return grid;
     }
 
+    public static save(grid: HexagonGrid, players: Player[]): SavedGrid {
+        const savedGrid: SavedGrid = [];
+        for (const field of grid.fields()) {
+            savedGrid.push({
+                ...field.axial,
+                p: players.indexOf(field.player),
+            });
+        }
+        return savedGrid;
+    }
+
     private setFieldToGrid(
         props: Pick<ChooserProps, 'axial' | 'fieldCount'>,
         grid: HexagonGrid,
