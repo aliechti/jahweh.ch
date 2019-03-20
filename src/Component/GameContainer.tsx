@@ -234,6 +234,9 @@ export class GameContainer extends React.Component<Props, State> {
     };
 
     private handleExit = () => {
+        if (this.game) {
+            this.game.pauseAutoPlay();
+        }
         this.setState({isStarted: false});
     };
 

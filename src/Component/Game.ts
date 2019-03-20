@@ -37,6 +37,7 @@ export class Game extends Container {
     private isAutoplayRunning: boolean;
     private unitManager: UnitManager;
     private movementManager: MovementManager;
+    private mustPauseAutoPlay: boolean;
 
     constructor(props: GameProps) {
         super();
@@ -105,6 +106,7 @@ export class Game extends Container {
         // This can be only run once at a time
         if (!this.isAutoplayRunning) {
             this.isAutoplayRunning = true;
+            this.mustPauseAutoPlay = false;
             let doTurn = this.player.actor.doTurn;
             while (doTurn) {
                 await Promise.all([
@@ -117,10 +119,17 @@ export class Game extends Container {
                     }),
                     sleep(500),
                 ]);
-                doTurn = this.nextTurn();
+                if (!this.mustPauseAutoPlay) {
+                    doTurn = this.nextTurn();
+                }
             }
             this.isAutoplayRunning = false;
+            this.mustPauseAutoPlay = false;
         }
+    }
+
+    public pauseAutoPlay() {
+        this.mustPauseAutoPlay = true;
     }
 
     private handleTurnStart = () => {
