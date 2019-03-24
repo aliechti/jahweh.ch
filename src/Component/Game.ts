@@ -245,9 +245,14 @@ export class Game extends Container {
             }
             // Reset unit dragging
             dragManager.setDragging(undefined);
-        } else if (field.territory && field.player === this.player) {
-            // Only select other territory if no unit is dragging and its the current player
-            this.selectTerritory(field.territory);
+        } else if (field.player === this.player) {
+            // Only select other territory/unit if no unit is dragging and its the current player
+            if (field.territory) {
+                this.selectTerritory(field.territory);
+            }
+            if (field.unit) {
+                this.handleUnitClick(field.unit, e);
+            }
         } else {
             console.warn('Can\'t use another players territory');
         }
