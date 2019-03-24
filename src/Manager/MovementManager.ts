@@ -22,18 +22,16 @@ export class MovementManager {
         this.map = props.map;
     }
 
-    public move = (unit: Unit, field: HexagonField, unitPlayer: Player): boolean => {
+    public move = (unit: Unit, field: HexagonField, unitPlayer: Player, unitTerritory?: Territory): boolean => {
         if (unit === field.unit) {
             console.warn('Unit is already on this field');
             return false;
         }
         // Use unit field territory and player
-        let unitTerritory: Territory;
         if (unit.props.field && unit.props.field.territory) {
             unitTerritory = unit.props.field.territory;
-        } else if (unitPlayer.selectedTerritory !== undefined) {
-            // Use selected territory if new unit bought and doesn't have a field attached yet
-            unitTerritory = unitPlayer.selectedTerritory;
+        } else if (unitTerritory !== undefined) {
+            // Use given territory if new unit bought and doesn't have a field attached yet
         } else {
             console.warn('No territory selected');
             return false;
@@ -132,7 +130,7 @@ export class MovementManager {
         }));
         this.renewMainBuildings(enemyTerritories);
         // Recalculate selected territory
-        if (unitPlayer.selectedTerritory) {
+        if (unitPlayer.actor.isInteractive && unitPlayer.selectedTerritory) {
             this.props.selectTerritory(unitPlayer.selectedTerritory);
         }
         return true;
