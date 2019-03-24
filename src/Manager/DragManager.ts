@@ -48,11 +48,11 @@ export class DragManager {
         this.lastPosition = {x, y};
     }
 
-    getDragging(): Unit | undefined {
+    getDragging = (): Unit | undefined => {
         return (this._dragging ? this._dragging.unit : undefined);
-    }
+    };
 
-    setDragging(unit: Unit | undefined, position?: { x: number, y: number }) {
+    setDragging = (unit: Unit | undefined, position?: { x: number, y: number }) => {
         const {container, moveEventContainer, extractImage, resolution} = this.props;
         // Remove currently dragging
         if (this._dragging !== undefined) {
@@ -87,7 +87,7 @@ export class DragManager {
             container.appendChild(this._dragging.image);
             moveEventContainer.addEventListener('mousemove', this.handleMove);
         }
-    }
+    };
 
     get zoom(): number {
         return this._zoom;

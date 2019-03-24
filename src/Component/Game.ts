@@ -23,7 +23,7 @@ export interface GameProps {
 
 export interface GameDragManager {
     getDragging: () => Unit | undefined;
-    setDragging: (unit?: Unit) => void;
+    setDragging: (unit?: Unit, position?: { x: number, y: number }) => void;
 }
 
 export type GamePanelProps = Pick<PanelProps, 'player' | 'territory'>;
@@ -64,7 +64,7 @@ export class Game extends Container {
 
         for (const field of this.props.grid.fields()) {
             field.interactive = true;
-            field.on('click', () => this.handleFieldClick(field));
+            field.on('click', (e: InteractionEvent) => this.handleFieldClick(field, e));
         }
         for (const territory of this.map.territories) {
             const size = territory.props.fields.length;
@@ -233,7 +233,7 @@ export class Game extends Container {
         return this.player.actor.doTurn;
     };
 
-    private handleFieldClick = (field: HexagonField) => {
+    private handleFieldClick = (field: HexagonField, e: InteractionEvent) => {
         const {dragManager} = this.props;
         const unit = dragManager.getDragging();
         console.log('click field');
@@ -258,12 +258,12 @@ export class Game extends Container {
         const {dragManager} = this.props;
         const {field} = unit.props;
         if (dragManager.getDragging() === undefined) {
-            dragManager.setDragging(unit);
+            dragManager.setDragging(unit, e.data.global);
             if (field && field.territory) {
                 this.selectTerritory(field.territory);
             }
         } else if (field) {
-            this.handleFieldClick(field);
+            this.handleFieldClick(field, e);
         }
     };
 
@@ -284,9 +284,7 @@ export class Game extends Container {
             return;
         }
         const unit = new Unit({type, onClick: this.handleUnitClick});
-        unit.x = position.x;
-        unit.y = position.y;
-        dragManager.setDragging(unit);
+        dragManager.setDragging(unit, position);
     };
 
     private buyUnit = (type: UnitType, field: HexagonField, territory: Territory): Unit | undefined => {

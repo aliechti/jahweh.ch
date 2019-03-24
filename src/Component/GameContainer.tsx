@@ -160,23 +160,7 @@ export class GameContainer extends React.Component<Props, State> {
             playerManager,
             updatePanel,
             unitTypeManager: this.unitTypeManager,
-            dragManager: {
-                getDragging: () => this.dragManager.getDragging(),
-                setDragging: (unit) => {
-                    if (unit === undefined) {
-                        this.dragManager.setDragging(unit);
-                    } else if (unit.props.field) {
-                        // If the unit has a field, it's from the canvas game container
-                        // Pivot and unit has to be calculated with the zoom ratio
-                        this.dragManager.setDragging(unit, {
-                            x: game.x - game.pivot.x * this._zoom + unit.x * this._zoom,
-                            y: game.y - game.pivot.y * this._zoom + unit.y * this._zoom,
-                        });
-                    } else {
-                        this.dragManager.setDragging(unit, {x: unit.x, y: unit.y});
-                    }
-                },
-            },
+            dragManager: this.dragManager,
             onWin: this.handleExit,
         });
         this.zoom = 1;
