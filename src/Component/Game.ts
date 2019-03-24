@@ -228,16 +228,6 @@ export class Game extends Container {
         }
     }
 
-    private getTerritoryMainBuilding(territory: Territory): Unit | undefined {
-        const field = territory.props.fields.find((item) => {
-            return item.unit !== undefined && item.unit.props.type === this.props.unitTypeManager.mainBuilding;
-        });
-        if (field === undefined) {
-            return undefined;
-        }
-        return field.unit;
-    }
-
     private handleFieldClick = (field: HexagonField) => {
         const {dragManager} = this.props;
         const unit = dragManager.getDragging();
