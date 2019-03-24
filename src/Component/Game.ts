@@ -256,11 +256,14 @@ export class Game extends Container {
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
         const {dragManager} = this.props;
+        const {field} = unit.props;
         if (dragManager.getDragging() === undefined) {
             dragManager.setDragging(unit);
-            e.stopPropagation();
-        } else if (unit.props.field) {
-            this.handleFieldClick(unit.props.field);
+            if (field && field.territory) {
+                this.selectTerritory(field.territory);
+            }
+        } else if (field) {
+            this.handleFieldClick(field);
         }
     };
 
