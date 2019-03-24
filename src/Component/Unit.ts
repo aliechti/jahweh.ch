@@ -66,20 +66,17 @@ export class Unit extends Sprite {
 
     set canMove(value: boolean) {
         this._canMove = value;
-        this.interactive = false;
+        this.setInteractive(false);
     }
 
-    get interactive(): boolean {
-        return super.interactive;
-    }
-
-    set interactive(value: boolean) {
+    setInteractive(value: boolean) {
         if (value) {
             this.play();
         } else {
             this.stop();
         }
-        super.interactive = value;
+        this.interactive = value;
+        this.buttonMode = value;
     }
 
     private play() {

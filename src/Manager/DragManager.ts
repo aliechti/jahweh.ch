@@ -60,7 +60,7 @@ export class DragManager {
             moveEventContainer.removeEventListener('mousemove', this.handleMove);
             // Reset unit interactivity and visibility
             if (unit.canMove) {
-                unit.interactive = interactive;
+                unit.setInteractive(interactive);
             }
             unit.visible = true;
             if (image) {
@@ -82,7 +82,7 @@ export class DragManager {
                 image,
                 interactive: unit.interactive,
             };
-            unit.interactive = false;
+            unit.setInteractive(false);
             unit.visible = false;
             container.appendChild(this._dragging.image);
             moveEventContainer.addEventListener('mousemove', this.handleMove);

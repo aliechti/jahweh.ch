@@ -3,14 +3,16 @@ import {Unit} from '../Component/Unit';
 import {Actor, OnTurnProps, Player} from '../Manager/PlayerManager';
 
 export class Human implements Actor {
+
+    public isInteractive = true;
+
     public onTurnStart = (props: OnTurnProps) => {
         // Set player unit interactivity
         const fields = this.getPlayerFields(props.player);
         const units = this.getFieldUnits(fields);
         for (const unit of units) {
             if (unit.canMove) {
-                unit.interactive = true;
-                unit.buttonMode = true;
+                unit.setInteractive(true);
             }
         }
     };
@@ -20,8 +22,7 @@ export class Human implements Actor {
         const units = this.getFieldUnits(fields);
         // Remove player unit interactivity
         for (const unit of units) {
-            unit.interactive = false;
-            unit.buttonMode = false;
+            unit.setInteractive(false);
         }
     };
 

@@ -44,6 +44,7 @@ export interface OnTurnProps {
 }
 
 export interface Actor {
+    isInteractive?: boolean;
     doTurn?: DoTurnFunction;
     onTurnStart?: OnTurnFunction;
     onTurnEnd?: OnTurnFunction;
