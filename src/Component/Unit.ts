@@ -65,12 +65,21 @@ export class Unit extends Sprite {
     }
 
     set canMove(value: boolean) {
+        this._canMove = value;
+        this.interactive = false;
+    }
+
+    get interactive(): boolean {
+        return super.interactive;
+    }
+
+    set interactive(value: boolean) {
         if (value) {
             this.play();
         } else {
             this.stop();
         }
-        this._canMove = value;
+        super.interactive = value;
     }
 
     private play() {
