@@ -36,8 +36,17 @@ export interface DoTurnProps {
     buyUnit: (type: UnitType, field: HexagonField, territory: Territory) => Unit | undefined;
 }
 
+export type OnTurnFunction = (props: OnTurnProps) => void;
+
+export interface OnTurnProps {
+    player: Player;
+    map: GameMap;
+}
+
 export interface Actor {
     doTurn?: DoTurnFunction;
+    onTurnStart?: OnTurnFunction;
+    onTurnEnd?: OnTurnFunction;
 }
 
 export class PlayerManager {

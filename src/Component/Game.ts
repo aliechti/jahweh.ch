@@ -157,12 +157,28 @@ export class Game extends Container {
         }
         // Set current player to panel
         this.updatePanel();
-        // Attach unit click handlers for current player and remove others
-        this.setCurrentPlayerInteractivity();
+        // Prepare units for turn
+        for (const unit of this.unitContainer.children) {
+            const field = unit.props.field;
+            if (field && field.player === this.player) {
+                unit.onTurn();
+            } else {
+                unit.offTurn();
+            }
+        }
+        // Execute actor turn start actions
+        const {actor} = this.player;
+        if (actor.onTurnStart) {
+            actor.onTurnStart({player: this.player, map: this.map});
+        }
     };
 
     private handleTurnEnd = () => {
         this.unselectTerritory();
+        const {actor} = this.player;
+        if (actor.onTurnEnd) {
+            actor.onTurnEnd({player: this.player, map: this.map});
+        }
     };
 
     private hasPlayerWon = (player: Player) => {
@@ -216,17 +232,6 @@ export class Game extends Container {
         this.handleTurnStart();
         return this.player.actor.doTurn;
     };
-
-    private setCurrentPlayerInteractivity(): void {
-        for (const unit of this.unitContainer.children) {
-            const field = unit.props.field;
-            if (field && field.player === this.player) {
-                unit.onTurn();
-            } else {
-                unit.offTurn();
-            }
-        }
-    }
 
     private handleFieldClick = (field: HexagonField) => {
         const {dragManager} = this.props;

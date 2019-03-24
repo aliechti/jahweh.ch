@@ -71,8 +71,6 @@ export class Unit extends Sprite {
             this.stop();
         }
         this._canMove = value;
-        this.interactive = value;
-        this.buttonMode = value;
     }
 
     private play() {
