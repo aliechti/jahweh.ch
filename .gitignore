@@ -1,4 +1,4 @@
-web/build
+public/build
 ### Node
 node_modules
 ### IntelliJ

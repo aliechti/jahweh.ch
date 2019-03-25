@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "outDir": "./web/build/",
+    "outDir": "./public/build/",
     "module": "es6",
     "target": "es6",
     "jsx": "react",
