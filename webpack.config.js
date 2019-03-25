@@ -1,5 +1,6 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 let config = {
     entry: './src/index.tsx',
@@ -25,6 +26,11 @@ let config = {
     output: {
         filename: 'script.js',
         path: path.resolve(__dirname, 'public/build')
+    },
+    optimization: {
+        minimizer: [
+            new OptimizeCssAssetsPlugin({})
+        ]
     },
     plugins: [
         new MiniCssExtractPlugin({
