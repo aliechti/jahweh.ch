@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Player} from '../../../Manager/PlayerManager';
 import {Territory} from '../../Territory';
 import {UnitType} from '../../Unit';
+import {PlayerStats} from './PlayerStats';
 import {UnitShop} from './UnitShop';
 
 export interface GamePanelProps {
@@ -16,12 +17,6 @@ export interface GamePanelProps {
 
 interface State {
     isAutoplayRunning: boolean;
-}
-
-function colorToString(color: number): string {
-    const hex = color.toString(16);
-    const padding = '0'.repeat(6 - hex.length);
-    return '#' + padding + hex;
 }
 
 export class GamePanel extends React.Component<GamePanelProps, State> {
@@ -48,8 +43,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
         return (
             <div ref={containerRef} className="full click-trough" style={{left: 'auto', width: '250px'}}>
                 <div>
-                    <div style={{color: colorToString(player.color)}}>Player</div>
-                    <div>Money {territory ? territory.money : 0}</div>
+                    <PlayerStats player={player} territory={territory}/>
                 </div>
                 <div className="unit-shop">
                     <UnitShop unitTypes={unitTypes} onClickUnitType={onClickUnitType}/>
