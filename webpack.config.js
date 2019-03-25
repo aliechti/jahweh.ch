@@ -16,7 +16,7 @@ let config = {
     },
     output: {
         filename: 'script.js',
-        path: path.resolve(__dirname, 'web/build')
+        path: path.resolve(__dirname, 'public/build')
     }
 };
 
