@@ -250,7 +250,7 @@ export class Game extends Container {
             if (field.territory) {
                 this.selectTerritory(field.territory);
             }
-            if (field.unit) {
+            if (field.unit && field.unit.canMove) {
                 this.handleUnitClick(field.unit, e);
             }
         } else {
