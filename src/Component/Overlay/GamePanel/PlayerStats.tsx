@@ -2,7 +2,7 @@ import * as React from 'react';
 import {Player} from '../../../Manager/PlayerManager';
 import {Territory} from '../../Territory';
 
-interface Props {
+export interface PlayerStatsProps {
     player: Player;
     territory?: Territory;
 }
@@ -13,7 +13,7 @@ function colorToString(color: number): string {
     return '#' + padding + hex;
 }
 
-export class PlayerStats extends React.Component<Props> {
+export class PlayerStats extends React.Component<PlayerStatsProps> {
     render() {
         const {player, territory} = this.props;
         return <>

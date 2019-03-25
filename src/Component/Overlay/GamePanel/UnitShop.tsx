@@ -1,12 +1,12 @@
 import * as React from 'react';
 import {UnitType} from '../../Unit';
 
-interface Props {
+export interface UnitShopProps {
     unitTypes: UnitType[];
     onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
 }
 
-export class UnitShop extends React.Component<Props> {
+export class UnitShop extends React.Component<UnitShopProps> {
     render() {
         const {unitTypes, onClickUnitType} = this.props;
         return unitTypes.map((type) => {

@@ -4,10 +4,11 @@ import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
 import {DragManager} from '../Manager/DragManager';
 import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
-import {Game, GamePanelProps} from './Game';
+import {Game} from './Game';
 import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {GamePanel} from './Overlay/GamePanel/GamePanel';
+import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {Start} from './Overlay/Start';
 import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
@@ -22,7 +23,7 @@ interface Props {
 
 interface State {
     isStarted: boolean;
-    panelProps?: GamePanelProps;
+    playerStatsProps?: PlayerStatsProps;
     options: GameOptions;
 }
 
@@ -224,8 +225,8 @@ export class GameContainer extends React.Component<Props, State> {
         this.setState({isStarted: false});
     };
 
-    private handlePanelUpdate = (panelProps: GamePanelProps) => {
-        this.setState({panelProps});
+    private handlePanelUpdate = (playerStatsProps: PlayerStatsProps) => {
+        this.setState({playerStatsProps});
     };
 
     get zoom(): number {
@@ -241,12 +242,12 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     renderPanel() {
-        const {panelProps} = this.state;
-        if (panelProps === undefined || this.unitTypeManager === undefined || this.game === undefined) {
+        const {playerStatsProps} = this.state;
+        if (playerStatsProps === undefined || this.unitTypeManager === undefined || this.game === undefined) {
             return;
         }
         return (
-            <GamePanel {...panelProps}
+            <GamePanel {...playerStatsProps}
                        unitTypes={this.unitTypeManager.units}
                        onClickUnitType={this.game.handlePanelUnitClick}
                        onClickNextTurn={this.game.nextTurns}

@@ -1,15 +1,8 @@
 import * as React from 'react';
-import {Player} from '../../../Manager/PlayerManager';
-import {Territory} from '../../Territory';
-import {UnitType} from '../../Unit';
-import {PlayerStats} from './PlayerStats';
-import {UnitShop} from './UnitShop';
+import {PlayerStats, PlayerStatsProps} from './PlayerStats';
+import {UnitShop, UnitShopProps} from './UnitShop';
 
-export interface GamePanelProps {
-    player: Player;
-    territory?: Territory;
-    unitTypes: UnitType[];
-    onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
+export interface GamePanelProps extends PlayerStatsProps, UnitShopProps {
     onClickNextTurn: () => Promise<void>;
     onClickExit: () => void;
     containerRef?: React.RefObject<HTMLDivElement>;

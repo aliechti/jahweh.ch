@@ -6,7 +6,7 @@ import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {GamePanelProps} from './Overlay/GamePanel/GamePanel';
+import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import Container = PIXI.Container;
@@ -15,7 +15,7 @@ import InteractionEvent = PIXI.interaction.InteractionEvent;
 export interface GameProps {
     playerManager: PlayerManager;
     grid: HexagonGrid;
-    updatePanel: (props: GamePanelProps) => void;
+    updatePanel: (props: PlayerStatsProps) => void;
     unitTypeManager: UnitTypeManager;
     dragManager: GameDragManager;
     onWin: (player: Player) => void;
@@ -25,8 +25,6 @@ export interface GameDragManager {
     getDragging: () => Unit | undefined;
     setDragging: (unit?: Unit, position?: { x: number, y: number }) => void;
 }
-
-export type GamePanelProps = Pick<GamePanelProps, 'player' | 'territory'>;
 
 export class Game extends Container {
     private props: GameProps;
