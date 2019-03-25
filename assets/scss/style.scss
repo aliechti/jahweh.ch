@@ -1,0 +1,58 @@
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+html, body, input, select, button {
+    font-size: 1.5rem;
+    font-family: sans-serif;
+    color: #fff;
+}
+
+input, select, button {
+    padding: 0.2rem 0.6rem;
+    color: #000;
+    background-color: #fff;
+    border: 1px solid #000;
+}
+
+input, select {
+    width: 100%;
+}
+
+button {
+    cursor: pointer;
+}
+
+.full {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 1rem;
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.start {
+    background-color: #00000088;
+}
+
+.center {
+    margin: auto;
+}
+
+.click-trough {
+    pointer-events: none;
+}
+
+.click-trough > *:not(.click-trough) {
+    pointer-events: auto;
+}

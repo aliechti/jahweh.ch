@@ -1,5 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import '../assets/scss/style.scss';
 import {Human} from './Actor/Human';
 import {SimpleAI} from './Actor/SimpleAI';
 import {GameContainer} from './Component/GameContainer';
