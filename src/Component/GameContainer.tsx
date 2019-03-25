@@ -7,7 +7,7 @@ import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {Game, GamePanelProps} from './Game';
 import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
-import {Panel} from './Overlay/Panel';
+import {GamePanel} from './Overlay/GamePanel';
 import {Start} from './Overlay/Start';
 import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
@@ -246,12 +246,12 @@ export class GameContainer extends React.Component<Props, State> {
             return;
         }
         return (
-            <Panel {...panelProps}
-                   unitTypes={this.unitTypeManager.units}
-                   onClickUnitType={this.game.handlePanelUnitClick}
-                   onClickNextTurn={this.game.nextTurns}
-                   onClickExit={this.handleExit}
-                   containerRef={this.panelContainer}
+            <GamePanel {...panelProps}
+                       unitTypes={this.unitTypeManager.units}
+                       onClickUnitType={this.game.handlePanelUnitClick}
+                       onClickNextTurn={this.game.nextTurns}
+                       onClickExit={this.handleExit}
+                       containerRef={this.panelContainer}
             />
         );
     }

@@ -3,7 +3,7 @@ import {Player} from '../../Manager/PlayerManager';
 import {Territory} from '../Territory';
 import {UnitType} from '../Unit';
 
-export interface PanelProps {
+export interface GamePanelProps {
     player: Player;
     territory?: Territory;
     unitTypes: UnitType[];
@@ -23,10 +23,10 @@ function colorToString(color: number): string {
     return '#' + padding + hex;
 }
 
-export class Panel extends React.Component<PanelProps, State> {
+export class GamePanel extends React.Component<GamePanelProps, State> {
     private _isMounted: boolean;
 
-    constructor(props: PanelProps) {
+    constructor(props: GamePanelProps) {
         super(props);
         this.state = {
             isAutoplayRunning: false,
