@@ -1,7 +1,8 @@
 import * as React from 'react';
-import {Player} from '../../Manager/PlayerManager';
-import {Territory} from '../Territory';
-import {UnitType} from '../Unit';
+import {Player} from '../../../Manager/PlayerManager';
+import {Territory} from '../../Territory';
+import {UnitType} from '../../Unit';
+import {UnitShop} from './UnitShop';
 
 export interface GamePanelProps {
     player: Player;
@@ -51,18 +52,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
                     <div>Money {territory ? territory.money : 0}</div>
                 </div>
                 <div className="unit-shop">
-                    {unitTypes.map((type) => {
-                        if (type.isBuildable) {
-                            const title = `cost: ${type.cost}\n`
-                                + `salary: ${type.salary}\n`
-                                + `movable: ${type.isMovable ? 'true' : 'false'}`;
-                            return <button key={type.name} type="button" title={title}
-                                           onClick={(e) => onClickUnitType(type, {
-                                               x: e.clientX,
-                                               y: e.clientY,
-                                           })}>{type.name}</button>;
-                        }
-                    })}
+                    <UnitShop unitTypes={unitTypes} onClickUnitType={onClickUnitType}/>
                 </div>
                 <div>
                     <button type="button" disabled={isAutoplayRunning} onClick={() => {

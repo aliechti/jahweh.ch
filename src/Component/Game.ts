@@ -6,7 +6,7 @@ import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {GamePanelProps} from './Overlay/GamePanel';
+import {GamePanelProps} from './Overlay/GamePanel/GamePanel';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import Container = PIXI.Container;

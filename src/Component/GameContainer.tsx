@@ -7,7 +7,7 @@ import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {Game, GamePanelProps} from './Game';
 import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
-import {GamePanel} from './Overlay/GamePanel';
+import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {Start} from './Overlay/Start';
 import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
