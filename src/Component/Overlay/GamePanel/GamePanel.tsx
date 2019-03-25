@@ -1,8 +1,9 @@
 import * as React from 'react';
+import {PlayerStatistics, PlayerStatisticsProps} from './PlayerStatistics';
 import {PlayerStats, PlayerStatsProps} from './PlayerStats';
 import {UnitShop, UnitShopProps} from './UnitShop';
 
-export interface GamePanelProps extends PlayerStatsProps, UnitShopProps {
+export interface GamePanelProps extends PlayerStatsProps, UnitShopProps, PlayerStatisticsProps {
     onClickNextTurn: () => Promise<void>;
     onClickExit: () => void;
     containerRef?: React.RefObject<HTMLDivElement>;
@@ -32,6 +33,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
 
     render() {
         const {player, territory, unitTypes, onClickUnitType, onClickNextTurn, onClickExit, containerRef} = this.props;
+        const {playerManager} = this.props;
         const {isAutoplayRunning} = this.state;
         return (
             <div ref={containerRef} className="full click-trough" style={{left: 'auto', width: '250px'}}>
@@ -40,6 +42,9 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
                 </div>
                 <div className="unit-shop">
                     <UnitShop unitTypes={unitTypes} onClickUnitType={onClickUnitType}/>
+                </div>
+                <div className="statistics" style={{flex: '1 1 100%'}}>
+                    <PlayerStatistics playerManager={playerManager}/>
                 </div>
                 <div>
                     <button type="button" disabled={isAutoplayRunning} onClick={() => {

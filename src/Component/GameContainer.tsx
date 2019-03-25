@@ -48,12 +48,11 @@ const zoomOptions = {
 };
 
 export class GameContainer extends React.Component<Props, State> {
-    private canvasContainer: React.RefObject<HTMLDivElement>;
-    private dragContainer: React.RefObject<HTMLDivElement>;
-    private panelContainer: React.RefObject<HTMLDivElement>;
+    private readonly canvasContainer: React.RefObject<HTMLDivElement>;
+    private readonly dragContainer: React.RefObject<HTMLDivElement>;
+    private readonly panelContainer: React.RefObject<HTMLDivElement>;
     private app: Application;
     private game?: Game;
-    private unitTypeManager?: UnitTypeManager;
     private dragManager: DragManager;
     private textureGenerator: TextureGenerator;
     private _zoom: number;
@@ -155,12 +154,12 @@ export class GameContainer extends React.Component<Props, State> {
         }
         console.info('grid', JSON.stringify(HexagonGridGenerator.save(grid, playerManager.players)));
         const updatePanel = this.handlePanelUpdate;
-        this.unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
+        const unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
         const game = this.game = new Game({
             grid,
             playerManager,
             updatePanel,
-            unitTypeManager: this.unitTypeManager,
+            unitTypeManager,
             dragManager: this.dragManager,
             onWin: this.handleExit,
         });
@@ -243,12 +242,13 @@ export class GameContainer extends React.Component<Props, State> {
 
     renderPanel() {
         const {playerStatsProps} = this.state;
-        if (playerStatsProps === undefined || this.unitTypeManager === undefined || this.game === undefined) {
+        if (playerStatsProps === undefined || this.game === undefined) {
             return;
         }
         return (
             <GamePanel {...playerStatsProps}
-                       unitTypes={this.unitTypeManager.units}
+                       unitTypes={this.game.props.unitTypeManager.units}
+                       playerManager={this.game.props.playerManager}
                        onClickUnitType={this.game.handlePanelUnitClick}
                        onClickNextTurn={this.game.nextTurns}
                        onClickExit={this.handleExit}

@@ -50,6 +50,12 @@ export interface Actor {
     onTurnEnd?: OnTurnFunction;
 }
 
+export function colorToString(color: number): string {
+    const hex = color.toString(16);
+    const padding = '0'.repeat(6 - hex.length);
+    return '#' + padding + hex;
+}
+
 export class PlayerManager {
     private props: Props;
     public players: Player[];

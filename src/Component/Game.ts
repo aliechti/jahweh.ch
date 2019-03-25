@@ -27,14 +27,14 @@ export interface GameDragManager {
 }
 
 export class Game extends Container {
-    private props: GameProps;
-    private map: GameMap;
+    public readonly props: GameProps;
+    public readonly unitManager: UnitManager;
+    public readonly movementManager: MovementManager;
+    private readonly map: GameMap;
+    private readonly unitContainer: ExplicitContainer<Unit>;
     private player: Player;
-    private unitContainer: ExplicitContainer<Unit>;
     private turn: number;
     private isAutoplayRunning: boolean;
-    private unitManager: UnitManager;
-    private movementManager: MovementManager;
     private mustPauseAutoPlay: boolean;
 
     constructor(props: GameProps) {
