@@ -28,7 +28,6 @@ export type DoTurnFunction = (game: Game) => Promise<void>;
 export type OnTurnFunction = (game: Game) => void;
 
 export interface Actor {
-    isInteractive?: boolean;
     doTurn?: DoTurnFunction;
     onTurnStart?: OnTurnFunction;
     onTurnEnd?: OnTurnFunction;

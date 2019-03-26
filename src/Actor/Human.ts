@@ -9,7 +9,6 @@ type InteractionHandler = (e: InteractionEvent) => void;
 
 export class Human implements Actor {
 
-    public isInteractive = true;
     private fieldClickHandlers: Map<HexagonField, InteractionHandler> = new Map();
     private unitClickHandlers: Map<Unit, InteractionHandler> = new Map();
 
