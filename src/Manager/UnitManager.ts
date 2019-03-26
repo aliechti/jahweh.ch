@@ -11,30 +11,30 @@ interface Props {
 
 export class UnitManager {
     private props: Props;
+    private unitsField: WeakMap<Unit, HexagonField>;
 
     constructor(props: Props) {
         this.props = props;
+        this.unitsField = new WeakMap();
     }
 
     public add(type: UnitType, field: HexagonField) {
-        const unit = new Unit({
-            type: type,
-            field: field,
-        });
+        const unit = new Unit({type});
         this.set(unit, field);
         this.props.unitContainer.addChild(unit);
     }
 
     public set(unit: Unit, field: HexagonField) {
         // Remove unit from previous field
-        if (unit.props.field) {
-            unit.props.field.unit = undefined;
+        const previousField = this.unitsField.get(unit);
+        if (previousField) {
+            previousField.unit = undefined;
         } else {
-            // Unit has no field, so it must be newly bought
+            // Probably not in container yet
             this.props.unitContainer.addChild(unit);
         }
         // Add field to unit
-        unit.props.field = field;
+        this.unitsField.set(unit, field);
         // Set unit to new field
         field.unit = unit;
         // Reset unit position
@@ -42,11 +42,19 @@ export class UnitManager {
     }
 
     public delete(unit: Unit | undefined) {
-        if (unit && unit.props.field) {
-            unit.props.field.unit = undefined;
-            unit.props.field = undefined;
+        if (unit === undefined) {
+            return;
+        }
+        const previousField = this.unitsField.get(unit);
+        if (previousField) {
+            previousField.unit = undefined;
+            this.unitsField.delete(unit);
             this.props.unitContainer.removeChild(unit);
         }
+    }
+
+    public getField(unit: Unit): HexagonField | undefined {
+        return this.unitsField.get(unit);
     }
 
     public getTerritoryMainBuilding(territory: Territory): Unit | undefined {

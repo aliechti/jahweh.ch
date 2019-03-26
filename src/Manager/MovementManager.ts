@@ -28,8 +28,9 @@ export class MovementManager {
             return false;
         }
         // Use unit field territory and player
-        if (unit.props.field && unit.props.field.territory) {
-            unitTerritory = unit.props.field.territory;
+        const unitField = this.props.unitManager.getField(unit);
+        if (unitField && unitField.territory) {
+            unitTerritory = unitField.territory;
         } else if (unitTerritory !== undefined) {
             // Use given territory if new unit bought and doesn't have a field attached yet
         } else {

@@ -145,7 +145,7 @@ export class Game extends Container {
         this.updatePanel();
         // Prepare units for turn
         for (const unit of this.unitContainer.children) {
-            const field = unit.props.field;
+            const field = this.unitManager.getField(unit);
             if (field && field.player === this.player) {
                 unit.onTurn();
             } else {

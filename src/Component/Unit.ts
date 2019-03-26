@@ -1,6 +1,5 @@
 import Sprite = PIXI.Sprite;
 import Texture = PIXI.Texture;
-import {HexagonField} from './HexagonField';
 
 export interface UnitType {
     name: string;
@@ -14,7 +13,6 @@ export interface UnitType {
 
 export interface UnitProps {
     type: UnitType;
-    field?: HexagonField;
 }
 
 export class Unit extends Sprite {
@@ -47,10 +45,6 @@ export class Unit extends Sprite {
         if (this.props.type.isMovable) {
             this.canMove = false;
         }
-    }
-
-    public isBought(): boolean {
-        return this.props.field !== undefined;
     }
 
     get canMove(): boolean {

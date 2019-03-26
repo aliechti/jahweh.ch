@@ -67,12 +67,13 @@ export class Human implements Actor {
     }
 
     private handleFieldClick = (game: Game, field: HexagonField, e: InteractionEvent) => {
-        const {player, movementManager, buyUnit} = game;
+        const {player, movementManager, buyUnit, unitManager} = game;
         const {dragManager} = game.props;
         const unit = dragManager.getDragging();
         console.log('click field');
         if (unit !== undefined) {
-            if (unit.isBought()) {
+            // If the unit has a field its already bought
+            if (unitManager.getField(unit)) {
                 movementManager.move(unit, field, player);
             } else if (player.selectedTerritory) {
                 buyUnit(unit.props.type, field, player.selectedTerritory);
@@ -95,7 +96,7 @@ export class Human implements Actor {
     private handleUnitClick = (game: Game, unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
         const {dragManager} = game.props;
-        const {field} = unit.props;
+        const field = game.unitManager.getField(unit);
         if (dragManager.getDragging() === undefined) {
             dragManager.setDragging(unit, e.data.global);
             if (field && field.territory) {
