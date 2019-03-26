@@ -3,12 +3,10 @@ import {Territory} from '../Component/Territory';
 import {Unit, UnitType} from '../Component/Unit';
 import {UnitTypeManager} from './UnitTypeManager';
 import Container = PIXI.Container;
-import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 interface Props {
     unitTypeManager: UnitTypeManager;
     unitContainer: Container;
-    handleUnitClick: (unit: Unit, e: InteractionEvent) => void;
 }
 
 export class UnitManager {
@@ -22,7 +20,6 @@ export class UnitManager {
         const unit = new Unit({
             type: type,
             field: field,
-            onClick: this.props.handleUnitClick,
         });
         this.set(unit, field);
         this.props.unitContainer.addChild(unit);

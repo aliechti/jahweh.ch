@@ -1,11 +1,7 @@
+import {Game} from '../Component/Game';
 import {TextureGenerator} from '../Component/GameContainer';
-import {GameMap} from '../Component/GameMap';
 import {Hexagon, HexagonProps} from '../Component/Hexagon';
-import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
-import {Unit, UnitType} from '../Component/Unit';
-import {MovementManager} from './MovementManager';
-import {UnitTypeManager} from './UnitTypeManager';
 import Point = PIXI.Point;
 import Texture = PIXI.Texture;
 
@@ -27,22 +23,9 @@ export interface Player extends PlayerProps {
     territories: Territory[];
 }
 
-export type DoTurnFunction = (props: DoTurnProps) => Promise<void>;
+export type DoTurnFunction = (game: Game) => Promise<void>;
 
-export interface DoTurnProps {
-    player: Player;
-    map: GameMap;
-    unitTypeManager: UnitTypeManager;
-    movementManager: MovementManager;
-    buyUnit: (type: UnitType, field: HexagonField, territory: Territory) => Unit | undefined;
-}
-
-export type OnTurnFunction = (props: OnTurnProps) => void;
-
-export interface OnTurnProps {
-    player: Player;
-    map: GameMap;
-}
+export type OnTurnFunction = (game: Game) => void;
 
 export interface Actor {
     isInteractive?: boolean;

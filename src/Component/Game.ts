@@ -10,7 +10,6 @@ import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import Container = PIXI.Container;
-import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 export interface GameProps {
     playerManager: PlayerManager;
@@ -30,9 +29,9 @@ export class Game extends Container {
     public readonly props: GameProps;
     public readonly unitManager: UnitManager;
     public readonly movementManager: MovementManager;
-    private readonly map: GameMap;
+    public player: Player;
+    public readonly map: GameMap;
     private readonly unitContainer: ExplicitContainer<Unit>;
-    private player: Player;
     private turn: number;
     private isAutoplayRunning: boolean;
     private mustPauseAutoPlay: boolean;
@@ -48,7 +47,6 @@ export class Game extends Container {
         this.unitManager = new UnitManager({
             unitTypeManager: this.props.unitTypeManager,
             unitContainer: this.unitContainer,
-            handleUnitClick: this.handleUnitClick,
         });
         this.movementManager = new MovementManager({
             map: this.map,
@@ -60,10 +58,6 @@ export class Game extends Container {
         this.addChild(this.props.grid);
         this.addChild(this.unitContainer);
 
-        for (const field of this.props.grid.fields()) {
-            field.interactive = true;
-            field.on('click', (e: InteractionEvent) => this.handleFieldClick(field, e));
-        }
         for (const territory of this.map.territories) {
             const size = territory.props.fields.length;
             if (size > 1) {
@@ -82,14 +76,14 @@ export class Game extends Container {
         });
     }
 
-    private selectTerritory = (territory: Territory) => {
+    public selectTerritory = (territory: Territory) => {
         this.unselectTerritory();
         this.player.selectedTerritory = territory;
         this.updatePanel();
         this.tintTerritory(this.player.selectedTerritory, 0x555555);
     };
 
-    private unselectTerritory() {
+    public unselectTerritory() {
         if (this.player.selectedTerritory) {
             this.tintTerritory(this.player.selectedTerritory, 0xffffff);
             this.player.selectedTerritory = undefined;
@@ -108,13 +102,7 @@ export class Game extends Container {
             let doTurn = this.player.actor.doTurn;
             while (doTurn) {
                 await Promise.all([
-                    doTurn({
-                        player: this.player,
-                        map: this.map,
-                        unitTypeManager: this.props.unitTypeManager,
-                        movementManager: this.movementManager,
-                        buyUnit: this.buyUnit,
-                    }),
+                    doTurn(this),
                     sleep(500),
                 ]);
                 if (!this.mustPauseAutoPlay) {
@@ -167,7 +155,7 @@ export class Game extends Container {
         // Execute actor turn start actions
         const {actor} = this.player;
         if (actor.onTurnStart) {
-            actor.onTurnStart({player: this.player, map: this.map});
+            actor.onTurnStart(this);
         }
     };
 
@@ -175,7 +163,7 @@ export class Game extends Container {
         this.unselectTerritory();
         const {actor} = this.player;
         if (actor.onTurnEnd) {
-            actor.onTurnEnd({player: this.player, map: this.map});
+            actor.onTurnEnd(this);
         }
     };
 
@@ -231,45 +219,6 @@ export class Game extends Container {
         return this.player.actor.doTurn;
     };
 
-    private handleFieldClick = (field: HexagonField, e: InteractionEvent) => {
-        const {dragManager} = this.props;
-        const unit = dragManager.getDragging();
-        console.log('click field');
-        if (unit !== undefined) {
-            if (unit.isBought()) {
-                this.movementManager.move(unit, field, this.player);
-            } else if (this.player.selectedTerritory) {
-                this.buyUnit(unit.props.type, field, this.player.selectedTerritory);
-            }
-            // Reset unit dragging
-            dragManager.setDragging(undefined);
-        } else if (field.player === this.player) {
-            // Only select other territory/unit if no unit is dragging and its the current player
-            if (field.territory) {
-                this.selectTerritory(field.territory);
-            }
-            if (field.unit && field.unit.canMove) {
-                this.handleUnitClick(field.unit, e);
-            }
-        } else {
-            console.warn('Can\'t use another players territory');
-        }
-    };
-
-    private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
-        console.log('click unit');
-        const {dragManager} = this.props;
-        const {field} = unit.props;
-        if (dragManager.getDragging() === undefined) {
-            dragManager.setDragging(unit, e.data.global);
-            if (field && field.territory) {
-                this.selectTerritory(field.territory);
-            }
-        } else if (field) {
-            this.handleFieldClick(field, e);
-        }
-    };
-
     public handlePanelUnitClick = (type: UnitType, position: { x: number, y: number }) => {
         console.log('panel unit click', type);
         const territory = this.player.selectedTerritory;
@@ -286,11 +235,11 @@ export class Game extends Container {
             console.warn('not enough money to buy this unit');
             return;
         }
-        const unit = new Unit({type, onClick: this.handleUnitClick});
+        const unit = new Unit({type});
         dragManager.setDragging(unit, position);
     };
 
-    private buyUnit = (type: UnitType, field: HexagonField, territory: Territory): Unit | undefined => {
+    public buyUnit = (type: UnitType, field: HexagonField, territory: Territory): Unit | undefined => {
         if (!type.isBuildable) {
             console.warn('unit type is not buildable');
             return;
@@ -299,7 +248,7 @@ export class Game extends Container {
             console.warn('not enough money to buy this unit');
             return;
         }
-        const unit = new Unit({type, onClick: this.handleUnitClick});
+        const unit = new Unit({type});
         if (this.player.actor.isInteractive && type.isMovable) {
             unit.setInteractive(true);
         }

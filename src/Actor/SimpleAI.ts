@@ -1,9 +1,11 @@
+import {Game} from '../Component/Game';
 import {Unit} from '../Component/Unit';
-import {Actor, DoTurnProps} from '../Manager/PlayerManager';
+import {Actor} from '../Manager/PlayerManager';
 
 export class SimpleAI implements Actor {
-    public doTurn = async (props: DoTurnProps) => {
-        const {player, map, movementManager, unitTypeManager, buyUnit} = props;
+    public doTurn = async (game: Game) => {
+        const {player, map, movementManager, buyUnit} = game;
+        const {unitTypeManager} = game.props;
         for (const territory of player.territories) {
             if (!territory.isControllable()) {
                 continue;
