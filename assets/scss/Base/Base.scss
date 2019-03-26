@@ -1,4 +1,3 @@
-
 * {
     box-sizing: border-box;
 }
@@ -44,12 +43,4 @@ button {
 
 .center {
     margin: auto;
-}
-
-.click-trough {
-    pointer-events: none;
-}
-
-.click-trough > *:not(.click-trough) {
-    pointer-events: auto;
 }

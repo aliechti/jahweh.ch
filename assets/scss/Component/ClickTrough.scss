@@ -1,0 +1,6 @@
+.click-trough {
+    pointer-events: none;
+    & > *:not(.click-trough) {
+        pointer-events: auto;
+    }
+}
