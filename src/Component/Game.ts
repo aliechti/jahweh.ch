@@ -305,6 +305,7 @@ export class Game extends Container {
         }
         if (this.movementManager.move(unit, field, this.player, territory)) {
             territory.money -= type.cost;
+            this.updatePanel();
             return unit;
         }
     };
