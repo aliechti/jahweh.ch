@@ -18,14 +18,13 @@ export class PlayerStatistics extends React.Component<PlayerStatisticsProps> {
             return {color, fieldCount};
         });
         const maxFieldCount = Math.max(...players.map((player) => player.fieldCount));
-        return <div style={{display: 'flex', height: '4rem', alignItems: 'flex-end'}}>
+        return <div className="row" style={{height: '4rem', alignItems: 'flex-end'}}>
             {players.map((player) => {
                 const height = player.fieldCount / maxFieldCount * 100;
                 return (
-                    <div style={{
+                    <div className="col" style={{
                         background: colorToString(player.color),
                         height: `${height}%`,
-                        flex: '1 1 0',
                     }}/>
                 );
             })}

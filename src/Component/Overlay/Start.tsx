@@ -21,7 +21,7 @@ export class Start extends React.Component<Props> {
     render() {
         const {options, onClickStart} = this.props;
         return (
-            <div className="start full">
+            <div className="start full row">
                 <div className="center">
                     <div style={{width: '200px'}}>
                         <label>Shape</label>
@@ -40,18 +40,18 @@ export class Start extends React.Component<Props> {
                         </select>
                         {options.shape === 'load' ? '' :
                             options.shape === 'spiral' || options.shape === 'ring'
-                            ? <>
-                                <label>Radius</label>
-                                <input value={options.radius}
-                                       onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
-                            </> : <>
-                                <label>Columns</label>
-                                <input value={options.columns}
-                                       onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
-                                <label>Rows</label>
-                                <input value={options.rows}
-                                       onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
-                            </>
+                                ? <>
+                                    <label>Radius</label>
+                                    <input value={options.radius}
+                                           onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
+                                </> : <>
+                                    <label>Columns</label>
+                                    <input value={options.columns}
+                                           onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
+                                    <label>Rows</label>
+                                    <input value={options.rows}
+                                           onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
+                                </>
                         }
                     </div>
                     <div style={{textAlign: 'center', marginTop: '1rem'}}>

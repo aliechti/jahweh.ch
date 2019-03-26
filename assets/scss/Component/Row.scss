@@ -1,0 +1,21 @@
+$row-columns: 12;
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.col {
+    flex: 1 1 0;
+}
+
+.col-auto {
+    flex: 1 1 auto;
+}
+
+@for $i from 1 through $row-columns {
+    .col-#{$i} {
+        @extend .col;
+        flex-basis: percentage($i / $row-columns);
+    }
+}

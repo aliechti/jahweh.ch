@@ -36,17 +36,19 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
         const {playerManager} = this.props;
         const {isAutoplayRunning} = this.state;
         return (
-            <div ref={containerRef} className="full click-trough" style={{left: 'auto', width: '250px'}}>
-                <div>
+            <div ref={containerRef} className="full click-trough row"
+                 style={{left: 'auto', width: '250px', padding: '1rem'}}
+            >
+                <div className="col-12">
                     <PlayerStats player={player} territory={territory}/>
                 </div>
-                <div className="unit-shop">
+                <div className="col-12">
                     <UnitShop unitTypes={unitTypes} onClickUnitType={onClickUnitType}/>
                 </div>
-                <div className="statistics" style={{flex: '1 1 100%'}}>
+                <div className="col-12">
                     <PlayerStatistics playerManager={playerManager}/>
                 </div>
-                <div>
+                <div className="col-12">
                     <button type="button" disabled={isAutoplayRunning} onClick={() => {
                         this.setState({isAutoplayRunning: true});
                         onClickNextTurn().then(() => {
@@ -55,7 +57,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
                     }}>Next turn
                     </button>
                 </div>
-                <div>
+                <div className="col-12">
                     <button type="button" onClick={onClickExit}>Exit game</button>
                 </div>
             </div>
