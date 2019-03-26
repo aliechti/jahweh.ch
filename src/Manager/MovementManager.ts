@@ -10,7 +10,6 @@ interface Props {
     map: GameMap;
     unitTypeManager: UnitTypeManager;
     unitManager: UnitManager;
-    selectTerritory: (territory: Territory) => void;
 }
 
 export class MovementManager {
@@ -130,10 +129,6 @@ export class MovementManager {
             return field.territory as Territory;
         }));
         this.renewMainBuildings(enemyTerritories);
-        // Recalculate selected territory
-        if (unitPlayer.actor.isInteractive && unitPlayer.selectedTerritory) {
-            this.props.selectTerritory(unitPlayer.selectedTerritory);
-        }
         return true;
     }
 

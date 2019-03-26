@@ -52,7 +52,6 @@ export class Game extends Container {
             map: this.map,
             unitTypeManager: this.props.unitTypeManager,
             unitManager: this.unitManager,
-            selectTerritory: this.selectTerritory,
         });
 
         this.addChild(this.props.grid);
@@ -69,25 +68,11 @@ export class Game extends Container {
         this.autoPlay();
     }
 
-    private updatePanel() {
+    public updatePanel() {
         this.props.updatePanel({
             player: this.player,
             territory: this.player.selectedTerritory,
         });
-    }
-
-    public selectTerritory = (territory: Territory) => {
-        this.unselectTerritory();
-        this.player.selectedTerritory = territory;
-        this.updatePanel();
-        this.tintTerritory(this.player.selectedTerritory, 0x555555);
-    };
-
-    public unselectTerritory() {
-        if (this.player.selectedTerritory) {
-            this.tintTerritory(this.player.selectedTerritory, 0xffffff);
-            this.player.selectedTerritory = undefined;
-        }
     }
 
     private async autoPlay() {
@@ -160,7 +145,6 @@ export class Game extends Container {
     };
 
     private handleTurnEnd = () => {
-        this.unselectTerritory();
         const {actor} = this.player;
         if (actor.onTurnEnd) {
             actor.onTurnEnd(this);
@@ -258,12 +242,4 @@ export class Game extends Container {
             return unit;
         }
     };
-
-    private tintTerritory(territory: Territory | undefined, tint: number) {
-        if (territory) {
-            for (const field of territory.props.fields) {
-                field.tint = tint;
-            }
-        }
-    }
 }

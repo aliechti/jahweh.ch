@@ -1,5 +1,6 @@
 import {Game} from '../Component/Game';
 import {HexagonField} from '../Component/HexagonField';
+import {Territory} from '../Component/Territory';
 import {Unit} from '../Component/Unit';
 import {Actor, Player} from '../Manager/PlayerManager';
 import InteractionEvent = PIXI.interaction.InteractionEvent;
@@ -37,6 +38,7 @@ export class Human implements Actor {
     public onTurnEnd = (game: Game) => {
         const fields = this.getPlayerFields(game.player);
         const units = this.getFieldUnits(fields);
+        this.unselectTerritory(game);
         // Remove player unit interactivity
         for (const unit of units) {
             unit.setInteractive(false);
@@ -78,12 +80,16 @@ export class Human implements Actor {
             } else if (player.selectedTerritory) {
                 buyUnit(unit.props.type, field, player.selectedTerritory);
             }
+            // Recalculate selected territory
+            if (game.player.selectedTerritory) {
+                this.selectTerritory(game, game.player.selectedTerritory);
+            }
             // Reset unit dragging
             dragManager.setDragging(undefined);
         } else if (field.player === player) {
             // Only select other territory/unit if no unit is dragging and its the current player
             if (field.territory) {
-                game.selectTerritory(field.territory);
+                this.selectTerritory(game, field.territory);
             }
             if (field.unit && field.unit.canMove) {
                 this.handleUnitClick(game, field.unit, e);
@@ -100,10 +106,32 @@ export class Human implements Actor {
         if (dragManager.getDragging() === undefined) {
             dragManager.setDragging(unit, e.data.global);
             if (field && field.territory) {
-                game.selectTerritory(field.territory);
+                this.selectTerritory(game, field.territory);
             }
         } else if (field) {
             this.handleFieldClick(game, field, e);
         }
     };
+
+    private selectTerritory = (game: Game, territory: Territory) => {
+        this.unselectTerritory(game);
+        game.player.selectedTerritory = territory;
+        game.updatePanel();
+        this.tintTerritory(game.player.selectedTerritory, 0x555555);
+    };
+
+    private unselectTerritory(game: Game) {
+        if (game.player.selectedTerritory) {
+            this.tintTerritory(game.player.selectedTerritory, 0xffffff);
+            game.player.selectedTerritory = undefined;
+        }
+    }
+
+    private tintTerritory(territory: Territory | undefined, tint: number) {
+        if (territory) {
+            for (const field of territory.props.fields) {
+                field.tint = tint;
+            }
+        }
+    }
 }
