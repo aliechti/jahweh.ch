@@ -233,9 +233,6 @@ export class Game extends Container {
             return;
         }
         const unit = new Unit({type});
-        if (this.player.actor.isInteractive && type.isMovable) {
-            unit.setInteractive(true);
-        }
         if (this.movementManager.move(unit, field, this.player, territory)) {
             territory.money -= type.cost;
             this.updatePanel();

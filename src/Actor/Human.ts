@@ -78,7 +78,10 @@ export class Human implements Actor {
             if (unitManager.getField(unit)) {
                 movementManager.move(unit, field, player);
             } else if (player.selectedTerritory) {
-                buyUnit(unit.props.type, field, player.selectedTerritory);
+                const newUnit = buyUnit(unit.props.type, field, player.selectedTerritory);
+                if (newUnit && newUnit.canMove) {
+                    newUnit.setInteractive(true);
+                }
             }
             // Recalculate selected territory
             if (game.player.selectedTerritory) {
