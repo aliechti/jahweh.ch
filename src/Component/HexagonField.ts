@@ -11,7 +11,7 @@ export interface HexagonFieldProps {
     unit?: Unit;
 }
 
-export class HexagonField extends Sprite {
+export class HexagonField extends Sprite implements AxialCoordinates {
     private props: HexagonFieldProps;
 
     constructor(props: HexagonFieldProps) {
@@ -19,8 +19,12 @@ export class HexagonField extends Sprite {
         this.props = props;
     }
 
-    get axial(): AxialCoordinates {
-        return this.props.axial;
+    get q(): number {
+        return this.props.axial.q;
+    }
+
+    get r(): number {
+        return this.props.axial.r;
     }
 
     get player(): Player {

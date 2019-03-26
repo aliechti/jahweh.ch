@@ -95,9 +95,9 @@ export class HexagonGridGenerator {
     public load(savedGrid: SavedGrid): HexagonGrid {
         const grid = new HexagonGrid();
         for (const savedField of savedGrid) {
-            const axial = savedField;
+            const axial = {q: savedField.q, r: savedField.r};
             const field = this.generateField(axial, savedField.p);
-            grid.set(axial, field);
+            grid.set(field);
         }
         return grid;
     }
@@ -106,7 +106,8 @@ export class HexagonGridGenerator {
         const savedGrid: SavedGrid = [];
         for (const field of grid.fields()) {
             savedGrid.push({
-                ...field.axial,
+                q: field.q,
+                r: field.r,
                 p: players.indexOf(field.player),
             });
         }
@@ -123,7 +124,7 @@ export class HexagonGridGenerator {
         const index = getPlayer({...props, playerCount: players.length});
         if (index !== undefined) {
             const field = this.generateField(axial, index);
-            grid.set(axial, field);
+            grid.set(field);
         }
     }
 

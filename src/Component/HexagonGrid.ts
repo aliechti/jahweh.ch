@@ -30,21 +30,20 @@ export class HexagonGrid extends Container {
     }
 
     public getFieldNeighbors(field: HexagonField): HexagonField[] {
-        const axial = field.axial;
         const neighbors: HexagonField[] = [];
         for (const direction of axialDirections) {
-            const q = axial.q + direction.q;
-            const r = axial.r + direction.r;
-            const field = this.get({q, r});
-            if (field !== undefined) {
-                neighbors.push(field);
+            const q = field.q + direction.q;
+            const r = field.r + direction.r;
+            const neighbor = this.get({q, r});
+            if (neighbor !== undefined) {
+                neighbors.push(neighbor);
             }
         }
         return neighbors;
     }
 
-    public set(axial: AxialCoordinates, field: HexagonField): void {
-        this._fields.set(HexagonGrid.key(axial), field);
+    public set(field: HexagonField): void {
+        this._fields.set(HexagonGrid.key(field), field);
         this.addChild(field);
     }
 

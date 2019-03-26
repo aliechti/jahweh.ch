@@ -45,7 +45,7 @@ export class SimpleAI implements Actor {
             if (unitType) {
                 for (const neighbor of territoryNeighbors) {
                     if (buyUnit(unitType, neighbor, territory)) {
-                        console.log('bought unit', neighbor.axial, unitType.name);
+                        console.log('bought unit', neighbor, unitType.name);
                         break;
                     }
                 }
