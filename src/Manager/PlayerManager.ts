@@ -21,6 +21,7 @@ export interface PlayerProps {
 }
 
 export interface Player extends PlayerProps {
+    id: number;
     hexagonTexture: Texture;
     selectedTerritory?: Territory;
     territories: Territory[];
@@ -83,9 +84,10 @@ export class PlayerManager {
 
     private generatePlayers(playerProps: PlayerProps[]): Player[] {
         const players: Player[] = [];
-        for (const player of playerProps) {
+        for (const [id, player] of playerProps.entries()) {
             players.push({
                 ...player,
+                id,
                 territories: [],
                 hexagonTexture: this.generateHexagonTexture(player.color),
             });

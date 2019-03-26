@@ -9,20 +9,19 @@ export class PlayerStatistics extends React.Component<PlayerStatisticsProps> {
     render() {
         const {playerManager} = this.props;
         const players = playerManager.players.map((player) => {
-            const color = player.color;
             const fieldCount = player.territories.map(
                 (territory) => territory.props.fields,
             ).reduce((previous, current) => {
                 return Array().concat(previous, current);
             }).length;
-            return {color, fieldCount};
+            return {...player, fieldCount};
         });
         const maxFieldCount = Math.max(...players.map((player) => player.fieldCount));
         return <div className="row" style={{height: '4rem', alignItems: 'flex-end'}}>
             {players.map((player) => {
                 const height = player.fieldCount / maxFieldCount * 100;
                 return (
-                    <div className="col" style={{
+                    <div key={player.id} className="col" style={{
                         background: colorToString(player.color),
                         height: `${height}%`,
                     }}/>
