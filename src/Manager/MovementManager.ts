@@ -224,7 +224,14 @@ export class MovementManager {
         }
     }
 
-    private mergeUnits(unit: Unit, fieldUnit: Unit): boolean {
+    public mergeUnits(unit: Unit, fieldUnit: Unit): boolean {
+        const {unitManager} = this.props;
+        const stayingField = unitManager.getField(unit);
+        const droppedField = unitManager.getField(fieldUnit);
+        if (stayingField && droppedField && stayingField.territory !== droppedField.territory) {
+            console.warn('Only units in the same territory can merge together');
+            return false;
+        }
         const stayingType = fieldUnit.props.type;
         if (!stayingType.isBuildable || !stayingType.isMovable) {
             console.warn('Only buildable and movable units can merge together');
@@ -243,7 +250,7 @@ export class MovementManager {
             });
             // If unit staying has already moved the merged one has too
             unit.canMove = fieldUnit.canMove;
-            this.props.unitManager.delete(fieldUnit);
+            unitManager.delete(fieldUnit);
             unit.setType(mergedType);
         } else {
             console.warn('No type with same cost found to merge');
