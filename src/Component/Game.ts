@@ -92,6 +92,8 @@ export class Game extends Container {
                 ]);
                 if (!this.mustPauseAutoPlay) {
                     doTurn = this.nextTurn();
+                } else {
+                    doTurn = undefined;
                 }
             }
             this.isAutoplayRunning = false;
