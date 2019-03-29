@@ -30,10 +30,13 @@ export class SimpleAI implements Actor {
             console.time('buy-units ' + game.player.id);
             // Buy movable unit
             const territoryNeighbors = map.getTerritoryNeighbors(territory);
-            const requiredStrength = Math.min(...territoryNeighbors.map((neighbor) => {
-                return movementManager.getFieldDefendingStrength(neighbor);
-            }));
-            console.log('x', territoryNeighbors);
+            const strengthNeighbors = territoryNeighbors.map((neighbor) => {
+                return {
+                    field: neighbor,
+                    strength: movementManager.getFieldDefendingStrength(neighbor),
+                };
+            });
+            const requiredStrength = Math.min(...strengthNeighbors.map((neighbor) => neighbor.strength));
             const purchasableTypes = unitTypeManager.units.filter((type) => {
                 return type.isBuildable
                     && type.isMovable
@@ -45,11 +48,9 @@ export class SimpleAI implements Actor {
             const unitType = purchasableTypes.shift();
             console.log('buy unit', unitType, requiredStrength, purchasableTypes);
             if (unitType) {
-                for (const neighbor of territoryNeighbors) {
-                    if (buyUnit(unitType, neighbor, territory)) {
-                        console.log('bought unit', neighbor, unitType.name);
-                        break;
-                    }
+                const neighbor = strengthNeighbors.find((neighbor) => neighbor.strength < unitType.strength);
+                if (neighbor && buyUnit(unitType, neighbor.field, territory)) {
+                    console.log('bought unit', neighbor, unitType.name);
                 }
             }
             console.timeEnd('buy-units ' + game.player.id);
