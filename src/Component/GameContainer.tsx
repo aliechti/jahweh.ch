@@ -161,7 +161,7 @@ export class GameContainer extends React.Component<Props, State> {
             updatePanel,
             unitTypeManager,
             dragManager: this.dragManager,
-            onWin: this.handleExit,
+            onWin: this.handleExitGame,
         });
         this.zoom = 1;
         // Drag/pan handlers
@@ -217,11 +217,18 @@ export class GameContainer extends React.Component<Props, State> {
         game.y = mouse.y - this.panStart.y;
     };
 
-    private handleExit = () => {
+    private handleExitGame = () => {
         if (this.game) {
             this.game.pauseAutoPlay();
         }
         this.setState({isStarted: false});
+    };
+
+    private handleResumeGame = () => {
+        if (this.game) {
+            this.game.resume();
+            this.setState({isStarted: true});
+        }
     };
 
     private handlePanelUpdate = (playerStatsProps: PlayerStatsProps) => {
@@ -251,7 +258,7 @@ export class GameContainer extends React.Component<Props, State> {
                        playerManager={this.game.props.playerManager}
                        onClickUnitType={this.game.handlePanelUnitClick}
                        onClickNextTurn={this.game.nextTurns}
-                       onClickExit={this.handleExit}
+                       onClickExit={this.handleExitGame}
                        containerRef={this.panelContainer}
             />
         );
@@ -264,8 +271,13 @@ export class GameContainer extends React.Component<Props, State> {
                 <div className="canvas-container" ref={this.canvasContainer}/>
                 {isStarted
                     ? this.renderPanel()
-                    : <Start options={options} onClickStart={this.handleStartGame}
-                             onSetOptions={(options) => this.setState({options})}/>
+                    : <Start
+                        options={options}
+                        canResume={this.game !== undefined}
+                        onClickStart={this.handleStartGame}
+                        onClickResume={this.handleResumeGame}
+                        onSetOptions={(options) => this.setState({options})}
+                    />
                 }
                 <div className="drag-container click-trough"
                      style={{

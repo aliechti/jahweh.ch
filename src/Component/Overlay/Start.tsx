@@ -3,7 +3,9 @@ import {Chooser, GameOptions, Shape} from '../GameContainer';
 
 interface Props {
     options: GameOptions;
+    canResume: boolean;
     onClickStart: () => void;
+    onClickResume: () => void;
     onSetOptions: (options: GameOptions) => void;
 }
 
@@ -19,7 +21,7 @@ export class Start extends React.Component<Props> {
     };
 
     render() {
-        const {options, onClickStart} = this.props;
+        const {options, canResume, onClickStart, onClickResume} = this.props;
         return (
             <div className="start full row">
                 <div className="center">
@@ -57,6 +59,11 @@ export class Start extends React.Component<Props> {
                     <div style={{textAlign: 'center', marginTop: '1rem'}}>
                         <button type="button" onClick={onClickStart}>Start</button>
                     </div>
+                    {canResume ?
+                        <div style={{textAlign: 'center', marginTop: '1rem'}}>
+                            <button type="button" onClick={onClickResume}>Resume</button>
+                        </div>
+                        : ''}
                 </div>
             </div>
         );

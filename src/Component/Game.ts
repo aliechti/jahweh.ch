@@ -75,6 +75,13 @@ export class Game extends Container {
         });
     }
 
+    public async resume() {
+        let doTurn = this.player.actor.doTurn;
+        if (doTurn) {
+            await this.autoPlay();
+        }
+    }
+
     private async autoPlay() {
         function sleep(ms: number) {
             return new Promise(resolve => setTimeout(resolve, ms));
