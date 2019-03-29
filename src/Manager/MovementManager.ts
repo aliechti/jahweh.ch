@@ -1,7 +1,7 @@
 import {GameMap} from '../Component/GameMap';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
-import {Unit} from '../Component/Unit';
+import {Unit, UnitType} from '../Component/Unit';
 import {Player} from './PlayerManager';
 import {UnitManager} from './UnitManager';
 import {UnitTypeManager} from './UnitTypeManager';
@@ -238,10 +238,7 @@ export class MovementManager {
             return false;
         }
         const droppedType = unit.props.type;
-        const cost = stayingType.cost + droppedType.cost;
-        const mergedType = this.props.unitTypeManager.units.find((type) => {
-            return type.cost === cost && type.isMovable && type.isBuildable;
-        });
+        const mergedType = this.getMergedType(stayingType, droppedType);
         if (mergedType) {
             console.log('Units merged', {
                 dropped: stayingType,
@@ -257,5 +254,12 @@ export class MovementManager {
             return false;
         }
         return true;
+    }
+
+    public getMergedType(a: UnitType, b: UnitType): UnitType | undefined {
+        const cost = a.cost + b.cost;
+        return this.props.unitTypeManager.units.find((type) => {
+            return type.cost === cost && type.isMovable && type.isBuildable;
+        });
     }
 }
