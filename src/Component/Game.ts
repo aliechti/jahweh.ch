@@ -244,7 +244,6 @@ export class Game extends Container {
         const unit = new Unit({type});
         if (this.movementManager.move(unit, field, this.player, territory)) {
             territory.money -= type.cost;
-            this.updatePanel();
             return unit;
         }
     };
