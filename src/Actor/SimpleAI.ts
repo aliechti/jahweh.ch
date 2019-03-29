@@ -62,7 +62,9 @@ export class SimpleAI implements Actor {
                 return type.isBuildable
                     && type.isMovable
                     && type.cost < territory.money
-                    && type.strength > requiredStrength;
+                    && type.strength > requiredStrength
+                    // Prevent bankruptcy by not buy the unit if the salaries are bigger than the income
+                    && type.salary + territory.salaries() < territory.income();
             });
             const unitType = purchasableTypes.shift();
             console.log('buy unit', unitType, requiredStrength, purchasableTypes);
