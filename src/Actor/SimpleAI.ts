@@ -10,24 +10,48 @@ export class SimpleAI implements Actor {
             if (!territory.isControllable()) {
                 continue;
             }
+            console.time('move-units ' + game.player.id);
             // Move units
-            const units = territory.props.fields.map((field) => {
+            let units = territory.props.fields.map((field) => {
                 return field.unit;
             }).filter((unit) => unit !== undefined) as Unit[];
             if (units.length > 0) {
-                const territoryNeighbors = new Set(map.getTerritoryNeighbors(territory));
+                const territoryNeighbors = map.getTerritoryNeighbors(territory);
+                const strengthNeighbors = territoryNeighbors.map((neighbor) => {
+                    return {
+                        field: neighbor,
+                        strength: movementManager.getFieldDefendingStrength(neighbor),
+                    };
+                });
+                const requiredStrength = Math.min(...strengthNeighbors.map((neighbor) => neighbor.strength));
+                // Filter too weak units
+                units = units.filter((unit) => {
+                    return unit.props.type.strength > requiredStrength;
+                });
+                // Order units by strength to not waste any strong unit
+                units.sort((a, b) => {
+                    return a.props.type.strength - b.props.type.strength;
+                });
                 for (const unit of units) {
                     if (!unit.canMove) {
                         continue;
                     }
-                    for (const neighbor of territoryNeighbors) {
-                        if (movementManager.move(unit, neighbor, player)) {
-                            territoryNeighbors.delete(neighbor);
+                    for (const neighbor of strengthNeighbors) {
+                        if (unit.props.type.strength > neighbor.strength
+                            && movementManager.move(unit, neighbor.field, player)
+                        ) {
+                            // Remove neighbor, to not check it again
+                            const index = strengthNeighbors.indexOf(neighbor);
+                            if (index !== -1) {
+                                strengthNeighbors.splice(index, 1);
+                            }
                             break;
                         }
                     }
                 }
             }
+            console.timeEnd('move-units ' + game.player.id);
+            console.time('buy-units ' + game.player.id);
             // Buy movable unit
             const territoryNeighbors = map.getTerritoryNeighbors(territory);
             const requiredStrength = Math.min(...territoryNeighbors.map((neighbor) => {
@@ -50,6 +74,7 @@ export class SimpleAI implements Actor {
                     }
                 }
             }
+            console.timeEnd('buy-units ' + game.player.id);
         }
     };
 }
