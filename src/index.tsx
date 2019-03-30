@@ -1,3 +1,4 @@
+import 'pixi.js';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import '../assets/scss/style.scss';

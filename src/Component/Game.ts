@@ -217,26 +217,6 @@ export class Game extends Container {
         return this.player.actor.doTurn;
     };
 
-    public handlePanelUnitClick = (type: UnitType, position: { x: number, y: number }) => {
-        console.log('panel unit click', type);
-        const territory = this.player.selectedTerritory;
-        if (territory === undefined) {
-            console.warn('no territory selected');
-            return;
-        }
-        const {dragManager} = this.props;
-        if (dragManager.getDragging() !== undefined) {
-            console.warn('you can\'t drag another unit');
-            return;
-        }
-        if (territory.money < type.cost) {
-            console.warn('not enough money to buy this unit');
-            return;
-        }
-        const unit = new Unit({type});
-        dragManager.setDragging(unit, position);
-    };
-
     public buyUnit = (type: UnitType, field: HexagonField, territory: Territory): Unit | undefined => {
         if (!type.isBuildable) {
             console.warn('unit type is not buildable');

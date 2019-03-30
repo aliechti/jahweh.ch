@@ -1,6 +1,7 @@
 import {Game} from '../Component/Game';
 import {TextureGenerator} from '../Component/GameContainer';
 import {Hexagon, HexagonProps} from '../Component/Hexagon';
+import {OnClickPanelUnitType} from '../Component/Overlay/GamePanel/UnitShop';
 import {Territory} from '../Component/Territory';
 import Point = PIXI.Point;
 import Texture = PIXI.Texture;
@@ -33,6 +34,7 @@ export interface Actor {
     doTurn?: () => Promise<void>;
     onTurnStart?: () => void;
     onTurnEnd?: () => void;
+    onPanelUnitClick?: OnClickPanelUnitType;
 }
 
 export function colorToString(color: number): string {

@@ -1,7 +1,7 @@
 import {Game} from '../Component/Game';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
-import {Unit} from '../Component/Unit';
+import {Unit, UnitType} from '../Component/Unit';
 import {Actor, ActorProps, Player} from '../Manager/PlayerManager';
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 
@@ -58,6 +58,27 @@ export class Human implements Actor {
             unit.off('click', handler);
             this.unitClickHandlers.delete(unit);
         }
+    };
+
+    public onPanelUnitClick = (type: UnitType, position: { x: number, y: number }) => {
+        const {player, game} = this.props;
+        console.log('panel unit click', type);
+        const territory = player.selectedTerritory;
+        if (territory === undefined) {
+            console.warn('no territory selected');
+            return;
+        }
+        const {dragManager} = game.props;
+        if (dragManager.getDragging() !== undefined) {
+            console.warn('you can\'t drag another unit');
+            return;
+        }
+        if (territory.money < type.cost) {
+            console.warn('not enough money to buy this unit');
+            return;
+        }
+        const unit = new Unit({type});
+        dragManager.setDragging(unit, position);
     };
 
     private getFieldUnits(fields: HexagonField[]): Unit[] {

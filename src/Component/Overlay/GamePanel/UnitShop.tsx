@@ -3,8 +3,10 @@ import {UnitType} from '../../Unit';
 
 export interface UnitShopProps {
     unitTypes: UnitType[];
-    onClickUnitType: (type: UnitType, position: { x: number, y: number }) => void;
+    onClickUnitType?: OnClickPanelUnitType;
 }
+
+export type OnClickPanelUnitType = (type: UnitType, position: { x: number, y: number }) => void;
 
 export class UnitShop extends React.Component<UnitShopProps> {
     render() {
@@ -15,7 +17,7 @@ export class UnitShop extends React.Component<UnitShopProps> {
                     + `salary: ${type.salary}\n`
                     + `movable: ${type.isMovable ? 'true' : 'false'}`;
                 return <button key={type.name} type="button" title={title}
-                               onClick={(e) => onClickUnitType(type, {
+                               onClick={(e) => onClickUnitType && onClickUnitType(type, {
                                    x: e.clientX,
                                    y: e.clientY,
                                })}>{type.name}</button>;
