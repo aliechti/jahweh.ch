@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./public/build/",
-    "module": "es6",
+    "module": "esnext",
     "target": "es6",
     "jsx": "react",
     "removeComments": true,
