@@ -168,7 +168,7 @@ export class MovementManager {
                     fieldsChecked.push(fieldOnSameTerritory);
                     // If the connected fields don't contain each other they are split up
                     const connectedFields = this.map.grid.getConnectedFields(fieldOnSameTerritory);
-                    if (!connectedFields.has(enemyField)) {
+                    if (!connectedFields.includes(enemyField)) {
                         // make new territory
                         const newTerritory = new Territory({
                             player: fieldOnSameTerritory.player,
