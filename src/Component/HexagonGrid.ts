@@ -10,23 +10,16 @@ export class HexagonGrid extends Container {
         this._fields = new Map();
     }
 
-    public getConnectedFields(field: HexagonField): Set<HexagonField> {
-        const fields = new Set<HexagonField>();
-        // Recursive function
-        const addNeighbors = (hexagonField: HexagonField) => {
-            fields.add(hexagonField);
-            // Find and loop trough neighbors
-            const neighbors = this.getFieldNeighbors(hexagonField);
-            for (const neighbor of neighbors) {
-                // Add it if its the same player and not in the list yet
-                if (neighbor.player === hexagonField.player && !fields.has(neighbor)) {
-                    // Recursion
-                    addNeighbors(neighbor);
-                }
-            }
-        };
-        addNeighbors(field);
-        return fields;
+    public getConnectedFields(field: HexagonField): HexagonField[] {
+        const queue: HexagonField[] = [field];
+        let neighbor;
+        let i = 0;
+        while ((neighbor = queue[i++]) && neighbor) {
+            // Add it if its the same player and not in the list yet
+            queue.push(...this.getFieldNeighbors(neighbor)
+                .filter((f) => f.player === field.player && !queue.includes(f)));
+        }
+        return queue;
     }
 
     public getFieldNeighbors(field: HexagonField): HexagonField[] {
