@@ -48,7 +48,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
                 <div className="col-12">
                     <PlayerStatistics playerManager={playerManager}/>
                 </div>
-                <div className="col-12">
+                <div className="col-12" style={{visibility: player.actor.doTurn ? 'hidden' : undefined}}>
                     <button type="button" disabled={isAutoplayRunning} onClick={() => {
                         this.setState({isAutoplayRunning: true});
                         onClickNextTurn().then(() => {
