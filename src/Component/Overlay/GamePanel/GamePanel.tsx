@@ -42,7 +42,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
                 <div className="col-12">
                     <PlayerStats player={player} territory={territory}/>
                 </div>
-                <div className="col-12">
+                <div className="col-12" style={{visibility: !onClickUnitType ? 'hidden' : undefined}}>
                     <UnitShop unitTypes={unitTypes} onClickUnitType={onClickUnitType}/>
                 </div>
                 <div className="col-12">
