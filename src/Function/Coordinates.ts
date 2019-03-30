@@ -86,14 +86,12 @@ export function axialNeighbor(axial: AxialCoordinates, direction: number): Axial
     return axialAdd(axial, axialDirections[direction]);
 }
 
-export function cubeAdd(...cubes: CubeCoordinates[]) {
-    const added: CubeCoordinates = {x: 0, y: 0, z: 0};
-    for (const cube of cubes) {
-        added.x += cube.x;
-        added.y += cube.y;
-        added.z += cube.z;
-    }
-    return added;
+export function cubeAdd(...cubes: CubeCoordinates[]): CubeCoordinates {
+    return cubes.reduce((a, b) => ({
+        x: a.x + b.x,
+        y: a.y + b.y,
+        z: a.z + b.z,
+    }));
 }
 
 export function cubeMultiply(cube: CubeCoordinates, multiplier: number): CubeCoordinates {
