@@ -11,7 +11,7 @@ export class PlayerStats extends React.Component<PlayerStatsProps> {
         const {player, territory} = this.props;
         return <>
             <div style={{color: colorToString(player.color)}}>Player</div>
-            <div>Money {territory ? territory.money : 0}</div>
+            <div style={{visibility: !territory ? 'hidden' : undefined}}>Money {territory ? territory.money : 0}</div>
         </>;
     }
 }
