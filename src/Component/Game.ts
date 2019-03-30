@@ -1,6 +1,6 @@
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {MovementManager} from '../Manager/MovementManager';
-import {DoTurnFunction, Player, PlayerManager} from '../Manager/PlayerManager';
+import {Player, PlayerManager} from '../Manager/PlayerManager';
 import {UnitManager} from '../Manager/UnitManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
@@ -64,6 +64,11 @@ export class Game extends Container {
                 this.unitManager.add(this.props.unitTypeManager.mainBuilding, field);
             }
         }
+
+        for (const player of this.props.playerManager.players) {
+            player.actor.init({player, game: this});
+        }
+
         this.handleTurnStart();
         this.autoPlay();
     }
@@ -94,7 +99,7 @@ export class Game extends Container {
             let doTurn = this.player.actor.doTurn;
             while (doTurn) {
                 await Promise.all([
-                    doTurn(this),
+                    doTurn(),
                     sleep(500),
                 ]);
                 if (!this.mustPauseAutoPlay) {
@@ -149,14 +154,14 @@ export class Game extends Container {
         // Execute actor turn start actions
         const {actor} = this.player;
         if (actor.onTurnStart) {
-            actor.onTurnStart(this);
+            actor.onTurnStart();
         }
     };
 
     private handleTurnEnd = () => {
         const {actor} = this.player;
         if (actor.onTurnEnd) {
-            actor.onTurnEnd(this);
+            actor.onTurnEnd();
         }
     };
 
@@ -181,7 +186,7 @@ export class Game extends Container {
         }
     };
 
-    private nextTurn = (): DoTurnFunction | undefined => {
+    private nextTurn = (): (() => Promise<void>) | undefined => {
         const {playerManager, onWin} = this.props;
         this.handleTurnEnd();
         if (this.hasPlayerWon(this.player)) {

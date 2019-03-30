@@ -1,10 +1,18 @@
 import {Game} from '../Component/Game';
 import {Territory} from '../Component/Territory';
 import {Unit} from '../Component/Unit';
-import {Actor} from '../Manager/PlayerManager';
+import {Actor, ActorProps} from '../Manager/PlayerManager';
 
 export class SimpleAI implements Actor {
-    public doTurn = async (game: Game) => {
+
+    private props: ActorProps;
+
+    public init = (props: ActorProps) => {
+        this.props = props;
+    };
+
+    public doTurn = async () => {
+        const {game} = this.props;
         const {player, map, movementManager, buyUnit} = game;
         const {unitTypeManager} = game.props;
         for (const territory of player.territories) {
@@ -153,5 +161,5 @@ export class SimpleAI implements Actor {
             }
         }
         return mergedUnits;
-    }
+    };
 }

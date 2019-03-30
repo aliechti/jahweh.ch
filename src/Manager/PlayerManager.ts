@@ -23,14 +23,16 @@ export interface Player extends PlayerProps {
     territories: Territory[];
 }
 
-export type DoTurnFunction = (game: Game) => Promise<void>;
-
-export type OnTurnFunction = (game: Game) => void;
+export interface ActorProps {
+    player: Player;
+    game: Game;
+}
 
 export interface Actor {
-    doTurn?: DoTurnFunction;
-    onTurnStart?: OnTurnFunction;
-    onTurnEnd?: OnTurnFunction;
+    init: (props: ActorProps) => void;
+    doTurn?: () => Promise<void>;
+    onTurnStart?: () => void;
+    onTurnEnd?: () => void;
 }
 
 export function colorToString(color: number): string {

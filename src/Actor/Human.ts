@@ -2,17 +2,23 @@ import {Game} from '../Component/Game';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
 import {Unit} from '../Component/Unit';
-import {Actor, Player} from '../Manager/PlayerManager';
+import {Actor, ActorProps, Player} from '../Manager/PlayerManager';
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 type InteractionHandler = (e: InteractionEvent) => void;
 
 export class Human implements Actor {
 
+    private props: ActorProps;
     private fieldClickHandlers: Map<HexagonField, InteractionHandler> = new Map();
     private unitClickHandlers: Map<Unit, InteractionHandler> = new Map();
 
-    public onTurnStart = (game: Game) => {
+    public init = (props: ActorProps) => {
+        this.props = props;
+    };
+
+    public onTurnStart = () => {
+        const {game} = this.props;
         const {player, map} = game;
         // Set player field interactivity
         for (const field of map.grid.fields()) {
@@ -34,7 +40,8 @@ export class Human implements Actor {
         }
     };
 
-    public onTurnEnd = (game: Game) => {
+    public onTurnEnd = () => {
+        const {game} = this.props;
         const fields = this.getPlayerFields(game.player);
         const units = this.getFieldUnits(fields);
         this.unselectTerritory(game);
