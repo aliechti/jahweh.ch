@@ -21,14 +21,9 @@ export class GameMap {
         const neighbors: HexagonField[] = [];
         // Walk trough all territory fields
         for (const field of fields) {
-            const fieldNeighbors = this.grid.getFieldNeighbors(field);
-            // Walk trough all neighbors of this field
-            for (const fieldNeighbor of fieldNeighbors) {
-                // Only if it isn't already included and isn't in the territory fields
-                if (!neighbors.includes(fieldNeighbor) && !fields.includes(fieldNeighbor)) {
-                    neighbors.push(fieldNeighbor);
-                }
-            }
+            // Add if neighbor is from another player and isn't already included
+            neighbors.push(...this.grid.getFieldNeighbors(field)
+                .filter((f) => f.player !== field.player && !neighbors.includes(f)));
         }
         return neighbors;
     }
