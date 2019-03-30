@@ -71,13 +71,11 @@ export function offsetToPixel(offset: OffsetCoordinates, radius: number): PixelC
     return {x, y};
 }
 
-export function axialAdd(...axials: AxialCoordinates[]) {
-    const added: AxialCoordinates = {q: 0, r: 0};
-    for (const axial of axials) {
-        added.q += axial.q;
-        added.r += axial.r;
-    }
-    return added;
+export function axialAdd(...axials: AxialCoordinates[]): AxialCoordinates {
+    return axials.reduce((a, b) => ({
+        q: a.q + b.q,
+        r: a.r + b.r,
+    }));
 }
 
 export function axialMultiply(axial: AxialCoordinates, multiplier: number): AxialCoordinates {
