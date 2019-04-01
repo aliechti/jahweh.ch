@@ -3,6 +3,7 @@ import {TextureGenerator} from '../Component/GameContainer';
 import {Hexagon, HexagonProps} from '../Component/Hexagon';
 import {OnClickPanelUnitType} from '../Component/Overlay/GamePanel/UnitShop';
 import {Territory} from '../Component/Territory';
+import {DragManager} from './DragManager';
 import Point = PIXI.Point;
 import Texture = PIXI.Texture;
 
@@ -26,6 +27,7 @@ export interface Player extends PlayerProps {
 export interface ActorProps {
     player: Player;
     game: Game;
+    dragManager: DragManager;
 }
 
 export interface Actor {

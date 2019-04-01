@@ -18,8 +18,7 @@ export class Human implements Actor {
     };
 
     public onTurnStart = () => {
-        const {game} = this.props;
-        const {player, map} = game;
+        const {player, map} = this.props.game;
         // Set player field interactivity
         for (const field of map.grid.fields()) {
             const clickHandler = (e: InteractionEvent) => this.handleFieldClick(field, e);
@@ -60,14 +59,13 @@ export class Human implements Actor {
     };
 
     public onPanelUnitClick = (type: UnitType, position: { x: number, y: number }) => {
-        const {game} = this.props;
+        const {dragManager} = this.props;
         console.log('panel unit click', type);
         const territory = this.selectedTerritory;
         if (territory === undefined) {
             console.warn('no territory selected');
             return;
         }
-        const {dragManager} = game.props;
         if (dragManager.getDragging() !== undefined) {
             console.warn('you can\'t drag another unit');
             return;
@@ -96,7 +94,7 @@ export class Human implements Actor {
 
     private handleFieldClick = (field: HexagonField, e: InteractionEvent) => {
         const {player, movementManager, buyUnit, unitManager, updatePanel} = this.props.game;
-        const {dragManager} = this.props.game.props;
+        const {dragManager} = this.props;
         const unit = dragManager.getDragging();
         console.log('click field');
         if (unit !== undefined) {
@@ -134,7 +132,7 @@ export class Human implements Actor {
 
     private handleUnitClick = (unit: Unit, e: InteractionEvent) => {
         console.log('click unit');
-        const {dragManager} = this.props.game.props;
+        const {dragManager} = this.props;
         const field = this.props.game.unitManager.getField(unit);
         if (dragManager.getDragging() === undefined) {
             dragManager.setDragging(unit, e.data.global);

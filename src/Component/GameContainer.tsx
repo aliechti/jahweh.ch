@@ -160,7 +160,6 @@ export class GameContainer extends React.Component<Props, State> {
             playerManager,
             updatePanel,
             unitTypeManager,
-            dragManager: this.dragManager,
             onWin: this.handleExitGame,
         });
         this.zoom = 1;
@@ -175,7 +174,7 @@ export class GameContainer extends React.Component<Props, State> {
         game.pivot = new Point(anchorX, anchorY);
         // Init actors and start game
         for (const player of playerManager.players) {
-            player.actor.init({player, game});
+            player.actor.init({player, game, dragManager: this.dragManager});
         }
         game.start();
         // Game must be started to get the panel width

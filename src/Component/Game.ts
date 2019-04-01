@@ -16,13 +16,7 @@ export interface GameProps {
     grid: HexagonGrid;
     updatePanel: (props: PlayerStatsProps) => void;
     unitTypeManager: UnitTypeManager;
-    dragManager: GameDragManager;
     onWin: (player: Player) => void;
-}
-
-export interface GameDragManager {
-    getDragging: () => Unit | undefined;
-    setDragging: (unit?: Unit, position?: { x: number, y: number }) => void;
 }
 
 export class Game extends Container {
