@@ -37,7 +37,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
         const {isAutoplayRunning} = this.state;
         return (
             <div ref={containerRef} className="full click-trough row"
-                 style={{left: 'auto', width: '250px', padding: '1rem'}}
+                 style={{left: 'auto', width: 'min-content', padding: '1rem'}}
             >
                 <div className="col-12">
                     <PlayerStats player={player} territory={territory}/>
