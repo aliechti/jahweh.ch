@@ -20,7 +20,6 @@ export interface PlayerProps {
 export interface Player extends PlayerProps {
     id: number;
     hexagonTexture: Texture;
-    selectedTerritory?: Territory;
     territories: Territory[];
 }
 
@@ -35,6 +34,7 @@ export interface Actor {
     onTurnStart?: () => void;
     onTurnEnd?: () => void;
     onPanelUnitClick?: OnClickPanelUnitType;
+    selectedTerritory?: Territory;
 }
 
 export function colorToString(color: number): string {

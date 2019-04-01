@@ -73,12 +73,12 @@ export class Game extends Container {
         this.autoPlay();
     }
 
-    public updatePanel() {
+    public updatePanel = () => {
         this.props.updatePanel({
             player: this.player,
-            territory: this.player.selectedTerritory,
+            territory: this.player.actor.selectedTerritory,
         });
-    }
+    };
 
     public async resume() {
         let doTurn = this.player.actor.doTurn;
