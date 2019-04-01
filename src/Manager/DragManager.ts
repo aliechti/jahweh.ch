@@ -16,7 +16,6 @@ export class DragManager {
     private _dragging?: {
         unit: Unit,
         image: HTMLImageElement,
-        interactive: boolean,
     };
     private _zoom: number;
     private lastPosition: { x: number, y: number };
@@ -56,12 +55,9 @@ export class DragManager {
         const {container, moveEventContainer, extractImage, resolution} = this.props;
         // Remove currently dragging
         if (this._dragging !== undefined) {
-            const {unit, image, interactive} = this._dragging;
+            const {unit, image} = this._dragging;
             moveEventContainer.removeEventListener('mousemove', this.handleMove);
-            // Reset unit interactivity and visibility
-            if (unit.canMove) {
-                unit.setInteractive(interactive);
-            }
+            // Reset unit visibility
             unit.visible = true;
             if (image) {
                 container.removeChild(image);
@@ -80,9 +76,7 @@ export class DragManager {
             this._dragging = {
                 unit,
                 image,
-                interactive: unit.interactive,
             };
-            unit.setInteractive(false);
             unit.visible = false;
             container.appendChild(this._dragging.image);
             moveEventContainer.addEventListener('mousemove', this.handleMove);

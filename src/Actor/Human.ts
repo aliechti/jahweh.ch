@@ -95,14 +95,13 @@ export class Human implements Actor {
             // If the unit has a field its already bought
             if (unitManager.getField(draggingUnit)) {
                 movementManager.move(draggingUnit, field, player);
+                draggingUnit.setInteractive(draggingUnit.canMove);
             } else if (this.selectedTerritory) {
                 const newUnit = buyUnit(draggingUnit.props.type, field, this.selectedTerritory);
                 if (newUnit) {
                     // Update panel money
                     updatePanel({territory: this.selectedTerritory});
-                    if (newUnit.canMove) {
-                        newUnit.setInteractive(true);
-                    }
+                    newUnit.setInteractive(newUnit.canMove);
                 }
             }
             // Recalculate selected territory
