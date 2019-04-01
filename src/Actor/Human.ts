@@ -19,6 +19,8 @@ export class Human implements Actor {
 
     public init = (props: ActorProps) => {
         this.props = props;
+        this.outlineContainer.removeChildren();
+        this.selectedTerritory = undefined;
     };
 
     public onTurnStart = () => {
