@@ -1,5 +1,6 @@
 import * as React from 'react';
-import {colorToString, PlayerManager} from '../../../Manager/PlayerManager';
+import {colorToString} from '../../../Function/Color';
+import {PlayerManager} from '../../../Manager/PlayerManager';
 
 export interface PlayerStatisticsProps {
     playerManager: PlayerManager;
