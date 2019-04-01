@@ -147,7 +147,7 @@ export class Human implements Actor {
             this.tintTerritory(this.selectedTerritory, 0xffffff);
         }
         if (territory) {
-            this.tintTerritory(territory, 0x888888);
+            this.tintTerritory(territory, 0xaaaaaa);
         }
         this.selectedTerritory = territory;
         this.props.updatePanel({territory});
