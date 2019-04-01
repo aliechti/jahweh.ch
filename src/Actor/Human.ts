@@ -44,7 +44,7 @@ export class Human implements Actor {
     public onTurnEnd = () => {
         const fields = this.getPlayerFields(this.props.player);
         const units = this.getFieldUnits(fields);
-        this.unselectTerritory();
+        this.selectTerritory();
         // Remove player unit interactivity
         for (const unit of units) {
             unit.setInteractive(false);
@@ -114,16 +114,12 @@ export class Human implements Actor {
                 }
             }
             // Recalculate selected territory
-            if (this.selectedTerritory) {
-                this.selectTerritory(this.selectedTerritory);
-            }
+            this.selectTerritory(this.selectedTerritory);
             // Reset unit dragging
             dragManager.setDragging(undefined);
         } else if (field.player === player) {
             // Only select other territory/unit if no unit is dragging and its the current player
-            if (field.territory) {
-                this.selectTerritory(field.territory);
-            }
+            this.selectTerritory(field.territory);
             if (field.unit && field.unit.canMove) {
                 this.handleUnitClick(field.unit, e);
             }
@@ -146,25 +142,20 @@ export class Human implements Actor {
         }
     };
 
-    private selectTerritory = (territory: Territory) => {
-        this.unselectTerritory();
-        this.selectedTerritory = territory;
-        this.props.updatePanel({territory});
-        this.tintTerritory(this.selectedTerritory, 0x555555);
-    };
-
-    private unselectTerritory() {
+    private selectTerritory = (territory?: Territory) => {
         if (this.selectedTerritory) {
             this.tintTerritory(this.selectedTerritory, 0xffffff);
-            this.selectedTerritory = undefined;
         }
-    }
-
-    private tintTerritory(territory: Territory | undefined, tint: number) {
         if (territory) {
-            for (const field of territory.props.fields) {
-                field.tint = tint;
-            }
+            this.tintTerritory(territory, 0x888888);
+        }
+        this.selectedTerritory = territory;
+        this.props.updatePanel({territory});
+    };
+
+    private tintTerritory(territory: Territory, tint: number) {
+        for (const field of territory.props.fields) {
+            field.tint = tint;
         }
     }
 }
