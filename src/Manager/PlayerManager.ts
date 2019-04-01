@@ -28,6 +28,7 @@ export interface ActorProps {
     player: Player;
     game: Game;
     dragManager: DragManager;
+    updatePanel: (props: { territory?: Territory }) => void;
 }
 
 export interface Actor {
@@ -36,7 +37,6 @@ export interface Actor {
     onTurnStart?: () => void;
     onTurnEnd?: () => void;
     onPanelUnitClick?: OnClickPanelUnitType;
-    selectedTerritory?: Territory;
 }
 
 export function colorToString(color: number): string {

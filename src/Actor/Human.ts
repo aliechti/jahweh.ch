@@ -93,8 +93,8 @@ export class Human implements Actor {
     }
 
     private handleFieldClick = (field: HexagonField, e: InteractionEvent) => {
-        const {player, movementManager, buyUnit, unitManager, updatePanel} = this.props.game;
-        const {dragManager} = this.props;
+        const {player, movementManager, buyUnit, unitManager} = this.props.game;
+        const {dragManager, updatePanel} = this.props;
         const unit = dragManager.getDragging();
         console.log('click field');
         if (unit !== undefined) {
@@ -105,7 +105,7 @@ export class Human implements Actor {
                 const newUnit = buyUnit(unit.props.type, field, this.selectedTerritory);
                 if (newUnit) {
                     // Update panel money
-                    updatePanel();
+                    updatePanel({territory: this.selectedTerritory});
                     if (newUnit.canMove) {
                         newUnit.setInteractive(true);
                     }
@@ -147,7 +147,7 @@ export class Human implements Actor {
     private selectTerritory = (territory: Territory) => {
         this.unselectTerritory();
         this.selectedTerritory = territory;
-        this.props.game.updatePanel();
+        this.props.updatePanel({territory});
         this.tintTerritory(this.selectedTerritory, 0x555555);
     };
 

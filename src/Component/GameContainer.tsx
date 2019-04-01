@@ -153,12 +153,10 @@ export class GameContainer extends React.Component<Props, State> {
             grid = generator[options.shape](options.columns, options.rows, chooser);
         }
         console.info('grid', JSON.stringify(HexagonGridGenerator.save(grid, playerManager.players)));
-        const updatePanel = this.handlePanelUpdate;
         const unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
         const game = this.game = new Game({
             grid,
             playerManager,
-            updatePanel,
             unitTypeManager,
             onWin: this.handleExitGame,
         });
@@ -174,7 +172,12 @@ export class GameContainer extends React.Component<Props, State> {
         game.pivot = new Point(anchorX, anchorY);
         // Init actors and start game
         for (const player of playerManager.players) {
-            player.actor.init({player, game, dragManager: this.dragManager});
+            player.actor.init({
+                player,
+                game,
+                dragManager: this.dragManager,
+                updatePanel: (props) => this.handlePanelUpdate({player, territory: props.territory}),
+            });
         }
         game.start();
         // Game must be started to get the panel width

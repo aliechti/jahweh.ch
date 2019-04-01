@@ -6,7 +6,6 @@ import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {GameMap} from './GameMap';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
 import Container = PIXI.Container;
@@ -14,7 +13,6 @@ import Container = PIXI.Container;
 export interface GameProps {
     playerManager: PlayerManager;
     grid: HexagonGrid;
-    updatePanel: (props: PlayerStatsProps) => void;
     unitTypeManager: UnitTypeManager;
     onWin: (player: Player) => void;
 }
@@ -64,13 +62,6 @@ export class Game extends Container {
         this.handleTurnStart();
         return this.autoPlay();
     }
-
-    public updatePanel = () => {
-        this.props.updatePanel({
-            player: this.player,
-            territory: this.player.actor.selectedTerritory,
-        });
-    };
 
     public async resume() {
         let doTurn = this.player.actor.doTurn;
@@ -132,8 +123,6 @@ export class Game extends Container {
                 }
             }
         }
-        // Set current player to panel
-        this.updatePanel();
         // Prepare units for turn
         for (const unit of this.unitContainer.children) {
             const field = this.unitManager.getField(unit);
