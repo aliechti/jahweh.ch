@@ -1,4 +1,3 @@
-import {Game} from '../Component/Game';
 import {Territory} from '../Component/Territory';
 import {Unit} from '../Component/Unit';
 import {Actor, ActorProps} from '../Manager/PlayerManager';
@@ -25,13 +24,13 @@ export class SimpleAI implements Actor {
                 return field.unit;
             }).filter((unit) => unit !== undefined) as Unit[];
             if (units.length > 0) {
-                this.moveUnits({units, territory, game});
+                this.moveUnits(units, territory);
                 // Merge not moved units
                 // todo: this is not yet used because there is a defending mechanism needed,
                 //  otherwise the AI just overcommits on strong units and doesn't have enough weak units left to defend
-                // const mergedUnits = this.mergeUnits({units, territory, game});
+                // const mergedUnits = this.mergeUnits(units, territory);
                 // if (mergedUnits.length > 0) {
-                //     this.moveUnits({units: mergedUnits, territory, game});
+                //     this.moveUnits(units: mergedUnits, territory);
                 // }
             }
             console.timeEnd('move-units ' + game.player.id);
@@ -65,14 +64,8 @@ export class SimpleAI implements Actor {
         }
     };
 
-    private moveUnits = (
-        {units, territory, game}: {
-            units: Unit[],
-            territory: Territory,
-            game: Game,
-        },
-    ) => {
-        const {map, movementManager, player} = game;
+    private moveUnits = (units: Unit[], territory: Territory) => {
+        const {map, movementManager, player} = this.props.game;
         const territoryNeighbors = map.getTerritoryNeighbors(territory);
         const strengthNeighbors = territoryNeighbors.map((neighbor) => {
             return {
@@ -108,14 +101,8 @@ export class SimpleAI implements Actor {
         }
     };
 
-    private mergeUnits = (
-        {units, territory, game}: {
-            units: Unit[],
-            territory: Territory,
-            game: Game,
-        },
-    ): Unit[] => {
-        const {map, movementManager} = game;
+    private mergeUnits = (units: Unit[], territory: Territory): Unit[] => {
+        const {map, movementManager} = this.props.game;
         const territoryNeighbors = map.getTerritoryNeighbors(territory);
         // Get and order territories strengths
         const requiredStrengths = territoryNeighbors.map((neighbor) => {
