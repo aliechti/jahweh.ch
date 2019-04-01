@@ -62,8 +62,6 @@ export class Unit extends Sprite {
         } else {
             this.stop();
         }
-        this.interactive = value;
-        this.buttonMode = value;
     }
 
     private play() {
