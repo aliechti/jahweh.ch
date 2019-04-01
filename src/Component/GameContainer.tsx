@@ -173,6 +173,11 @@ export class GameContainer extends React.Component<Props, State> {
         const anchorX = game.width / game.scale.x * 0.5;
         const anchorY = game.height / game.scale.y * 0.5;
         game.pivot = new Point(anchorX, anchorY);
+        // Init actors and start game
+        for (const player of playerManager.players) {
+            player.actor.init({player, game});
+        }
+        game.start();
         // Game must be started to get the panel width
         this.setState({isStarted: true}, () => {
             // Center game position

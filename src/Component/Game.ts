@@ -39,9 +39,7 @@ export class Game extends Container {
     constructor(props: GameProps) {
         super();
         this.props = props;
-        this.player = this.props.playerManager.first();
         this.map = new GameMap({grid: this.props.grid});
-        this.turn = 1;
         this.isAutoplayRunning = false;
         this.unitContainer = new Container() as ExplicitContainer<Unit>;
         this.unitManager = new UnitManager({
@@ -64,13 +62,13 @@ export class Game extends Container {
                 this.unitManager.add(this.props.unitTypeManager.mainBuilding, field);
             }
         }
+    }
 
-        for (const player of this.props.playerManager.players) {
-            player.actor.init({player, game: this});
-        }
-
+    public start() {
+        this.player = this.props.playerManager.first();
+        this.turn = 1;
         this.handleTurnStart();
-        this.autoPlay();
+        return this.autoPlay();
     }
 
     public updatePanel = () => {
