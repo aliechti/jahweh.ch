@@ -37,6 +37,8 @@ export class Human implements Actor {
                 unit.setInteractive(true);
             }
         }
+        // Update Panel
+        this.props.updatePanel({});
     };
 
     public onTurnEnd = () => {

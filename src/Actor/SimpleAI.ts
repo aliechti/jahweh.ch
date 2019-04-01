@@ -10,6 +10,11 @@ export class SimpleAI implements Actor {
         this.props = props;
     };
 
+    public onTurnStart = () => {
+        // Update Panel
+        this.props.updatePanel({});
+    };
+
     public doTurn = async () => {
         const {game} = this.props;
         const {player, map, movementManager, buyUnit} = game;
