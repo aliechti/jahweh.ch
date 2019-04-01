@@ -52,10 +52,10 @@ export class SimpleAI implements Actor {
             const purchasableTypes = unitTypeManager.units.filter((type) => {
                 return type.isBuildable
                     && type.isMovable
-                    && type.cost < territory.money
+                    && type.cost <= territory.money
                     && type.strength > requiredStrength
                     // Prevent bankruptcy by not buy the unit if the salaries are bigger than the income
-                    && type.salary + territory.salaries() < territory.income();
+                    && type.salary + territory.salaries() <= territory.income();
             });
             const unitType = purchasableTypes.shift();
             console.log('buy unit', unitType, requiredStrength, purchasableTypes);
@@ -141,7 +141,7 @@ export class SimpleAI implements Actor {
                     return false;
                 }
                 // Prevent bankruptcy by not merge the unit if the salaries are bigger than the income
-                return mergedType.salary + territory.salaries() < territory.income();
+                return mergedType.salary + territory.salaries() <= territory.income();
             });
             // Cancel if no unit was found (because of the sort order the next ones are too costly)
             if (nextUnit === undefined) {
