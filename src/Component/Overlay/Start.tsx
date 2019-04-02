@@ -24,7 +24,7 @@ export class Start extends React.Component<Props> {
     render() {
         const {options, canResume, onClickStart, onClickResume, onClickReadme} = this.props;
         return (
-            <div className="start full row">
+            <div className="full background-dim row">
                 <div className="center">
                     <div style={{width: '10rem'}}>
                         <label>Shape</label>
