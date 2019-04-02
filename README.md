@@ -1,5 +1,6 @@
 ## Purpose
-I've started this project to challenge myself and learn new things.
+I've started this [project](https://github.com/thejahweh/jahweh.ch) 
+to challenge [myself](https://github.com/thejahweh) and learn new things.
 It is a game because I never made any games and wanted to do something new.
 
 ## Gameplay
