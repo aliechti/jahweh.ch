@@ -257,7 +257,7 @@ export class GameContainer extends React.Component<Props, State> {
 
     renderReadme() {
         return (
-            <div className="full background-dim" style={{overflow: 'auto', padding: '1rem', fontSize: '75%'}}>
+            <div className="full background-dim row" style={{overflow: 'auto', padding: '1rem', fontSize: '75%'}}>
                 <div className="center" style={{maxWidth: '45rem'}}>
                     <article dangerouslySetInnerHTML={{__html: readme}}/>
                     <button type="button" onClick={() => this.setState({active: 'start'})}>Back</button>
