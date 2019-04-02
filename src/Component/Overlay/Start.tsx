@@ -56,7 +56,7 @@ export class Start extends React.Component<Props> {
                                            onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
                                 </>
                         }
-                        <div className="row">
+                        <div className="row" style={{marginTop: '0.5rem'}}>
                             <div className="col" style={{textAlign: 'center', marginTop: '0.5rem'}}>
                                 <button type="button" onClick={onClickStart}>Start</button>
                             </div>
