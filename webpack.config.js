@@ -18,6 +18,17 @@ let config = {
                     'css-loader',
                     'sass-loader'
                 ]
+            }, {
+                test: /\.md$/,
+                use: [
+                    'html-loader',
+                    {
+                        loader: 'markdown-loader',
+                        options: {
+                            headerIds: false,
+                        }
+                    },
+                ],
             }
         ]
     },
