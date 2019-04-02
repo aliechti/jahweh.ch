@@ -6,6 +6,7 @@ interface Props {
     canResume: boolean;
     onClickStart: () => void;
     onClickResume: () => void;
+    onClickReadme: () => void;
     onSetOptions: (options: GameOptions) => void;
 }
 
@@ -21,11 +22,11 @@ export class Start extends React.Component<Props> {
     };
 
     render() {
-        const {options, canResume, onClickStart, onClickResume} = this.props;
+        const {options, canResume, onClickStart, onClickResume, onClickReadme} = this.props;
         return (
             <div className="start full row">
                 <div className="center">
-                    <div style={{width: '200px'}}>
+                    <div style={{width: '10rem'}}>
                         <label>Shape</label>
                         <select value={options.shape}
                                 onChange={(e) => this.handleSetOption('shape', e.target.value)}>
@@ -55,15 +56,20 @@ export class Start extends React.Component<Props> {
                                            onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
                                 </>
                         }
-                    </div>
-                    <div style={{textAlign: 'center', marginTop: '1rem'}}>
-                        <button type="button" onClick={onClickStart}>Start</button>
-                    </div>
-                    {canResume ?
-                        <div style={{textAlign: 'center', marginTop: '1rem'}}>
-                            <button type="button" onClick={onClickResume}>Resume</button>
+                        <div className="row">
+                            <div className="col" style={{textAlign: 'center', marginTop: '0.5rem'}}>
+                                <button type="button" onClick={onClickStart}>Start</button>
+                            </div>
+                            {canResume ?
+                                <div className="col" style={{textAlign: 'center', marginTop: '0.5rem'}}>
+                                    <button type="button" onClick={onClickResume}>Resume</button>
+                                </div>
+                                : ''}
+                            <div className="col" style={{textAlign: 'center', marginTop: '0.5rem'}}>
+                                <button type="button" onClick={onClickReadme}>Readme</button>
+                            </div>
                         </div>
-                        : ''}
+                    </div>
                 </div>
             </div>
         );

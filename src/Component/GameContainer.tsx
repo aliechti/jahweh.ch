@@ -1,5 +1,6 @@
 import {Application} from 'pixi.js';
 import * as React from 'react';
+import readme from '../../README.md';
 import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
 import {DragManager} from '../Manager/DragManager';
 import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
@@ -22,7 +23,7 @@ interface Props {
 }
 
 interface State {
-    isStarted: boolean;
+    active: 'game' | 'start' | 'readme';
     playerStatsProps?: PlayerStatsProps;
     options: GameOptions;
 }
@@ -63,7 +64,7 @@ export class GameContainer extends React.Component<Props, State> {
         this.dragContainer = React.createRef();
         this.panelContainer = React.createRef();
         this.state = {
-            isStarted: false,
+            active: 'start',
             options: {
                 shape: 'spiral',
                 chooser: 'evenly',
@@ -181,7 +182,7 @@ export class GameContainer extends React.Component<Props, State> {
         }
         game.start();
         // Game must be started to get the panel width
-        this.setState({isStarted: true}, () => {
+        this.setState({active: 'game'}, () => {
             // Center game position
             let panelWidth = 0;
             if (this.panelContainer.current) {
@@ -228,13 +229,13 @@ export class GameContainer extends React.Component<Props, State> {
         if (this.game) {
             this.game.pauseAutoPlay();
         }
-        this.setState({isStarted: false});
+        this.setState({active: 'start'});
     };
 
     private handleResumeGame = () => {
         if (this.game) {
             this.game.resume();
-            this.setState({isStarted: true});
+            this.setState({active: 'game'});
         }
     };
 
@@ -252,6 +253,17 @@ export class GameContainer extends React.Component<Props, State> {
             this.game.scale = new Point(this._zoom, this._zoom);
             this.dragManager.zoom = this._zoom;
         }
+    }
+
+    renderReadme() {
+        return (
+            <div className="full" style={{overflow: 'auto', padding: '1rem', fontSize: '75%'}}>
+                <div className="center" style={{maxWidth: '45rem'}}>
+                    <article dangerouslySetInnerHTML={{__html: readme}}/>
+                    <button type="button" onClick={() => this.setState({active: 'start'})}>Back</button>
+                </div>
+            </div>
+        );
     }
 
     renderPanel() {
@@ -272,20 +284,30 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     render() {
-        const {isStarted, options} = this.state;
+        const {active, options} = this.state;
+        let page;
+        switch (active) {
+            case 'game':
+                page = this.renderPanel();
+                break;
+            case 'readme':
+                page = this.renderReadme();
+                break;
+            case 'start':
+                page = <Start
+                    options={options}
+                    canResume={this.game !== undefined}
+                    onClickStart={this.handleStartGame}
+                    onClickResume={this.handleResumeGame}
+                    onClickReadme={() => this.setState({active: 'readme'})}
+                    onSetOptions={(options) => this.setState({options})}
+                />;
+                break;
+        }
         return (
             <>
                 <div className="canvas-container" ref={this.canvasContainer}/>
-                {isStarted
-                    ? this.renderPanel()
-                    : <Start
-                        options={options}
-                        canResume={this.game !== undefined}
-                        onClickStart={this.handleStartGame}
-                        onClickResume={this.handleResumeGame}
-                        onSetOptions={(options) => this.setState({options})}
-                    />
-                }
+                {page}
                 <div className="drag-container click-trough"
                      style={{
                          position: 'absolute',
