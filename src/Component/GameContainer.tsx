@@ -167,6 +167,9 @@ export class GameContainer extends React.Component<Props, State> {
         game.on('mousedown', this.handleGamePanStart);
         game.on('mouseup', this.handleGamePanEnd);
         game.on('mouseupoutside', this.handleGamePanEnd);
+        game.on('touchstart', this.handleGamePanStart);
+        game.on('touchend', this.handleGamePanEnd);
+        game.on('touchendoutside', this.handleGamePanEnd);
         // Set game anchor to center
         const anchorX = game.width / game.scale.x * 0.5;
         const anchorY = game.height / game.scale.y * 0.5;
@@ -206,6 +209,7 @@ export class GameContainer extends React.Component<Props, State> {
         const game = e.currentTarget;
         this.panDelayTimer = setTimeout(() => {
             game.on('mousemove', this.handleGamePanMove);
+            game.on('touchmove', this.handleGamePanMove);
         }, 100);
     };
 
@@ -213,6 +217,7 @@ export class GameContainer extends React.Component<Props, State> {
         this.panStart = undefined;
         clearTimeout(this.panDelayTimer);
         e.currentTarget.off('mousemove', this.handleGamePanMove);
+        e.currentTarget.off('touchmove', this.handleGamePanMove);
     };
 
     private handleGamePanMove = (e: InteractionEvent) => {

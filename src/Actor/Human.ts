@@ -29,6 +29,7 @@ export class Human implements Actor {
         for (const field of map.grid.fields()) {
             const clickHandler = (e: InteractionEvent) => this.handleFieldClick(field, e);
             field.on('click', clickHandler);
+            field.on('tap', clickHandler);
             this.fieldClickHandlers.set(field, clickHandler);
             field.interactive = true;
         }
@@ -57,6 +58,7 @@ export class Human implements Actor {
         // Remove click handlers
         for (const [field, handler] of this.fieldClickHandlers) {
             field.off('click', handler);
+            field.off('tap', handler);
             this.fieldClickHandlers.delete(field);
         }
         // Remove outline Container
