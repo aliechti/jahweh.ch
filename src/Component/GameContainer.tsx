@@ -52,7 +52,7 @@ export class GameContainer extends React.Component<Props, State> {
     private readonly dragContainer: React.RefObject<HTMLDivElement>;
     private readonly panelContainer: React.RefObject<HTMLDivElement>;
     private app: Application;
-    private game?: Game;
+    private game: Game;
     private dragManager: DragManager;
     private textureGenerator: TextureGenerator;
     private _zoom: number;
@@ -229,16 +229,12 @@ export class GameContainer extends React.Component<Props, State> {
     };
 
     private handleExitGame = () => {
-        if (this.game) {
-            this.game.pauseAutoPlay();
-        }
+        this.game.pauseAutoPlay();
         this.props.handleExit();
     };
 
     private handleResumeGame = () => {
-        if (this.game) {
-            this.game.resume();
-        }
+        this.game.resume();
     };
 
     private handlePanelUpdate = (playerStatsProps: PlayerStatsProps) => {
@@ -250,16 +246,14 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     set zoom(value: number) {
-        if (this.game) {
-            this._zoom = Math.min(Math.max(value, zoomOptions.min), zoomOptions.max);
-            this.game.scale = new Point(this._zoom, this._zoom);
-            this.dragManager.zoom = this._zoom;
-        }
+        this._zoom = Math.min(Math.max(value, zoomOptions.min), zoomOptions.max);
+        this.game.scale = new Point(this._zoom, this._zoom);
+        this.dragManager.zoom = this._zoom;
     }
 
     renderPanel() {
         const {playerStatsProps} = this.state;
-        if (playerStatsProps === undefined || this.game === undefined) {
+        if (playerStatsProps === undefined) {
             return;
         }
         return (
