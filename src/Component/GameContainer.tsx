@@ -25,6 +25,7 @@ interface Props {
 
 interface State {
     playerStatsProps?: PlayerStatsProps;
+    isStarted: boolean;
 }
 
 export interface GameOptions {
@@ -62,7 +63,9 @@ export class GameContainer extends React.Component<Props, State> {
         this.canvasContainer = React.createRef();
         this.dragContainer = React.createRef();
         this.panelContainer = React.createRef();
-        this.state = {};
+        this.state = {
+            isStarted: false,
+        };
     }
 
     componentDidMount(): void {
@@ -188,13 +191,15 @@ export class GameContainer extends React.Component<Props, State> {
         }
         game.start();
         // Game must be started to get the panel width
-        // Center game position
-        let panelWidth = 0;
-        if (this.panelContainer.current) {
-            panelWidth = this.panelContainer.current.offsetWidth;
-        }
-        game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
-        this.app.stage.addChild(game);
+        this.setState({isStarted: true}, () => {
+            // Center game position
+            let panelWidth = 0;
+            if (this.panelContainer.current) {
+                panelWidth = this.panelContainer.current.offsetWidth;
+            }
+            game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
+            this.app.stage.addChild(game);
+        });
     };
 
     private panStart?: { x: number, y: number };
