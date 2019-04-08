@@ -36,7 +36,7 @@ export class GamePanel extends React.Component<GamePanelProps, State> {
         const {playerManager} = this.props;
         const {isAutoplayRunning} = this.state;
         return (
-            <div ref={containerRef} className="full click-trough row"
+            <div ref={containerRef} className="full row scrollable"
                  style={{left: 'auto', width: 'min-content', padding: '1rem'}}
             >
                 <div className="col-12">

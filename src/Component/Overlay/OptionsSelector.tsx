@@ -68,7 +68,7 @@ export class OptionsSelector extends React.Component<Props> {
                     <div className="col">
                         {this.renderGridOptions()}
                     </div>
-                    <div className="col">
+                    <div className="col scrollable" style={{maxHeight: '20rem'}}>
                         <PlayerSelector
                             playerProps={options.playerProps}
                             onSetPlayerProps={(playerProps) => this.handleSetOption('playerProps', playerProps)}
