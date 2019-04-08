@@ -1,12 +1,13 @@
 import * as React from 'react';
 import readme from '../../README.md';
+import {Human} from '../Actor/Human';
+import {SimpleAI} from '../Actor/SimpleAI';
 import {GameOptions} from '../Function/GameFactory';
 import {PlayerProps} from '../Manager/PlayerManager';
 import {GameContainer} from './GameContainer';
 import {Start} from './Overlay/Start';
 
 interface Props {
-    players: PlayerProps[];
 }
 
 interface State {
@@ -15,6 +16,25 @@ interface State {
     options: GameOptions;
 }
 
+const players: PlayerProps[] = [
+    {
+        color: 0xff0088,
+        actor: new Human(),
+    },
+    {
+        color: 0xff8800,
+        actor: new SimpleAI(),
+    },
+    {
+        color: 0xffff00,
+        actor: new SimpleAI(),
+    },
+    {
+        color: 0x00ffff,
+        actor: new SimpleAI(),
+    },
+];
+
 export class Main extends React.Component<Props, State> {
 
     constructor(props: any) {
@@ -22,7 +42,7 @@ export class Main extends React.Component<Props, State> {
         this.state = {
             active: 'start',
             options: {
-                players: this.props.players,
+                players: players,
                 shape: 'hexagon',
                 playerPicker: 'even',
                 columns: 10,
