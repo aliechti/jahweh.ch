@@ -6,9 +6,9 @@ import {Game} from './Game';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
+import {PanContainer} from './PanContainer';
 import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
-import InteractionEvent = PIXI.interaction.InteractionEvent;
 import Point = PIXI.Point;
 import RenderTexture = PIXI.RenderTexture;
 import SCALE_MODES = PIXI.SCALE_MODES;
@@ -122,12 +122,15 @@ export class GameContainer extends React.Component<Props, State> {
             onWin: this.handleExitGame,
         });
         this.zoom = 1;
-        game.on('mousedown', this.handleGamePanStart);
-        game.on('mouseup', this.handleGamePanEnd);
-        game.on('mouseupoutside', this.handleGamePanEnd);
-        game.on('touchstart', this.handleGamePanStart);
-        game.on('touchend', this.handleGamePanEnd);
-        game.on('touchendoutside', this.handleGamePanEnd);
+        const panContainer = new PanContainer({
+            shouldStart: (e) => {
+                // Don't allow pan start if something is dragging or a movable unit is clicked
+                const isDragging = this.dragManager.getDragging();
+                const isMovableUnit = e.target instanceof Unit && e.target.canMove;
+                return !isDragging && !isMovableUnit;
+            },
+        });
+        panContainer.addChild(game);
         game.start();
         // Game must be started to get the panel width
         this.setState({isStarted: true}, () => {
@@ -137,42 +140,8 @@ export class GameContainer extends React.Component<Props, State> {
                 panelWidth = this.panelContainer.current.offsetWidth;
             }
             game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
-            this.app.stage.addChild(game);
+            this.app.stage.addChild(panContainer);
         });
-    };
-
-    private panStart?: { x: number, y: number };
-    private panDelayTimer?: number;
-
-    private handleGamePanStart = (e: InteractionEvent) => {
-        // Don't allow pan start if something is dragging or a movable unit is clicked
-        const isDragging = this.dragManager.getDragging();
-        const isMovableUnit = e.target instanceof Unit && e.target.canMove;
-        if (isDragging || isMovableUnit) {
-            return;
-        }
-        const game = e.currentTarget;
-        this.panDelayTimer = setTimeout(() => {
-            game.on('mousemove', this.handleGamePanMove);
-            game.on('touchmove', this.handleGamePanMove);
-        }, 100);
-    };
-
-    private handleGamePanEnd = (e: InteractionEvent) => {
-        this.panStart = undefined;
-        clearTimeout(this.panDelayTimer);
-        e.currentTarget.off('mousemove', this.handleGamePanMove);
-        e.currentTarget.off('touchmove', this.handleGamePanMove);
-    };
-
-    private handleGamePanMove = (e: InteractionEvent) => {
-        const game = e.currentTarget;
-        const mouse = {x: e.data.global.x, y: e.data.global.y};
-        if (this.panStart === undefined) {
-            this.panStart = {x: mouse.x - game.x, y: mouse.y - game.y};
-        }
-        game.x = mouse.x - this.panStart.x;
-        game.y = mouse.y - this.panStart.y;
     };
 
     private handleExitGame = () => {
