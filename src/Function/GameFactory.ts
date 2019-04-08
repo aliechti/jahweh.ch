@@ -17,7 +17,7 @@ interface GameFactoryProps {
 }
 
 export interface GameOptions {
-    players: PlayerProps[];
+    playerProps: PlayerProps[];
     shape: Shape;
     playerPicker: PlayerPicker;
     columns: number;
@@ -37,7 +37,7 @@ export function gameFactory(props: GameFactoryProps): Game {
         lineColor: 0x000000,
     };
     const playerManager = new PlayerManager({
-        players: options.players,
+        players: options.playerProps,
         hexagonProps,
         textureGenerator,
     });

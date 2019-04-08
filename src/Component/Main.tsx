@@ -16,7 +16,7 @@ interface State {
     options: GameOptions;
 }
 
-const players: PlayerProps[] = [
+const defaultPlayerProps: PlayerProps[] = [
     {
         color: 0xff0088,
         actor: new Human(),
@@ -42,7 +42,7 @@ export class Main extends React.Component<Props, State> {
         this.state = {
             active: 'start',
             options: {
-                players: players,
+                playerProps: defaultPlayerProps,
                 shape: 'hexagon',
                 playerPicker: 'even',
                 columns: 10,
