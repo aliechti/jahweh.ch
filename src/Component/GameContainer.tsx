@@ -1,6 +1,5 @@
 import {Application} from 'pixi.js';
 import * as React from 'react';
-import readme from '../../README.md';
 import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
 import {DragManager} from '../Manager/DragManager';
 import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
@@ -10,7 +9,6 @@ import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
-import {Start} from './Overlay/Start';
 import {Unit} from './Unit';
 import DisplayObject = PIXI.DisplayObject;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
@@ -20,12 +18,13 @@ import SCALE_MODES = PIXI.SCALE_MODES;
 
 interface Props {
     players: PlayerProps[];
+    options: GameOptions;
+    state: 'start' | 'pause';
+    handleExit: () => void;
 }
 
 interface State {
-    active: 'game' | 'start' | 'readme';
     playerStatsProps?: PlayerStatsProps;
-    options: GameOptions;
 }
 
 export interface GameOptions {
@@ -63,16 +62,7 @@ export class GameContainer extends React.Component<Props, State> {
         this.canvasContainer = React.createRef();
         this.dragContainer = React.createRef();
         this.panelContainer = React.createRef();
-        this.state = {
-            active: 'start',
-            options: {
-                shape: 'spiral',
-                chooser: 'evenly',
-                columns: 10,
-                rows: 10,
-                radius: 4,
-            },
-        };
+        this.state = {};
     }
 
     componentDidMount(): void {
@@ -82,29 +72,39 @@ export class GameContainer extends React.Component<Props, State> {
         this.textureGenerator = (displayObject) => {
             return this.app.renderer.generateTexture(displayObject, SCALE_MODES.LINEAR, zoomOptions.max);
         };
-        const canvasContainer = this.canvasContainer.current;
-        if (canvasContainer) {
-            canvasContainer.appendChild(this.app.view);
-            window.addEventListener('resize', () => {
-                this.app.renderer.resize(window.innerWidth, window.innerHeight);
-            });
-        }
-        const dragContainer = this.dragContainer.current;
-        if (dragContainer) {
-            this.dragManager = new DragManager({
-                container: dragContainer,
-                moveEventContainer: document.body,
-                resolution: zoomOptions.max,
-                extractImage: (image) => this.app.renderer.plugins.extract.image(image),
-            });
-        }
+        this.canvasContainer.current!.appendChild(this.app.view);
+        this.dragManager = new DragManager({
+            container: this.dragContainer.current!,
+            moveEventContainer: document.body,
+            resolution: zoomOptions.max,
+            extractImage: (image) => this.app.renderer.plugins.extract.image(image),
+        });
+        // Resize handler
+        window.addEventListener('resize', () => {
+            this.app.renderer.resize(window.innerWidth, window.innerHeight);
+        });
         // Zoom scroll wheel handler
         window.addEventListener('wheel', this.handleScroll);
+        // Start
+        this.handleStartGame();
     }
 
     componentWillUnmount() {
         this.app.stop();
         window.removeEventListener('wheel', this.handleScroll);
+    }
+
+    componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
+        if (this.props.state !== prevProps.state) {
+            switch (this.props.state) {
+                case 'start':
+                    this.handleResumeGame();
+                    break;
+                case 'pause':
+                    this.handleExitGame();
+                    break;
+            }
+        }
     }
 
     private handleScroll = (e: WheelEvent) => {
@@ -118,7 +118,7 @@ export class GameContainer extends React.Component<Props, State> {
     };
 
     private handleStartGame = () => {
-        const {options} = this.state;
+        const {options} = this.props;
         this.app.stage.removeChildren();
         const hexagonProps: HexagonProps = {
             radius: 25,
@@ -185,15 +185,13 @@ export class GameContainer extends React.Component<Props, State> {
         }
         game.start();
         // Game must be started to get the panel width
-        this.setState({active: 'game'}, () => {
-            // Center game position
-            let panelWidth = 0;
-            if (this.panelContainer.current) {
-                panelWidth = this.panelContainer.current.offsetWidth;
-            }
-            game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
-            this.app.stage.addChild(game);
-        });
+        // Center game position
+        let panelWidth = 0;
+        if (this.panelContainer.current) {
+            panelWidth = this.panelContainer.current.offsetWidth;
+        }
+        game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
+        this.app.stage.addChild(game);
     };
 
     private panStart?: { x: number, y: number };
@@ -234,13 +232,12 @@ export class GameContainer extends React.Component<Props, State> {
         if (this.game) {
             this.game.pauseAutoPlay();
         }
-        this.setState({active: 'start'});
+        this.props.handleExit();
     };
 
     private handleResumeGame = () => {
         if (this.game) {
             this.game.resume();
-            this.setState({active: 'game'});
         }
     };
 
@@ -258,17 +255,6 @@ export class GameContainer extends React.Component<Props, State> {
             this.game.scale = new Point(this._zoom, this._zoom);
             this.dragManager.zoom = this._zoom;
         }
-    }
-
-    renderReadme() {
-        return (
-            <div className="full background-dim row" style={{overflow: 'auto', padding: '1rem', fontSize: '75%'}}>
-                <div className="center" style={{maxWidth: '45rem'}}>
-                    <article dangerouslySetInnerHTML={{__html: readme}}/>
-                    <button type="button" onClick={() => this.setState({active: 'start'})}>Back</button>
-                </div>
-            </div>
-        );
     }
 
     renderPanel() {
@@ -289,30 +275,11 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     render() {
-        const {active, options} = this.state;
-        let page;
-        switch (active) {
-            case 'game':
-                page = this.renderPanel();
-                break;
-            case 'readme':
-                page = this.renderReadme();
-                break;
-            case 'start':
-                page = <Start
-                    options={options}
-                    canResume={this.game !== undefined}
-                    onClickStart={this.handleStartGame}
-                    onClickResume={this.handleResumeGame}
-                    onClickReadme={() => this.setState({active: 'readme'})}
-                    onSetOptions={(options) => this.setState({options})}
-                />;
-                break;
-        }
+        const {state} = this.props;
         return (
             <>
                 <div className="canvas-container" ref={this.canvasContainer}/>
-                {page}
+                {state === 'start' ? this.renderPanel() : ''}
                 <div className="drag-container click-trough"
                      style={{
                          position: 'absolute',

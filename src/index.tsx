@@ -4,7 +4,7 @@ import * as ReactDOM from 'react-dom';
 import '../assets/scss/style.scss';
 import {Human} from './Actor/Human';
 import {SimpleAI} from './Actor/SimpleAI';
-import {GameContainer} from './Component/GameContainer';
+import {Main} from './Component/Main';
 import {PlayerProps} from './Manager/PlayerManager';
 
 const players: PlayerProps[] = [
@@ -26,8 +26,9 @@ const players: PlayerProps[] = [
     },
 ];
 
-const gameContainer = document.getElementById('game-container');
+const main = document.createElement('div');
+document.body.appendChild(main);
 
-if (gameContainer) {
-    ReactDOM.render(<GameContainer players={players}/>, gameContainer);
+if (main) {
+    ReactDOM.render(<Main players={players}/>, main);
 }
