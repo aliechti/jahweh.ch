@@ -28,27 +28,31 @@ export class OptionsSelector extends React.Component<Props> {
                         return <option key={shape} value={shape}>{shape}</option>;
                     })}
                 </select>
-                <label>Player picker</label>
-                <select value={options.playerPicker}
-                        onChange={(e) => this.handleSetOption('playerPicker', e.target.value)}>
-                    {playerPickers.map((chooser) => {
-                        return <option key={chooser} value={chooser}>{chooser}</option>;
-                    })}
-                </select>
                 {options.shape === 'load' ? '' :
-                    options.shape === 'hexagon' || options.shape === 'ring'
-                        ? <>
-                            <label>Radius</label>
-                            <input value={options.radius}
-                                   onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
-                        </> : <>
-                            <label>Columns</label>
-                            <input value={options.columns}
-                                   onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
-                            <label>Rows</label>
-                            <input value={options.rows}
-                                   onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
-                        </>
+                    <>
+                        <label>Player picker</label>
+                        <select value={options.playerPicker}
+                                onChange={(e) => this.handleSetOption('playerPicker', e.target.value)}>
+                            {playerPickers.map((chooser) => {
+                                return <option key={chooser} value={chooser}>{chooser}</option>;
+                            })}
+                        </select>
+                        {options.shape === 'hexagon' || options.shape === 'ring'
+                            ? <>
+                                <label>Radius</label>
+                                <input value={options.radius}
+                                       onChange={(e) => this.handleSetOption('radius', Number(e.target.value))}/>
+                            </> : <>
+                                <label>Columns</label>
+                                <input value={options.columns}
+                                       onChange={(e) => this.handleSetOption('columns', Number(e.target.value))}/>
+                                <label>Rows</label>
+                                <input value={options.rows}
+                                       onChange={(e) => this.handleSetOption('rows', Number(e.target.value))}/>
+                            </>
+                        }
+
+                    </>
                 }
             </>
         );
