@@ -69,7 +69,9 @@ export class PlayerSelector extends React.Component<Props> {
         return (
             <>
                 <label>Players</label>
-                {playerProps.map(this.renderPlayer)}
+                <div className="scrollable" style={{maxHeight: '20rem'}}>
+                    {playerProps.map(this.renderPlayer)}
+                </div>
                 <button onClick={this.handleAddPlayer}>Add player</button>
             </>
         );
