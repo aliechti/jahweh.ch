@@ -80,9 +80,7 @@ export class GameContainer extends React.Component<Props, State> {
             extractImage: (image) => this.app.renderer.plugins.extract.image(image),
         });
         // Resize handler
-        window.addEventListener('resize', () => {
-            this.app.renderer.resize(window.innerWidth, window.innerHeight);
-        });
+        window.addEventListener('resize', this.handleResize);
         // Zoom scroll wheel handler
         window.addEventListener('wheel', this.handleScroll);
         // Start
@@ -91,6 +89,7 @@ export class GameContainer extends React.Component<Props, State> {
 
     componentWillUnmount() {
         this.app.stop();
+        window.removeEventListener('resize', this.handleResize);
         window.removeEventListener('wheel', this.handleScroll);
     }
 
@@ -106,6 +105,10 @@ export class GameContainer extends React.Component<Props, State> {
             }
         }
     }
+
+    private handleResize = () => {
+        this.app.renderer.resize(window.innerWidth, window.innerHeight);
+    };
 
     private handleScroll = (e: WheelEvent) => {
         if (e.deltaY > 0) {
