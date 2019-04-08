@@ -20,7 +20,7 @@ export class PlayerSelector extends React.Component<Props> {
     private handleAddPlayer = () => {
         const {playerProps, onSetPlayerProps} = this.props;
         playerProps.push({
-            color: 0xaabbcc,
+            color: Math.floor(Math.random() * 0xffffff + 1),
             actor: 'simpleAi',
         });
         onSetPlayerProps(playerProps);
