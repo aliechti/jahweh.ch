@@ -110,8 +110,10 @@ export class GameContainer extends React.Component<Props, State> {
     };
 
     private handleScrollZoom = (e: WheelEvent) => {
-        this.zoomContainer.handleScrollZoom(e);
-        this.dragManager.zoom = this.zoomContainer.zoom;
+        if (this.props.state === 'start') {
+            this.zoomContainer.handleScrollZoom(e);
+            this.dragManager.zoom = this.zoomContainer.zoom;
+        }
     };
 
     private handleStartGame = () => {
