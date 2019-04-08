@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {GameOptions, PlayerPicker, Shape} from '../../Function/GameFactory';
+import {PlayerSelector} from './PlayerSelector';
 
 interface Props {
     options: GameOptions;
@@ -17,7 +18,7 @@ export class OptionsSelector extends React.Component<Props> {
         onSetOptions(options);
     };
 
-    render() {
+    private renderGridOptions() {
         const {options} = this.props;
         return (
             <>
@@ -54,6 +55,26 @@ export class OptionsSelector extends React.Component<Props> {
 
                     </>
                 }
+            </>
+        );
+    }
+
+    render() {
+        const {options} = this.props;
+        return (
+            <>
+
+                <div className="row">
+                    <div className="col">
+                        {this.renderGridOptions()}
+                    </div>
+                    <div className="col">
+                        <PlayerSelector
+                            playerProps={options.playerProps}
+                            onSetPlayerProps={(playerProps) => this.handleSetOption('playerProps', playerProps)}
+                        />
+                    </div>
+                </div>
             </>
         );
     }

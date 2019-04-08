@@ -26,6 +26,10 @@ input, select {
     width: 100%;
 }
 
+input[type="color"] {
+    height: 100%;
+}
+
 button {
     cursor: pointer;
     width: 100%;

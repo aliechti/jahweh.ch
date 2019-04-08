@@ -4,6 +4,10 @@ export function colorToString(color: number): string {
     return '#' + padding + hex;
 }
 
+export function stringToColor(string: string): number {
+    return parseInt(string.replace(/#/, '0x'), 16);
+}
+
 export function colorSplit(color: number) {
     const r = (color & 0xff0000) >> 16;
     const g = (color & 0x00ff00) >> 8;
