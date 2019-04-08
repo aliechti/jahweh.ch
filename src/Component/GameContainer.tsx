@@ -3,7 +3,6 @@ import * as React from 'react';
 import {gameFactory, GameOptions} from '../Function/GameFactory';
 import {DragManager} from '../Manager/DragManager';
 import {Game} from './Game';
-import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {PanContainer} from './PanContainer';
@@ -26,10 +25,6 @@ interface State {
 }
 
 export type TextureGenerator = (displayObject: DisplayObject) => RenderTexture;
-
-type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
-export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
-export type Chooser = 'random' | 'evenly';
 
 const zoomOptions: ZoomOptions = {
     min: 0.5,

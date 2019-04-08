@@ -1,6 +1,5 @@
 import * as React from 'react';
-import {GameOptions} from '../../Function/GameFactory';
-import {Chooser, Shape} from '../GameContainer';
+import {Chooser, GameOptions, Shape} from '../../Function/GameFactory';
 
 interface Props {
     options: GameOptions;

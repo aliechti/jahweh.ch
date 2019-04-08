@@ -1,5 +1,5 @@
 import {Game} from '../Component/Game';
-import {Chooser, Shape, TextureGenerator} from '../Component/GameContainer';
+import {TextureGenerator} from '../Component/GameContainer';
 import {HexagonProps} from '../Component/Hexagon';
 import {HexagonGridGenerator} from '../Component/HexagonGridGenerator';
 import {PlayerStatsProps} from '../Component/Overlay/GamePanel/PlayerStats';
@@ -24,6 +24,10 @@ export interface GameOptions {
     rows: number;
     radius: number;
 }
+
+type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
+export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
+export type Chooser = 'random' | 'evenly';
 
 export function gameFactory(props: GameFactoryProps): Game {
     const {options, textureGenerator, dragManager, onUpdatePanel, onWin} = props;
