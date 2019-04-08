@@ -10,7 +10,7 @@ interface Props {
     onSetOptions: (options: GameOptions) => void;
 }
 
-const shapes: Shape[] = ['rectangle', 'rhombus', 'ring', 'spiral', 'load'];
+const shapes: Shape[] = ['rectangle', 'rhombus', 'ring', 'hexagon', 'load'];
 const playerPickers: PlayerPicker[] = ['random', 'even'];
 
 export class Start extends React.Component<Props> {
@@ -42,7 +42,7 @@ export class Start extends React.Component<Props> {
                             })}
                         </select>
                         {options.shape === 'load' ? '' :
-                            options.shape === 'spiral' || options.shape === 'ring'
+                            options.shape === 'hexagon' || options.shape === 'ring'
                                 ? <>
                                     <label>Radius</label>
                                     <input value={options.radius}

@@ -68,7 +68,7 @@ export class HexagonGridGenerator {
         return grid;
     }
 
-    public spiral(radius: number): HexagonGrid {
+    public hexagon(radius: number): HexagonGrid {
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
         grid.set(this.generateField(center, 0));

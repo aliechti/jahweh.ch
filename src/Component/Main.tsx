@@ -23,7 +23,7 @@ export class Main extends React.Component<Props, State> {
             active: 'start',
             options: {
                 players: this.props.players,
-                shape: 'spiral',
+                shape: 'hexagon',
                 playerPicker: 'even',
                 columns: 10,
                 rows: 10,

@@ -58,7 +58,7 @@ export function gameFactory(props: GameFactoryProps): Game {
             throw 'could not load saved grid';
         }
         grid = generator[options.shape](savedGrid);
-    } else if (options.shape === 'spiral' || options.shape === 'ring') {
+    } else if (options.shape === 'hexagon' || options.shape === 'ring') {
         grid = generator[options.shape](options.radius);
         chooser(grid, playerManager.players);
     } else {
