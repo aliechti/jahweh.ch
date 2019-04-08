@@ -28,14 +28,6 @@ export interface SavedField extends AxialCoordinates {
     p: number;
 }
 
-export interface ChooserProps {
-    axial: AxialCoordinates;
-    playerCount: number;
-    fieldCount: number;
-}
-
-export type PlayerChooser = (props: ChooserProps) => number | undefined;
-
 export class HexagonGridGenerator {
     public readonly props: HexagonGridProps;
     public calculation: HexagonCalculation;
@@ -45,48 +37,44 @@ export class HexagonGridGenerator {
         this.calculation = HexagonGridGenerator.toHexagonCalculation(props.hexagonProps);
     }
 
-    public rectangle(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
-        const fieldCount = columns * rows;
+    public rectangle(columns: number, rows: number): HexagonGrid {
         const grid = new HexagonGrid();
         for (let y = 0; y < rows; y++) {
             for (let x = 0; x < columns; x++) {
                 const axial = offsetToAxial({x, y});
-                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
+                grid.set(this.generateField(axial, 0));
             }
         }
         return grid;
     }
 
-    public rhombus(columns: number, rows: number, getPlayer: PlayerChooser): HexagonGrid {
-        const fieldCount = columns * rows;
+    public rhombus(columns: number, rows: number): HexagonGrid {
         const grid = new HexagonGrid();
         for (let r = 0; r < rows; r++) {
             for (let q = 0; q < columns; q++) {
                 const axial = {q, r};
-                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
+                grid.set(this.generateField(axial, 0));
             }
         }
         return grid;
     }
 
-    public ring(radius: number, getPlayer: PlayerChooser): HexagonGrid {
-        const fieldCount = radius * 6;
+    public ring(radius: number): HexagonGrid {
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
         for (const axial of ring(radius, center)) {
-            this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
+            grid.set(this.generateField(axial, 0));
         }
         return grid;
     }
 
-    public spiral(radius: number, getPlayer: PlayerChooser): HexagonGrid {
-        const fieldCount = 3 * radius * (radius + 1) + 1;
+    public spiral(radius: number): HexagonGrid {
         const grid = new HexagonGrid();
         const center = offsetToAxial({x: radius, y: radius});
-        this.setFieldToGrid({axial: center, fieldCount}, grid, getPlayer);
+        grid.set(this.generateField(center, 0));
         for (let i = 1; i <= radius; i++) {
             for (const axial of ring(i, center)) {
-                this.setFieldToGrid({axial, fieldCount}, grid, getPlayer);
+                grid.set(this.generateField(axial, 0));
             }
         }
         return grid;
@@ -112,20 +100,6 @@ export class HexagonGridGenerator {
             });
         }
         return savedGrid;
-    }
-
-    private setFieldToGrid(
-        props: Pick<ChooserProps, 'axial' | 'fieldCount'>,
-        grid: HexagonGrid,
-        getPlayer: PlayerChooser,
-    ) {
-        const {axial} = props;
-        const {players} = this.props;
-        const index = getPlayer({...props, playerCount: players.length});
-        if (index !== undefined) {
-            const field = this.generateField(axial, index);
-            grid.set(field);
-        }
     }
 
     private generateField(axial: AxialCoordinates, playerIndex: number): HexagonField {

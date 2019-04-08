@@ -6,7 +6,7 @@ import {PlayerStatsProps} from '../Component/Overlay/GamePanel/PlayerStats';
 import {DragManager} from '../Manager/DragManager';
 import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
-import {chooserRandom, generateEvenlyChooser} from './Generator';
+import {playerPickerEven, playerPickerRandom} from './Generator';
 
 interface GameFactoryProps {
     options: GameOptions,
@@ -43,21 +43,23 @@ export function gameFactory(props: GameFactoryProps): Game {
     });
     let chooser;
     if (options.chooser === 'evenly') {
-        chooser = generateEvenlyChooser(0, playerManager.players);
+        chooser = playerPickerEven;
     } else {
-        chooser = chooserRandom;
+        chooser = playerPickerRandom;
     }
     let grid;
-    if (options.shape === 'spiral' || options.shape === 'ring') {
-        grid = generator[options.shape](options.radius, chooser);
-    } else if (options.shape === 'load') {
+    if (options.shape === 'load') {
         const savedGrid = JSON.parse(localStorage.getItem('savedGrid') || '');
         if (!Array.isArray(savedGrid)) {
             throw 'could not load saved grid';
         }
         grid = generator[options.shape](savedGrid);
+    } else if (options.shape === 'spiral' || options.shape === 'ring') {
+        grid = generator[options.shape](options.radius);
+        chooser(grid, playerManager.players);
     } else {
-        grid = generator[options.shape](options.columns, options.rows, chooser);
+        grid = generator[options.shape](options.columns, options.rows);
+        chooser(grid, playerManager.players);
     }
     console.info('grid', JSON.stringify(HexagonGridGenerator.save(grid, playerManager.players)));
     const unitTypeManager = new UnitTypeManager({textureGenerator});

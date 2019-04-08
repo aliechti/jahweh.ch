@@ -1,11 +1,14 @@
-import {ChooserProps, PlayerChooser} from '../Component/HexagonGridGenerator';
+import {HexagonGrid} from '../Component/HexagonGrid';
 import {Player} from '../Manager/PlayerManager';
 
-export const chooserRandom: PlayerChooser = (props) => {
-    return Math.floor(Math.random() * Math.floor(props.playerCount));
+export const playerPickerRandom = (grid: HexagonGrid, players: Player[]) => {
+    for (const field of grid.fields()) {
+        const index = Math.floor(Math.random() * Math.floor(players.length));
+        field.player = players[index];
+    }
 };
 
-export const generateEvenlyChooser = (emptyPercentage: number, players: Player[]): PlayerChooser => {
+export const playerPickerEven = (grid: HexagonGrid, players: Player[]) => {
     function shuffleArray(array: any[]) {
         for (let i = 0; i < array.length; i++) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -13,24 +16,16 @@ export const generateEvenlyChooser = (emptyPercentage: number, players: Player[]
         }
     }
 
-    // todo: emptyPercentage should not create islands
-    const fill: (number | undefined)[] = [];
-
-    function generateFill(props: ChooserProps) {
-        const emptyCount = props.fieldCount / 100 * emptyPercentage;
-        const fieldCount = props.fieldCount - emptyCount;
-        fill.push(...Array(Math.floor(emptyCount)).fill(null));
-        for (const i in players) {
-            fill.push(...Array(Math.floor(fieldCount / players.length)).fill(i));
-        }
-        shuffleArray(fill);
+    const fields = Array.from(grid.fields());
+    const fieldsPerPlayer = Math.floor(fields.length / players.length);
+    for (let i = fieldsPerPlayer * players.length; i < fields.length; i++) {
+        grid.delete(fields[i]);
+        fields.splice(i, 1);
     }
-
-    let i = 0;
-    return (props) => {
-        if (i === 0) {
-            generateFill(props);
+    shuffleArray(fields);
+    for (let i = 0; i < players.length; i++) {
+        for (let j = 0; j < fieldsPerPlayer; j++) {
+            fields[i * fieldsPerPlayer + j].player = players[i];
         }
-        return fill[i++] || undefined;
-    };
+    }
 };
