@@ -18,4 +18,8 @@ $row-columns: 12;
         @extend .col;
         flex-basis: percentage($i / $row-columns);
     }
+    .max-#{$i} {
+        @extend .col;
+        max-width: percentage($i / $row-columns);
+    }
 }

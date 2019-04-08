@@ -17,7 +17,7 @@ export class Start extends React.Component<Props> {
         return (
             <div className="full background-dim row scrollable">
                 <div className="center">
-                    <div style={{minWidth: '10rem', maxWidth: '22rem'}}>
+                    <div style={{minWidth: '10rem', maxWidth: '25rem'}}>
                         <OptionsSelector options={options} onSetOptions={onSetOptions}/>
                         <div className="row" style={{marginTop: '0.5rem'}}>
                             <div className="col" style={{textAlign: 'center', marginTop: '0.5rem'}}>

@@ -26,10 +26,19 @@ export class PlayerSelector extends React.Component<Props> {
         onSetPlayerProps(playerProps);
     };
 
+    private handleRemovePlayer = (player: PlayerProps) => {
+        const {playerProps, onSetPlayerProps} = this.props;
+        const index = playerProps.indexOf(player);
+        if (index !== -1) {
+            playerProps.splice(index, 1);
+        }
+        onSetPlayerProps(playerProps);
+    };
+
     renderPlayer = (player: PlayerProps, index: number) => {
         return (
-            <div className="row" key={index}>
-                <div className="col-auto">
+            <div className="row" key={index} style={{flexWrap: 'nowrap'}}>
+                <div className="col-8">
                     <select
                         value={player.actor}
                         onChange={(e) => this.handleSetPlayer(player, 'actor', e.target.value)}
@@ -39,13 +48,18 @@ export class PlayerSelector extends React.Component<Props> {
                         })}
                     </select>
                 </div>
-                <div className="col-auto">
+                <div className="col-2 max-2">
                     <input
                         type="color"
                         value={colorToString(player.color)}
                         onChange={(e) => this.handleSetPlayer(player, 'color', stringToColor(e.target.value))}
                     />
                 </div>
+                {index > 1 ?
+                    <div className="col-2">
+                        <button onClick={() => this.handleRemovePlayer(player)}>x</button>
+                    </div>
+                    : ''}
             </div>
         );
     };
