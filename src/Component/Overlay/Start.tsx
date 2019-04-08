@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {Chooser, GameOptions, Shape} from '../../Function/GameFactory';
+import {GameOptions, PlayerPicker, Shape} from '../../Function/GameFactory';
 
 interface Props {
     options: GameOptions;
@@ -11,7 +11,7 @@ interface Props {
 }
 
 const shapes: Shape[] = ['rectangle', 'rhombus', 'ring', 'spiral', 'load'];
-const choosers: Chooser[] = ['random', 'evenly'];
+const playerPickers: PlayerPicker[] = ['random', 'even'];
 
 export class Start extends React.Component<Props> {
 
@@ -34,10 +34,10 @@ export class Start extends React.Component<Props> {
                                 return <option key={shape} value={shape}>{shape}</option>;
                             })}
                         </select>
-                        <label>Chooser</label>
-                        <select value={options.chooser}
-                                onChange={(e) => this.handleSetOption('chooser', e.target.value)}>
-                            {choosers.map((chooser) => {
+                        <label>Player picker</label>
+                        <select value={options.playerPicker}
+                                onChange={(e) => this.handleSetOption('playerPicker', e.target.value)}>
+                            {playerPickers.map((chooser) => {
                                 return <option key={chooser} value={chooser}>{chooser}</option>;
                             })}
                         </select>

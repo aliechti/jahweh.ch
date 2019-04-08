@@ -19,7 +19,7 @@ interface GameFactoryProps {
 export interface GameOptions {
     players: PlayerProps[];
     shape: Shape;
-    chooser: Chooser;
+    playerPicker: PlayerPicker;
     columns: number;
     rows: number;
     radius: number;
@@ -27,7 +27,7 @@ export interface GameOptions {
 
 type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : never }[keyof T];
 export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
-export type Chooser = 'random' | 'evenly';
+export type PlayerPicker = 'random' | 'even';
 
 export function gameFactory(props: GameFactoryProps): Game {
     const {options, textureGenerator, dragManager, onUpdatePanel, onWin} = props;
@@ -46,7 +46,7 @@ export function gameFactory(props: GameFactoryProps): Game {
         hexagonProps: hexagonProps,
     });
     let chooser;
-    if (options.chooser === 'evenly') {
+    if (options.playerPicker === 'even') {
         chooser = playerPickerEven;
     } else {
         chooser = playerPickerRandom;

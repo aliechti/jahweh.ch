@@ -24,7 +24,7 @@ export class Main extends React.Component<Props, State> {
             options: {
                 players: this.props.players,
                 shape: 'spiral',
-                chooser: 'evenly',
+                playerPicker: 'even',
                 columns: 10,
                 rows: 10,
                 radius: 4,
