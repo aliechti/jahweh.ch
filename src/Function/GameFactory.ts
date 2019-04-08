@@ -7,7 +7,6 @@ import {DragManager} from '../Manager/DragManager';
 import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {chooserRandom, generateEvenlyChooser} from './Generator';
-import Point = PIXI.Point;
 
 interface GameFactoryProps {
     options: GameOptions,
@@ -70,10 +69,6 @@ export function gameFactory(props: GameFactoryProps): Game {
     });
     // Drag/pan handlers
     game.interactive = true;
-    // Set game anchor to center
-    const anchorX = game.width / game.scale.x * 0.5;
-    const anchorY = game.height / game.scale.y * 0.5;
-    game.pivot = new Point(anchorX, anchorY);
     // Init actors
     for (const player of playerManager.players) {
         player.actor.init({

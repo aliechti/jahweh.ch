@@ -8,6 +8,7 @@ import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {PanContainer} from './PanContainer';
 import {Unit} from './Unit';
+import {ZoomContainer, ZoomOptions} from './ZoomContainer';
 import DisplayObject = PIXI.DisplayObject;
 import Point = PIXI.Point;
 import RenderTexture = PIXI.RenderTexture;
@@ -30,7 +31,7 @@ type FunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? K : ne
 export type Shape = FunctionPropertyNames<HexagonGridGenerator>;
 export type Chooser = 'random' | 'evenly';
 
-const zoomOptions = {
+const zoomOptions: ZoomOptions = {
     min: 0.5,
     max: 2,
     steps: 0.1,
@@ -40,11 +41,12 @@ export class GameContainer extends React.Component<Props, State> {
     private readonly canvasContainer: React.RefObject<HTMLDivElement>;
     private readonly dragContainer: React.RefObject<HTMLDivElement>;
     private readonly panelContainer: React.RefObject<HTMLDivElement>;
-    private app: Application;
-    private game: Game;
     private dragManager: DragManager;
     private textureGenerator: TextureGenerator;
-    private _zoom: number;
+    private app: Application;
+    private game: Game;
+    private zoomContainer: ZoomContainer;
+    private panContainer: PanContainer;
 
     constructor(props: any) {
         super(props);
@@ -72,8 +74,19 @@ export class GameContainer extends React.Component<Props, State> {
         });
         // Resize handler
         window.addEventListener('resize', this.handleResize);
-        // Zoom scroll wheel handler
-        window.addEventListener('wheel', this.handleScroll);
+        // Zoom & pan containers
+        this.panContainer = new PanContainer({
+            shouldStart: (e) => {
+                // Don't allow pan start if something is dragging or a movable unit is clicked
+                const isDragging = this.dragManager.getDragging();
+                const isMovableUnit = e.target instanceof Unit && e.target.canMove;
+                return !isDragging && !isMovableUnit;
+            },
+        });
+        this.zoomContainer = new ZoomContainer({options: zoomOptions});
+        this.panContainer.addChild(this.zoomContainer);
+        this.app.stage.addChild(this.panContainer);
+        window.addEventListener('wheel', this.handleScrollZoom);
         // Start
         this.handleStartGame();
     }
@@ -81,7 +94,7 @@ export class GameContainer extends React.Component<Props, State> {
     componentWillUnmount() {
         this.app.stop();
         window.removeEventListener('resize', this.handleResize);
-        window.removeEventListener('wheel', this.handleScroll);
+        window.removeEventListener('wheel', this.handleScrollZoom);
     }
 
     componentDidUpdate(prevProps: Readonly<Props>, prevState: Readonly<State>, snapshot?: any): void {
@@ -101,19 +114,13 @@ export class GameContainer extends React.Component<Props, State> {
         this.app.renderer.resize(window.innerWidth, window.innerHeight);
     };
 
-    private handleScroll = (e: WheelEvent) => {
-        if (e.deltaY > 0) {
-            // out
-            this.zoom -= this.zoom * zoomOptions.steps;
-        } else {
-            // in
-            this.zoom += this.zoom * zoomOptions.steps;
-        }
+    private handleScrollZoom = (e: WheelEvent) => {
+        this.zoomContainer.handleScrollZoom(e);
+        this.dragManager.zoom = this.zoomContainer.zoom;
     };
 
     private handleStartGame = () => {
         const {options} = this.props;
-        this.app.stage.removeChildren();
         const game = this.game = gameFactory({
             options,
             dragManager: this.dragManager,
@@ -121,16 +128,6 @@ export class GameContainer extends React.Component<Props, State> {
             onUpdatePanel: this.handlePanelUpdate,
             onWin: this.handleExitGame,
         });
-        this.zoom = 1;
-        const panContainer = new PanContainer({
-            shouldStart: (e) => {
-                // Don't allow pan start if something is dragging or a movable unit is clicked
-                const isDragging = this.dragManager.getDragging();
-                const isMovableUnit = e.target instanceof Unit && e.target.canMove;
-                return !isDragging && !isMovableUnit;
-            },
-        });
-        panContainer.addChild(game);
         game.start();
         // Game must be started to get the panel width
         this.setState({isStarted: true}, () => {
@@ -139,8 +136,13 @@ export class GameContainer extends React.Component<Props, State> {
             if (this.panelContainer.current) {
                 panelWidth = this.panelContainer.current.offsetWidth;
             }
-            game.position = new Point((this.app.renderer.width - panelWidth) / 2, this.app.renderer.height / 2);
-            this.app.stage.addChild(panContainer);
+            const panX = (this.app.renderer.width - panelWidth) / 2;
+            const panY = this.app.renderer.height / 2;
+            this.panContainer.position = new Point(panX, panY);
+            this.zoomContainer.addChild(game);
+            const anchorX = this.zoomContainer.width * 0.5;
+            const anchorY = this.zoomContainer.height * 0.5;
+            this.zoomContainer.pivot = new Point(anchorX, anchorY);
         });
     };
 
@@ -156,16 +158,6 @@ export class GameContainer extends React.Component<Props, State> {
     private handlePanelUpdate = (playerStatsProps: PlayerStatsProps) => {
         this.setState({playerStatsProps});
     };
-
-    get zoom(): number {
-        return this._zoom;
-    }
-
-    set zoom(value: number) {
-        this._zoom = Math.min(Math.max(value, zoomOptions.min), zoomOptions.max);
-        this.game.scale = new Point(this._zoom, this._zoom);
-        this.dragManager.zoom = this._zoom;
-    }
 
     renderPanel() {
         const {playerStatsProps} = this.state;
