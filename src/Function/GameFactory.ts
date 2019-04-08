@@ -4,9 +4,10 @@ import {HexagonProps} from '../Component/Hexagon';
 import {HexagonGridGenerator} from '../Component/HexagonGridGenerator';
 import {PlayerStatsProps} from '../Component/Overlay/GamePanel/PlayerStats';
 import {DragManager} from '../Manager/DragManager';
-import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
+import {PlayerManager} from '../Manager/PlayerManager';
 import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {playerPickerEven, playerPickerRandom} from './Generator';
+import {playerFactory, PlayerProps} from './PlayerFactory';
 
 interface GameFactoryProps {
     options: GameOptions,
@@ -36,11 +37,12 @@ export function gameFactory(props: GameFactoryProps): Game {
         lineWidth: 2,
         lineColor: 0x000000,
     };
-    const playerManager = new PlayerManager({
-        players: options.playerProps,
+    const players = playerFactory({
+        playerProps: options.playerProps,
         hexagonProps,
         textureGenerator,
     });
+    const playerManager = new PlayerManager(players);
     const generator = new HexagonGridGenerator({
         players: playerManager.players,
         hexagonProps: hexagonProps,

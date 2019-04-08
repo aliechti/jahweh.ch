@@ -1,9 +1,7 @@
 import * as React from 'react';
 import readme from '../../README.md';
-import {Human} from '../Actor/Human';
-import {SimpleAI} from '../Actor/SimpleAI';
 import {GameOptions} from '../Function/GameFactory';
-import {PlayerProps} from '../Manager/PlayerManager';
+import {PlayerProps} from '../Function/PlayerFactory';
 import {GameContainer} from './GameContainer';
 import {Start} from './Overlay/Start';
 
@@ -19,19 +17,19 @@ interface State {
 const defaultPlayerProps: PlayerProps[] = [
     {
         color: 0xff0088,
-        actor: new Human(),
+        actor: 'human',
     },
     {
         color: 0xff8800,
-        actor: new SimpleAI(),
+        actor: 'simpleAi',
     },
     {
         color: 0xffff00,
-        actor: new SimpleAI(),
+        actor: 'simpleAi',
     },
     {
         color: 0x00ffff,
-        actor: new SimpleAI(),
+        actor: 'simpleAi',
     },
 ];
 

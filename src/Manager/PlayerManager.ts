@@ -1,27 +1,15 @@
 import {Game} from '../Component/Game';
-import {TextureGenerator} from '../Component/GameContainer';
-import {Hexagon, HexagonProps} from '../Component/Hexagon';
 import {OnClickPanelUnitType} from '../Component/Overlay/GamePanel/UnitShop';
 import {Territory} from '../Component/Territory';
 import {DragManager} from './DragManager';
-import Point = PIXI.Point;
 import Texture = PIXI.Texture;
 
-interface Props {
-    players: PlayerProps[];
-    hexagonProps: Pick<HexagonProps, 'radius' | 'lineWidth' | 'lineColor'>;
-    textureGenerator: TextureGenerator;
-}
-
-export interface PlayerProps {
-    color: number;
-    actor: Actor;
-}
-
-export interface Player extends PlayerProps {
+export interface Player {
     id: number;
     hexagonTexture: Texture;
     territories: Territory[];
+    color: number;
+    actor: Actor;
 }
 
 export interface ActorProps {
@@ -40,12 +28,10 @@ export interface Actor {
 }
 
 export class PlayerManager {
-    private props: Props;
     public players: Player[];
 
-    constructor(props: Props) {
-        this.props = props;
-        this.players = this.generatePlayers(props.players);
+    constructor(players: Player[]) {
+        this.players = players;
     }
 
     public first(): Player {
@@ -62,26 +48,5 @@ export class PlayerManager {
         if (index !== -1) {
             this.players.splice(index, 1);
         }
-    }
-
-    private generatePlayers(playerProps: PlayerProps[]): Player[] {
-        const players: Player[] = [];
-        for (const [id, player] of playerProps.entries()) {
-            players.push({
-                ...player,
-                id,
-                territories: [],
-                hexagonTexture: this.generateHexagonTexture(player.color),
-            });
-        }
-        return players;
-    }
-
-    private generateHexagonTexture(color: number): Texture {
-        const {textureGenerator, hexagonProps} = this.props;
-        const hexagonTemplate = new Hexagon({...hexagonProps, fillColor: color});
-        const texture = textureGenerator(hexagonTemplate);
-        texture.defaultAnchor = new Point(0.5, 0.5);
-        return texture;
     }
 }
