@@ -180,18 +180,9 @@ export class GameContainer extends React.Component<Props, State> {
         const {state} = this.props;
         return (
             <>
-                <div className="canvas-container" ref={this.canvasContainer}/>
+                <div ref={this.canvasContainer}/>
                 {state === 'start' ? this.renderPanel() : ''}
-                <div className="drag-container click-trough"
-                     style={{
-                         position: 'absolute',
-                         transformOrigin: 'top left',
-                         top: '0',
-                         left: '0',
-                         width: '100%',
-                         height: '100%',
-                     }}
-                     ref={this.dragContainer}/>
+                <div className="full click-trough" ref={this.dragContainer}/>
             </>
         );
     }
