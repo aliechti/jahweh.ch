@@ -1,11 +1,8 @@
 import {Application} from 'pixi.js';
 import * as React from 'react';
-import {chooserRandom, generateEvenlyChooser} from '../Function/Generator';
+import {gameFactory, GameOptions} from '../Function/GameFactory';
 import {DragManager} from '../Manager/DragManager';
-import {PlayerManager, PlayerProps} from '../Manager/PlayerManager';
-import {UnitTypeManager} from '../Manager/UnitTypeManager';
 import {Game} from './Game';
-import {HexagonProps} from './Hexagon';
 import {HexagonGridGenerator} from './HexagonGridGenerator';
 import {GamePanel} from './Overlay/GamePanel/GamePanel';
 import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
@@ -17,7 +14,6 @@ import RenderTexture = PIXI.RenderTexture;
 import SCALE_MODES = PIXI.SCALE_MODES;
 
 interface Props {
-    players: PlayerProps[];
     options: GameOptions;
     state: 'start' | 'pause';
     handleExit: () => void;
@@ -26,14 +22,6 @@ interface Props {
 interface State {
     playerStatsProps?: PlayerStatsProps;
     isStarted: boolean;
-}
-
-export interface GameOptions {
-    shape: Shape;
-    chooser: Chooser;
-    columns: number;
-    rows: number;
-    radius: number;
 }
 
 export type TextureGenerator = (displayObject: DisplayObject) => RenderTexture;
@@ -126,69 +114,20 @@ export class GameContainer extends React.Component<Props, State> {
     private handleStartGame = () => {
         const {options} = this.props;
         this.app.stage.removeChildren();
-        const hexagonProps: HexagonProps = {
-            radius: 25,
-            lineWidth: 2,
-            lineColor: 0x000000,
-        };
-        const playerManager = new PlayerManager({
-            players: this.props.players,
-            hexagonProps: hexagonProps,
+        const game = this.game = gameFactory({
+            options,
+            dragManager: this.dragManager,
             textureGenerator: this.textureGenerator,
-        });
-        const generator = new HexagonGridGenerator({
-            players: playerManager.players,
-            hexagonProps: hexagonProps,
-        });
-        let chooser;
-        if (options.chooser === 'evenly') {
-            chooser = generateEvenlyChooser(0, playerManager.players);
-        } else {
-            chooser = chooserRandom;
-        }
-        let grid;
-        if (options.shape === 'spiral' || options.shape === 'ring') {
-            grid = generator[options.shape](options.radius, chooser);
-        } else if (options.shape === 'load') {
-            const savedGrid = JSON.parse(localStorage.getItem('savedGrid') || '');
-            if (!Array.isArray(savedGrid)) {
-                console.error('could not load saved grid');
-                return;
-            }
-            grid = generator[options.shape](savedGrid);
-        } else {
-            grid = generator[options.shape](options.columns, options.rows, chooser);
-        }
-        console.info('grid', JSON.stringify(HexagonGridGenerator.save(grid, playerManager.players)));
-        const unitTypeManager = new UnitTypeManager({textureGenerator: this.textureGenerator});
-        const game = this.game = new Game({
-            grid,
-            playerManager,
-            unitTypeManager,
+            onUpdatePanel: this.handlePanelUpdate,
             onWin: this.handleExitGame,
         });
         this.zoom = 1;
-        // Drag/pan handlers
-        game.interactive = true;
         game.on('mousedown', this.handleGamePanStart);
         game.on('mouseup', this.handleGamePanEnd);
         game.on('mouseupoutside', this.handleGamePanEnd);
         game.on('touchstart', this.handleGamePanStart);
         game.on('touchend', this.handleGamePanEnd);
         game.on('touchendoutside', this.handleGamePanEnd);
-        // Set game anchor to center
-        const anchorX = game.width / game.scale.x * 0.5;
-        const anchorY = game.height / game.scale.y * 0.5;
-        game.pivot = new Point(anchorX, anchorY);
-        // Init actors and start game
-        for (const player of playerManager.players) {
-            player.actor.init({
-                player,
-                game,
-                dragManager: this.dragManager,
-                updatePanel: (props) => this.handlePanelUpdate({player, territory: props.territory}),
-            });
-        }
         game.start();
         // Game must be started to get the panel width
         this.setState({isStarted: true}, () => {

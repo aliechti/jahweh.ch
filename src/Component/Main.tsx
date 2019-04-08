@@ -1,7 +1,8 @@
 import * as React from 'react';
 import readme from '../../README.md';
+import {GameOptions} from '../Function/GameFactory';
 import {PlayerProps} from '../Manager/PlayerManager';
-import {GameContainer, GameOptions} from './GameContainer';
+import {GameContainer} from './GameContainer';
 import {Start} from './Overlay/Start';
 
 interface Props {
@@ -21,6 +22,7 @@ export class Main extends React.Component<Props, State> {
         this.state = {
             active: 'start',
             options: {
+                players: this.props.players,
                 shape: 'spiral',
                 chooser: 'evenly',
                 columns: 10,
@@ -72,7 +74,6 @@ export class Main extends React.Component<Props, State> {
                 {page}
                 {gameState ?
                     <GameContainer
-                        players={this.props.players}
                         options={options}
                         state={gameState}
                         handleExit={() => this.setState({gameState: 'pause', active: 'start'})}
