@@ -1,3 +1,8 @@
+:root {
+    --input-p-x: 0.6rem;
+    --input-p-y: 0.2rem;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -16,7 +21,7 @@ html, body, input, select, button {
 }
 
 input, select, button {
-    padding: 0.2rem 0.6rem;
+    padding: var(--input-p-y) var(--input-p-x);
     color: #000;
     background-color: #fff;
     border: 1px solid #000;
@@ -28,6 +33,10 @@ input, select {
 
 input[type="color"] {
     height: 100%;
+}
+
+select {
+    padding-bottom: calc(var(--input-p-y) - 1px);
 }
 
 button {
