@@ -1,5 +1,5 @@
 import {Territory} from '../Component/Territory';
-import {Unit} from '../Component/Unit';
+import {Unit, UnitType} from '../Component/Unit';
 import {Actor, ActorProps} from '../Manager/PlayerManager';
 
 export class SimpleAI implements Actor {
@@ -52,10 +52,8 @@ export class SimpleAI implements Actor {
             const purchasableTypes = unitTypeManager.units.filter((type) => {
                 return type.isBuildable
                     && type.isMovable
-                    && type.cost <= territory.money
                     && type.strength > requiredStrength
-                    // Prevent bankruptcy by not buy the unit if the salaries are bigger than the income
-                    && type.salary + territory.salaries() <= territory.income();
+                    && this.isAffordable(territory, type, 1);
             });
             const unitType = purchasableTypes.shift();
             console.log('buy unit', unitType, requiredStrength, purchasableTypes);
@@ -68,6 +66,25 @@ export class SimpleAI implements Actor {
             console.timeEnd('buy-units ' + game.player.id);
         }
     };
+
+    private isAffordable(territory: Territory, type: UnitType, turns: number) {
+        const money = territory.money - type.cost;
+        // Not enough money
+        if (money < 0) {
+            return false;
+        }
+        // Prevent bankruptcy by not buy the unit if the salaries are bigger than the income
+        const salaries = type.salary + territory.salaries();
+        const income = territory.income() - salaries;
+        // Has enough income to keep the unit
+        if (income >= 0) {
+            return true;
+        }
+        const moneyAtTurn = money + income * turns;
+        // Can at least keep it up for [turns]
+        return moneyAtTurn >= 0;
+
+    }
 
     private moveUnits = (units: Unit[], territory: Territory) => {
         const {map, movementManager, player} = this.props.game;
