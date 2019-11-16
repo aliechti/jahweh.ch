@@ -14,6 +14,7 @@ export class OptionsSelector extends React.Component<Props> {
 
     private handleSetOption = (name: keyof GameOptions, value: any) => {
         const {options, onSetOptions} = this.props;
+        // @ts-ignore
         options[name] = value;
         onSetOptions(options);
     };

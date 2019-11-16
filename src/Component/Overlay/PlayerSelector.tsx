@@ -13,6 +13,7 @@ export class PlayerSelector extends React.Component<Props> {
 
     private handleSetPlayer = (player: PlayerProps, name: keyof PlayerProps, value: any) => {
         const {playerProps, onSetPlayerProps} = this.props;
+        // @ts-ignore
         player[name] = value;
         onSetPlayerProps(playerProps);
     };
