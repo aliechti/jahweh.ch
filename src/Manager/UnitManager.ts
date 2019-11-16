@@ -1,8 +1,8 @@
+import {Container} from 'pixi.js';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
 import {Unit, UnitType} from '../Component/Unit';
 import {UnitTypeManager} from './UnitTypeManager';
-import Container = PIXI.Container;
 
 interface Props {
     unitTypeManager: UnitTypeManager;

@@ -1,12 +1,10 @@
+import {Container, Graphics, Polygon} from 'pixi.js';
 import {HexagonField} from '../Component/HexagonField';
 import {Territory} from '../Component/Territory';
 import {Unit, UnitType} from '../Component/Unit';
 import {axialAdd, AxialCoordinates, axialDirections} from '../Function/Coordinates';
 import {Actor, ActorProps, Player} from '../Manager/PlayerManager';
-import Container = PIXI.Container;
-import Graphics = PIXI.Graphics;
 import InteractionEvent = PIXI.interaction.InteractionEvent;
-import Polygon = PIXI.Polygon;
 
 type InteractionHandler = (e: InteractionEvent) => void;
 

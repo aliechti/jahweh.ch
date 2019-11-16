@@ -1,10 +1,9 @@
+import {Point, Polygon} from 'pixi.js';
 import {AxialCoordinates, axialToPixel, offsetToAxial, ring} from '../Function/Coordinates';
 import {Player} from '../Manager/PlayerManager';
 import {Hexagon, HexagonProps} from './Hexagon';
 import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
-import Point = PIXI.Point;
-import Polygon = PIXI.Polygon;
 
 export interface HexagonGridProps {
     players: Player[];

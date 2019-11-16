@@ -1,4 +1,4 @@
-import {Application} from 'pixi.js';
+import {Application, DisplayObject, Point, RenderTexture, SCALE_MODES} from 'pixi.js';
 import * as React from 'react';
 import {gameFactory, GameOptions} from '../Function/GameFactory';
 import {DragManager} from '../Manager/DragManager';
@@ -8,10 +8,6 @@ import {PlayerStatsProps} from './Overlay/GamePanel/PlayerStats';
 import {PanContainer} from './PanContainer';
 import {Unit} from './Unit';
 import {ZoomContainer, ZoomOptions} from './ZoomContainer';
-import DisplayObject = PIXI.DisplayObject;
-import Point = PIXI.Point;
-import RenderTexture = PIXI.RenderTexture;
-import SCALE_MODES = PIXI.SCALE_MODES;
 
 interface Props {
     options: GameOptions;
@@ -54,7 +50,9 @@ export class GameContainer extends React.Component<Props, State> {
     }
 
     componentDidMount(): void {
-        this.app = new Application(window.innerWidth, window.innerHeight, {
+        this.app = new Application({
+            width: window.innerWidth,
+            height: window.innerHeight,
             antialias: true,
         });
         this.textureGenerator = (displayObject) => {

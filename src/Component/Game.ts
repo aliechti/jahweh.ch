@@ -1,3 +1,4 @@
+import {Container} from 'pixi.js';
 import {ExplicitContainer} from '../Interface/ExplicitContainer';
 import {MovementManager} from '../Manager/MovementManager';
 import {Player, PlayerManager} from '../Manager/PlayerManager';
@@ -8,7 +9,6 @@ import {HexagonField} from './HexagonField';
 import {HexagonGrid} from './HexagonGrid';
 import {Territory} from './Territory';
 import {Unit, UnitType} from './Unit';
-import Container = PIXI.Container;
 
 export interface GameProps {
     playerManager: PlayerManager;

@@ -1,6 +1,6 @@
+import {Container} from 'pixi.js';
 import {AxialCoordinates, axialDirections} from '../Function/Coordinates';
 import {HexagonField} from './HexagonField';
-import Container = PIXI.Container;
 
 export class HexagonGrid extends Container {
     private _fields: Map<string, HexagonField>;

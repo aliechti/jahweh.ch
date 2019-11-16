@@ -1,8 +1,8 @@
+import {Sprite} from 'pixi.js';
 import {AxialCoordinates} from '../Function/Coordinates';
 import {Player} from '../Manager/PlayerManager';
 import {Territory} from './Territory';
 import {Unit} from './Unit';
-import Sprite = PIXI.Sprite;
 
 export interface HexagonFieldProps {
     axial: AxialCoordinates;

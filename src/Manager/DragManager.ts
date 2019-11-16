@@ -1,14 +1,12 @@
+import {DisplayObject, RenderTexture} from 'pixi.js';
 import {Unit} from '../Component/Unit';
-import DisplayObject = PIXI.DisplayObject;
-import RenderTexture = PIXI.RenderTexture;
-import Texture = PIXI.Texture;
 
 interface Props {
     container: HTMLElement;
     moveEventContainer: HTMLElement;
     resolution: number;
 
-    extractImage(target?: DisplayObject | RenderTexture | Texture): HTMLImageElement;
+    extractImage(target: DisplayObject | RenderTexture): HTMLImageElement;
 }
 
 export class DragManager {
@@ -66,7 +64,7 @@ export class DragManager {
         }
         // Set currently dragging
         if (unit) {
-            const image = extractImage(unit.texture);
+            const image = extractImage(unit.texture as RenderTexture);
             image.classList.add('click-trough');
             image.style.position = 'absolute';
             this.setImageScale(image);

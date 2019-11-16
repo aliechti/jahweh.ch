@@ -1,10 +1,9 @@
+import {Point, Texture} from 'pixi.js';
 import {Human} from '../Actor/Human';
 import {SimpleAI} from '../Actor/SimpleAI';
 import {TextureGenerator} from '../Component/GameContainer';
 import {Hexagon, HexagonProps} from '../Component/Hexagon';
 import {Player} from '../Manager/PlayerManager';
-import Point = PIXI.Point;
-import Texture = PIXI.Texture;
 
 interface PlayerFactoryProps {
     playerProps: PlayerProps[];

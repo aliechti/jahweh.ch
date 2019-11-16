@@ -1,5 +1,4 @@
-import Container = PIXI.Container;
-import Point = PIXI.Point;
+import {Container, Point} from 'pixi.js';
 
 interface Props {
     options: ZoomOptions;

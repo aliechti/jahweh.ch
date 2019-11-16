@@ -1,5 +1,5 @@
-import Sprite = PIXI.Sprite;
-import Texture = PIXI.Texture;
+import {Sprite} from 'pixi.js';
+import RenderTexture = PIXI.RenderTexture;
 
 export interface UnitType {
     name: string;
@@ -8,7 +8,7 @@ export interface UnitType {
     salary: number;
     isBuildable: boolean;
     isMovable: boolean;
-    texture: Texture;
+    texture: RenderTexture;
 }
 
 export interface UnitProps {

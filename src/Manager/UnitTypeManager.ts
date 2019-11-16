@@ -1,7 +1,4 @@
-import Graphics = PIXI.Graphics;
-import Point = PIXI.Point;
-import RenderTexture = PIXI.RenderTexture;
-import Texture = PIXI.Texture;
+import {Graphics, Point, RenderTexture} from 'pixi.js';
 import {UnitType} from '../Component/Unit';
 
 interface Props {
@@ -85,7 +82,7 @@ export class UnitTypeManager {
         return {...definition, texture: this.definitionToTexture(definition.texture)};
     }
 
-    private definitionToTexture(definition: string): Texture {
+    private definitionToTexture(definition: string): RenderTexture {
         const graphics = new Graphics();
         graphics.lineStyle(1, 0x222222);
         graphics.beginFill(0x6789AB);

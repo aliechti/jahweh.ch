@@ -1,4 +1,4 @@
-import Container = PIXI.Container;
+import {Container} from 'pixi.js';
 import InteractionEvent = PIXI.interaction.InteractionEvent;
 
 interface Props {

@@ -1,8 +1,8 @@
+import {Texture} from 'pixi.js';
 import {Game} from '../Component/Game';
 import {OnClickPanelUnitType} from '../Component/Overlay/GamePanel/UnitShop';
 import {Territory} from '../Component/Territory';
 import {DragManager} from './DragManager';
-import Texture = PIXI.Texture;
 
 export interface Player {
     id: number;
