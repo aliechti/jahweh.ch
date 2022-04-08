@@ -1,7 +1,7 @@
 ## Purpose
-I've started this [project](https://github.com/thejahweh/jahweh.ch) 
-to challenge [myself](https://github.com/thejahweh) and learn new things.
-It is a game because I never made any games and wanted to do something new.
+I've started this [project](https://github.com/aliechti/jahweh.ch)
+to challenge [myself](https://github.com/aliechti) and learn new things. It is a game because I never made any games and
+wanted to do something new.
 
 ## Gameplay
 The game is playable online on my website https://jahweh.ch
